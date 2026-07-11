@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🛠️ מודול 2: עולם קלוד קוד</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#4A90E2; --purple:#7B68EE; --green:#2ECC71;
+  --bg:#eef2fb; --bg2:#e4ecfb; --card:#ffffff; --text:#2d3142; --text-soft:#5a5f7a;
+  --radius:26px; --radius-sm:16px;
+  --shadow:0 12px 30px rgba(74,144,226,0.18);
+  --shadow-soft:0 6px 16px rgba(74,144,226,0.12);
+  --code-bg:#1e2233; --code-text:#d7dcff;
+}
+body.dark{
+  --bg:#141827; --bg2:#1b2032; --card:#222842; --text:#f2f3fb; --text-soft:#b7bcda;
+  --shadow:0 12px 30px rgba(0,0,0,0.45); --shadow-soft:0 6px 16px rgba(0,0,0,0.35);
+  --code-bg:#0d0f1a; --code-text:#c7d0ff;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:'Heebo',sans-serif; background:linear-gradient(160deg,var(--bg),var(--bg2)); color:var(--text); min-height:100vh; transition:background .4s ease,color .4s ease; padding-top:126px;}
+h1,h2,h3{margin:0 0 8px 0;}
+button{font-family:'Heebo',sans-serif;cursor:pointer;border:none;outline:none;}
+code, pre, .mono{font-family:'JetBrains Mono',monospace;}
+
+.topnav{position:fixed;top:0;right:0;left:0;z-index:100;background:var(--card);box-shadow:var(--shadow-soft);padding:10px 16px 0 16px;transition:background .4s ease;}
+.topnav-row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1200px;margin:0 auto;}
+.logo{font-weight:900;font-size:1.2rem;white-space:nowrap;background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;flex-shrink:0;}
+.hub-link{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 14px;font-size:.8rem;font-weight:700;text-decoration:none;white-space:nowrap;}
+.nav-scroll{display:flex;gap:8px;overflow-x:auto;flex:1;padding:4px 2px;scrollbar-width:thin;align-items:center;}
+.nav-scroll::-webkit-scrollbar{height:6px;}
+.nav-scroll::-webkit-scrollbar-thumb{background:var(--purple);border-radius:10px;}
+.navbtn{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 13px;font-size:0.82rem;font-weight:500;white-space:nowrap;transition:all .25s ease;border:2px solid transparent;position:relative;}
+.navbtn:hover{transform:translateY(-2px) scale(1.04);}
+.navbtn.active{background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;box-shadow:var(--shadow-soft);}
+.navbtn.passed::after{content:'✓';position:absolute;top:-4px;left:-4px;background:var(--green);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
+.theme-toggle{flex-shrink:0;background:var(--bg2);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;transition:transform .3s ease;}
+.theme-toggle:hover{transform:rotate(20deg) scale(1.1);}
+.progress-wrap{max-width:1200px;margin:8px auto 0 auto;height:10px;background:var(--bg2);border-radius:999px;overflow:hidden;}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));border-radius:999px;transition:width .5s ease;}
+.progress-label{max-width:1200px;margin:4px auto 0 auto;font-size:.72rem;color:var(--text-soft);text-align:left;padding:0 4px;}
+
+.page{display:none;animation:fadeIn .5s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.page-inner{max-width:860px;margin:0 auto;padding:18px 16px 60px 16px;}
+.hero-title{font-size:clamp(1.5rem,4vw,2.3rem);font-weight:900;text-align:center;margin-bottom:6px;}
+.hero-sub{text-align:center;color:var(--text-soft);font-size:1.02rem;margin-bottom:22px;}
+.world-tag{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 12px;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--green));color:#fff;margin-bottom:10px;}
+.level-tag{display:inline-block;font-size:.7rem;font-weight:800;padding:3px 12px;border-radius:999px;background:var(--bg2);color:var(--text-soft);margin-bottom:10px;margin-right:6px;}
+
+.card{background:var(--card);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);margin-bottom:20px;}
+.explain{font-size:1.05rem;line-height:1.95;color:var(--text);}
+.explain p{margin:0 0 14px 0;}
+.explain p:last-child{margin-bottom:0;}
+.explain b, .highlight{background:linear-gradient(90deg,rgba(123,104,238,.18),rgba(46,204,113,.18));padding:2px 8px;border-radius:8px;font-weight:700;color:var(--purple);}
+body.dark .explain b, body.dark .highlight{color:#c9c2ff;}
+
+.section-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.05rem;margin:0 0 14px 0;}
+.section-title .num{background:var(--purple);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;}
+
+.demo-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.demo-label{font-weight:700;margin-bottom:12px;font-size:1rem;color:var(--text-soft);}
+
+.lab-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.code-block{position:relative;background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px 18px;overflow-x:auto;font-size:.82rem;line-height:1.7;direction:ltr;text-align:left;margin-top:10px;}
+.code-block pre{margin:0;white-space:pre;}
+.code-label{position:absolute;top:8px;left:14px;font-size:.65rem;color:#8891b8;letter-spacing:.05em;text-transform:uppercase;}
+.lab-note{font-size:.92rem;color:var(--text-soft);margin-top:10px;line-height:1.7;}
+
+textarea, input[type=text]{width:100%;font-family:'Heebo',sans-serif;font-size:1rem;padding:14px 16px;border-radius:var(--radius-sm);border:2px solid var(--bg2);background:var(--bg);color:var(--text);resize:none;transition:border .2s ease;}
+textarea:focus, input[type=text]:focus{border-color:var(--purple);}
+
+.btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;font-weight:700;font-size:0.92rem;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-soft);transition:transform .2s ease, box-shadow .2s ease;}
+.btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 26px rgba(74,144,226,.3);}
+.btn:active{transform:translateY(0) scale(.98);}
+.btn.secondary{background:var(--bg2);color:var(--text);}
+.btn.green{background:linear-gradient(90deg,var(--green),#27ae60);}
+.btn.red{background:linear-gradient(90deg,#e74c3c,#c0392b);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:10px;}
+
+.quiz-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.quiz-q{font-weight:700;margin:18px 0 10px 0;}
+.quiz-q:first-of-type{margin-top:6px;}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{background:var(--bg);border-radius:12px;padding:11px 16px;text-align:right;font-size:.95rem;border:2px solid transparent;transition:all .2s ease;}
+.quiz-opt:hover{border-color:var(--purple);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(46,204,113,.15);font-weight:700;}
+.quiz-opt.wrong{border-color:#e74c3c;background:rgba(231,76,60,.12);}
+.quiz-opt.disabled{pointer-events:none;}
+.quiz-summary{margin-top:18px;padding:14px 18px;border-radius:14px;background:var(--bg);font-weight:700;text-align:center;}
+.quiz-summary.pass{background:rgba(46,204,113,.15);color:var(--green);}
+.quiz-summary.fail{background:rgba(231,76,60,.12);color:#e74c3c;}
+
+.skill-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:16px;}
+.skill-card{background:var(--bg);border-radius:var(--radius-sm);padding:14px 8px;text-align:center;font-weight:700;font-size:.85rem;transition:all .3s ease;border:3px solid transparent;}
+.skill-card .sk-em{font-size:1.8rem;display:block;margin-bottom:6px;}
+.skill-card.match{border-color:var(--green);background:rgba(46,204,113,.15);transform:scale(1.08) translateY(-4px);box-shadow:var(--shadow-soft);}
+
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;margin-top:14px;}
+.tool-btn{background:var(--bg);border-radius:var(--radius-sm);padding:16px 8px;text-align:center;font-weight:700;font-size:.85rem;transition:all .2s ease;}
+.tool-btn:hover{transform:translateY(-3px);}
+.tool-btn .t-em{font-size:1.8rem;display:block;margin-bottom:6px;}
+.action-log{margin-top:16px;background:var(--bg);border-radius:var(--radius-sm);padding:16px;min-height:50px;font-size:.95rem;font-weight:600;text-align:center;}
+
+.mcp-stage{position:relative;height:230px;background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;}
+.mcp-node{font-size:2.2rem;text-align:center;}
+.mcp-label{font-size:.75rem;color:var(--text-soft);font-weight:700;text-align:center;margin-top:4px;}
+.app-picker{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.app-btn{background:var(--bg);border-radius:999px;padding:8px 16px;font-weight:700;font-size:.85rem;border:3px solid transparent;transition:all .2s ease;}
+.app-btn.selected{border-color:var(--purple);background:rgba(123,104,238,.15);}
+.mcp-bubble{position:absolute;top:50%;transform:translateY(-50%);background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;padding:6px 14px;border-radius:999px;font-size:.8rem;font-weight:700;opacity:0;box-shadow:var(--shadow-soft);}
+
+.sub-stage{position:relative;height:220px;background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;overflow:hidden;}
+.sub-main{position:absolute;top:50%;right:16px;transform:translateY(-50%);font-size:2.2rem;text-align:center;}
+.sub-cloud{position:absolute;top:16px;left:16px;width:140px;height:190px;border-radius:24px;background:rgba(123,104,238,.12);border:2px dashed var(--purple);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.8rem;color:var(--text-soft);font-weight:700;text-align:center;padding:8px;}
+.sub-helper{position:absolute;top:50%;right:100px;transform:translateY(-50%);font-size:1.8rem;transition:all 1s ease;}
+.sub-result{margin-top:14px;text-align:center;font-weight:700;min-height:26px;color:var(--green);}
+.sub-thought{font-size:.72rem;opacity:.7;animation:fadeOut 1.2s ease forwards;}
+@keyframes fadeOut{from{opacity:.9;}to{opacity:0;}}
+
+.slash-list{margin-top:8px;background:var(--bg);border-radius:var(--radius-sm);overflow:hidden;}
+.slash-item{padding:12px 16px;font-weight:700;cursor:pointer;transition:background .2s ease;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.slash-item:hover{background:rgba(123,104,238,.12);}
+.slash-item .sd{font-weight:400;color:var(--text-soft);font-size:.85rem;}
+.slash-effect{margin-top:14px;background:var(--bg);border-radius:var(--radius-sm);padding:20px;text-align:center;font-weight:700;min-height:60px;display:flex;align-items:center;justify-content:center;}
+
+.hook-gate{position:relative;height:230px;background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:16px;}
+.hook-guard{font-size:2.4rem;}
+.hook-question{font-weight:700;font-size:1.05rem;}
+.hook-outcome{font-weight:700;min-height:24px;}
+
+.plugin-stage{background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;padding:24px;min-height:200px;position:relative;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;}
+.plugin-item{background:var(--card);border-radius:14px;padding:14px 10px;text-align:center;font-weight:700;font-size:.8rem;box-shadow:var(--shadow-soft);transition:all .8s ease;width:80px;}
+.plugin-item .p-em{font-size:1.6rem;display:block;}
+.plugin-box{background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;border-radius:20px;padding:20px;text-align:center;font-weight:800;box-shadow:var(--shadow);display:none;}
+
+.clock-stage{background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;padding:24px;text-align:center;}
+.clock-face{font-size:3rem;transition:transform .5s ease;}
+.clock-log{margin-top:14px;text-align:right;background:var(--card);border-radius:var(--radius-sm);padding:12px 16px;min-height:100px;box-shadow:var(--shadow-soft);font-size:.9rem;}
+.clock-log div{padding:4px 0;border-bottom:1px solid var(--bg2);}
+.clock-log div:last-child{border-bottom:none;}
+.time-picker{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px;}
+.time-btn{background:var(--bg);border-radius:999px;padding:8px 16px;font-weight:700;border:3px solid transparent;transition:all .2s ease;}
+.time-btn.selected{border-color:var(--green);background:rgba(46,204,113,.15);}
+
+.finish-emoji{font-size:4rem;text-align:center;margin-bottom:10px;}
+
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:10px;}
+.lesson-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:transform .25s ease, box-shadow .25s ease;text-align:center;border:3px solid transparent;position:relative;}
+.lesson-card:hover{transform:translateY(-6px) rotate(-1deg);box-shadow:0 16px 32px rgba(74,144,226,.25);}
+.lesson-card .em{font-size:2.2rem;display:block;margin-bottom:8px;}
+.lesson-card .tt{font-weight:800;font-size:1rem;margin-bottom:4px;}
+.lesson-card .dd{font-size:.85rem;color:var(--text-soft);}
+.lesson-card.done{border-color:var(--green);}
+
+@media (max-width:600px){
+  body{padding-top:112px;}
+  .logo{font-size:1rem;}
+  .navbtn{font-size:.76rem;padding:6px 10px;}
+  .card,.demo-card,.lab-card,.quiz-card{padding:18px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="topnav-row">
+    <a class="hub-link" href="index.html">🏠 האקדמיה</a>
+    <div class="logo">🛠️ מודול 2: קלוד קוד</div>
+    <div class="nav-scroll" id="navScroll"></div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 8 הושלמו</div>
+</div>
+
+<section class="page active" id="page-home">
+  <div class="page-inner">
+    <div class="hero-title">🛠️ מודול 2: עולם קלוד קוד</div>
+    <div class="hero-sub">איך בונים סוכנים אמיתיים: Skills, Tools, MCP, Subagents, Slash Commands, Hooks, Plugins, וסוכנים אוטונומיים.</div>
+    <div class="lesson-grid" id="lessonGrid"></div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="page" id="page-skills">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ מודול 2</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🧩 Skills - יחידות יכולת הניתנות לגילוי אוטומטי</div>
+    <div class="card">
+      <div class="explain">
+        <p>Skill הוא חבילת הוראות עצמאית - תיקייה שמכילה קובץ <code>SKILL.md</code> עם YAML frontmatter ותוכן Markdown, השוכנת ב-<code>.claude/skills/&lt;name&gt;/</code> (ברמת פרויקט) או <code>~/.claude/skills/&lt;name&gt;/</code> (ברמה אישית). השדה הקריטי הוא <b>description</b>: זה בדיוק מה שקלוד קורא כדי להחליט אם הבקשה שלכם "מתאימה" לסקיל הזה - בלי שתצטרכו לקרוא לו בשם במפורש.</p>
+        <p>בניגוד לפרומפט חד-פעמי, Skill הוא <span class="highlight">קבוע וניתן לשימוש חוזר</span>: הוא נטען לתוך ההקשר רק כאשר הבקשה תואמת לתיאור שלו, מה שהופך אותו לפתרון סקיילבילי - אפשר להוסיף עשרות סקילים בלי "להציף" את קלוד בכל ההוראות בכל שיחה.</p>
+        <p>שדות מתקדמים: <code>allowed-tools</code> (מגביל אילו כלים הסקיל מורשה להשתמש בהם), <code>disable-model-invocation</code> (אם true - רק המשתמש יכול להפעיל את הסקיל במפורש), ו-<code>context: fork</code> (מריץ את הסקיל כתת-סוכן מבודד).</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: קובץ SKILL.md אמיתי</div>
+      <div class="code-block"><span class="code-label">.claude/skills/pdf-report/SKILL.md</span><pre>---
+name: pdf-report
+description: Generate formatted PDF reports from markdown
+  templates. Use when the user asks to create, compile,
+  or export a report to PDF.
+allowed-tools:
+  - Read
+  - Write
+  - Glob
+disable-model-invocation: false
+---
+# PDF Report Generator
+You are a report generation specialist. When invoked:
+1. Read the user's markdown content or template
+2. Enhance formatting, structure, and visual hierarchy
+3. Generate a polished PDF with a cover page, TOC, and
+   consistent styling</pre></div>
+      <div class="lab-note">💡 השם בשדה <code>name</code> חייב להתאים לשם התיקייה עצמה. ה-description ארוך ומפורט בכוונה - description עמום יגרום לסקיל להיות מופעל באופן לא עקבי.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">✍️ כתבו בקשה ותראו איזה סקיל "נדלק" לפי ה-description שלו:</div>
+      <input type="text" id="skillInput" oninput="matchSkills(this.value)" placeholder="לדוגמה: תעשה לי מצגת על חלל">
+      <div class="skill-grid" id="skillGrid"></div>
+    </div>
+    <div class="quiz-card" id="quiz-skills"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goHome()">🏠 חזרה למפת המודול</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section class="page" id="page-tools">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ מודול 2</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">🖐️ Tools - הממשק הפורמלי בין המודל לעולם</div>
+    <div class="card">
+      <div class="explain">
+        <p>מבחינה טכנית, "כלי" הוא פונקציה בעלת שם, תיאור, וסכימת קלט (JSON Schema) שמוגדרת לפני הקריאה למודל. כשהמודל "מחליט" להשתמש בכלי, הוא לא מריץ שום דבר בעצמו - הוא פשוט מחזיר בלוק תוכן מסוג <code>tool_use</code> עם שם הכלי וארגומנטים. ה-harness הוא זה שבפועל מריץ את הפעולה, ומחזיר את התוצאה כבלוק <code>tool_result</code> בהודעה הבאה.</p>
+        <p>קלוד קוד מגיע עם כלים מובנים כמו <b>Read</b>, <b>Write</b>/<b>Edit</b>, <b>Bash</b>, ו-<b>WebSearch</b>/<b>WebFetch</b>. כלים נוספים יכולים להגיע דרך שרתי MCP (השיעור הבא) - <span class="highlight">כלים מובנים תמיד זמינים; כלי MCP הם תוספת אופציונלית</span> שדורשת חיבור מפורש.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: איך קריאת כלי נראית בפרוטוקול עצמו</div>
+      <div class="code-block"><span class="code-label">tool_use content block</span><pre>{
+  "type": "tool_use",
+  "id": "toolu_01A...",
+  "name": "Read",
+  "input": { "file_path": "/project/README.md" }
+}
+
+// ואז ה-harness מחזיר בהודעה הבאה:
+{
+  "type": "tool_result",
+  "tool_use_id": "toolu_01A...",
+  "content": "# Welcome to the project\n..."
+}</pre></div>
+      <div class="lab-note">💡 שרשרת tool_use → tool_result היא בדיוק מה שראינו כפסאודוקוד בשיעור Agentic Loop (מודול 1) - זה לא מטאפורה, זה הפורמט המילולי שמופיע ב-messages array.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🖱️ לחצו על כלי ותראו מה קלוד "עושה" איתו בפועל:</div>
+      <div class="tool-grid" id="toolGrid"></div>
+      <div class="action-log" id="actionLog">בחרו כלי כדי לראות אותו בפעולה 👆</div>
+    </div>
+    <div class="quiz-card" id="quiz-tools"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- MCP -->
+<section class="page" id="page-mcp">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ מודול 2</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🌉 MCP - פרוטוקול תקני לחיבור כלים חיצוניים</div>
+    <div class="card">
+      <div class="explain">
+        <p>Model Context Protocol הוא תקן פתוח בארכיטקטורת <span class="highlight">client-server</span>: קלוד הוא ה-client, ו-<b>שרת MCP</b> הוא תהליך נפרד שיודע "לתרגם" בין הפרוטוקול הגנרי לבין ה-API הספציפי של שירות חיצוני (Slack, GitHub, מסד נתונים פנימי).</p>
+        <p>שרתי MCP מוגדרים בקובץ <code>.mcp.json</code>. שרת <b>מקומי (stdio)</b> מוגדר עם <code>command</code> ו-<code>args</code>. שרת <b>מרוחק (HTTP)</b> מוגדר עם <code>url</code>. שני הסוגים יכולים לקבל משתני סביבה (<code>env</code>) עם תמיכה בהרחבה מהצורה <code>${VAR}</code>, כדי שסודות לא יישמרו ישירות בקובץ ה-JSON.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: קובץ .mcp.json אמיתי</div>
+      <div class="code-block"><span class="code-label">.mcp.json</span><pre>{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_TOKEN": "${GITHUB_TOKEN}" },
+      "type": "stdio"
+    },
+    "remote-analytics": {
+      "url": "https://api.example.com/mcp",
+      "headers": { "Authorization": "Bearer ${AUTH_TOKEN}" },
+      "type": "http"
+    }
+  }
+}</pre></div>
+      <div class="lab-note">💡 שימו לב לשני הדפוסים באותו קובץ: <code>command</code>/<code>args</code> לשרת מקומי מול <code>url</code>/<code>headers</code> לשרת מרוחק.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">📱 בחרו אפליקציה ולחצו "שלח בקשה" כדי לראות את מסלול ה-MCP:</div>
+      <div class="app-picker" id="appPicker"></div>
+      <div class="api-row" style="display:flex;gap:10px;margin-top:14px;"><button class="btn" onclick="sendMcpRequest()">📨 שלח בקשה</button></div>
+      <div class="mcp-stage">
+        <div style="text-align:center;"><div class="mcp-node">🤖</div><div class="mcp-label">קלוד (client)</div></div>
+        <div style="text-align:center;"><div class="mcp-node">🌉</div><div class="mcp-label">שרת MCP</div></div>
+        <div style="text-align:center;" id="mcpAppNode"><div class="mcp-node">💬</div><div class="mcp-label">האפליקציה</div></div>
+        <div id="mcpBubble" class="mcp-bubble"></div>
+      </div>
+    </div>
+    <div class="quiz-card" id="quiz-mcp"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- SUBAGENTS -->
+<section class="page" id="page-subagents">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ מודול 2</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🕵️ Subagents - בידוד הקשר לצורך האצלה</div>
+    <div class="card">
+      <div class="explain">
+        <p>Subagent הוא מופע קלוד נפרד ומבודד - עם system prompt משלו, רשימת כלים מוגבלת (<code>tools</code> / <code>disallowedTools</code>), ולעיתים אפילו מודל אחר (<code>model</code>). כשהסוכן הראשי מאציל משימה עצמאית, ה-subagent מבצע את כל העבודה בהקשר <span class="highlight">משלו</span>, ומחזיר לסוכן הראשי רק את <b>התוצאה הסופית</b>.</p>
+        <p>זה פותר ישירות את בעיית גדילת ההקשר שראינו ב-Agentic Loop (מודול 1): אם משימת מחקר דורשת 20 חיפושי אינטרנט, כל 20 התוצאות "נחיות" בתוך ה-subagent, ולא מציפות את חלון ההקשר הראשי. זה גם מאפשר <b>התמחות</b>.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: הגדרת subagent אמיתית</div>
+      <div class="code-block"><span class="code-label">.claude/agents/code-reviewer.md</span><pre>---
+name: code-reviewer
+description: Expert code review specialist. Use when
+  reviewing pull requests or architectural changes.
+tools:
+  - Read
+  - Grep
+  - Glob
+model: sonnet
+disallowedTools:
+  - Write
+  - Edit
+  - Bash
+permissionMode: read-only
+---
+# Code Review Specialist
+You are a senior engineer performing code reviews.
+Check for bugs, performance issues, security gaps,
+and style violations. Provide actionable feedback.</pre></div>
+      <div class="lab-note">💡 שימו לב ל-<code>disallowedTools</code>: זו הגנה מפורשת - גם אם מישהו ינסה לשכנע את ה-subagent הזה לכתוב קובץ, הוא פיזית לא יכול.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🚀 לחצו לשלוח subagent למשימת חקירה:</div>
+      <div class="api-row" style="display:flex;gap:10px;margin-top:14px;"><button class="btn" onclick="sendSubagent()">🕵️ שלח subagent לחקור</button></div>
+      <div class="sub-stage">
+        <div class="sub-cloud" id="subCloud">כאן קורית כל העבודה בהקשר מבודד 🔒</div>
+        <div class="sub-main">🤖<br><span style="font-size:.7rem;">קלוד הראשי</span></div>
+        <div class="sub-helper" id="subHelper">🕵️</div>
+      </div>
+      <div class="sub-result" id="subResult"></div>
+    </div>
+    <div class="quiz-card" id="quiz-subagents"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- SLASH COMMANDS -->
+<section class="page" id="page-slash">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ מודול 2</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">⚡ Slash Commands - הפעלה מפורשת מול הפעלה אוטומטית</div>
+    <div class="card">
+      <div class="explain">
+        <p>פקודת סלאש היא הפעלה יזומה של המשתמש (מתחילה ב-<code>/</code>). ההבדל המהותי מ-Skill: <b>פקודה מוגדרת בקובץ שטוח</b> ב-<code>.claude/commands/&lt;name&gt;.md</code> ומופעלת <span class="highlight">רק</span> על ידי הקלדה מפורשת. Skill, לעומת זאת, נמצא בתיקייה עשירה יותר ויכול להיות מופעל <b>גם</b> על ידי /שם וגם באופן אוטומטי כשהתיאור שלו תואם לבקשה.</p>
+        <p>שתי תוספות מתקדמות: <code>/goal</code> - מגדיר מצב-סיום ניתן לאימות שקלוד ממשיך לעבוד לקראתו לבד בין תורות; ו-<code>/loop</code> - מריץ קלוד במחזורים חוזרים, אופציונלית עד תנאי עצירה (<code>until</code>). שני אלה הופכים אינטראקציה בודדת לתהליך עבודה מתמשך - הבסיס לשיעור הבא.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: פקודה מותאמת אישית + /goal ו-/loop</div>
+      <div class="code-block"><span class="code-label">.claude/commands/deploy.md</span><pre>---
+name: deploy
+description: Deploy the current branch to production
+---
+# Deploy
+Before deploying: run tests, check for uncommitted
+changes, confirm target environment, then execute
+the deployment script.</pre></div>
+      <div class="code-block" style="margin-top:12px;"><span class="code-label">שילוב /goal + /loop</span><pre>/goal פרוסים ל-staging וכל הבדיקות עוברות בהצלחה
+/loop until כל הבדיקות עוברות</pre></div>
+      <div class="lab-note">💡 שימו לב לניסוח ה-goal: "כל הבדיקות עוברות בהצלחה" הוא מצב הניתן לאימות.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🪄 לחצו על פקודה ותראו מה היא עושה:</div>
+      <div class="slash-list" id="slashList"></div>
+      <div class="slash-effect" id="slashEffect">בחרו פקודה למעלה 👆</div>
+    </div>
+    <div class="quiz-card" id="quiz-slash"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- HOOKS -->
+<section class="page" id="page-hooks">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ מודול 2</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🛡️ Hooks - שכבת אכיפה דטרמיניסטית</div>
+    <div class="card">
+      <div class="explain">
+        <p>Hook הוא סקריפט שרץ אוטומטית בנקודות חיים מוגדרות - <b>PreToolUse</b> (לפני הרצת כלי), <b>PostToolUse</b> (אחרי סיום הכלי), <b>UserPromptSubmit</b>, <b>Stop</b> ועוד. ה-hook מקבל JSON דרך stdin, ושולט בהתנהגות דרך <span class="highlight">קוד היציאה</span>: <code>0</code> מאשר, <code>2</code> חוסם לחלוטין.</p>
+        <p>ההבדל המהותי מ-Skill או מ-System Prompt: hook הוא <b>דטרמיניסטי</b> - הוא אוכף בקוד ברמת התשתית, ולכן לא ניתן לעקוף אותו באמצעות שכנוע (Prompt Injection).</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: hook אמיתי שחוסם rm -rf</div>
+      <div class="code-block"><span class="code-label">.claude/settings.json</span><pre>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [{
+          "type": "command",
+          "command": "bash -c 'echo \"$CLAUDE_TOOL_INPUT\" | grep -qE \"rm -rf\" && exit 2 || exit 0'"
+        }]
+      }
+    ]
+  }
+}</pre></div>
+      <div class="lab-note">💡 ה-<code>matcher</code> קובע על אילו כלים ה-hook חל. כאן: כל פקודת Bash נבדקת מול תבנית מסוכנת לפני שהיא מגיעה למעטפת.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🚦 קלוד רוצה לבצע פעולה - מה יגיד ה-hook?</div>
+      <div class="hook-gate">
+        <div class="hook-guard" id="hookGuard">🛡️</div>
+        <div class="hook-question">קלוד רוצה: "להריץ Bash: rm -rf ./old_files" 🗑️ - לאשר (exit 0) או לחסום (exit 2)?</div>
+        <div class="api-row" style="display:flex;gap:10px;">
+          <button class="btn green" onclick="hookDecide(true)">✅ exit 0 (אשר)</button>
+          <button class="btn red" onclick="hookDecide(false)">🚫 exit 2 (חסום)</button>
+        </div>
+        <div class="hook-outcome" id="hookOutcome"></div>
+      </div>
+    </div>
+    <div class="quiz-card" id="quiz-hooks"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- PLUGINS -->
+<section class="page" id="page-plugins">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ מודול 2</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">📦 Plugins - אריזה, גרסאות והפצה</div>
+    <div class="card">
+      <div class="explain">
+        <p>Plugin לא מוסיף יכולת חדשה מבחינה טכנית - כל מה שהוא מכיל (skills, hooks, MCP servers, subagents) ניתן להגדרה בנפרד תחת <code>.claude/</code>. מה ש-plugin כן מוסיף הוא <span class="highlight">גבול פורמלי</span>: שם, מספר גרסה, ומניפסט (<code>.claude-plugin/plugin.json</code>), שהופכים אוסף הגדרות אישי ל<b>יחידה ניתנת להפצה, גרסאות, והתקנה אחידה</b>.</p>
+        <p>מבנה תיקיות סטנדרטי: <code>skills/</code>, <code>agents/</code>, <code>commands/</code>, <code>.mcp.json</code>, ו-<code>hooks/</code> - כל אלה מתגלים אוטומטית. השדה החובה היחיד למניפסט מינימלי הוא <code>name</code>.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: plugin.json ומבנה תיקיות אמיתי</div>
+      <div class="code-block"><span class="code-label">.claude-plugin/plugin.json</span><pre>{
+  "name": "document-tools",
+  "version": "2.1.0",
+  "description": "PDF, DOCX, and PPTX generation tools",
+  "author": { "name": "Sarah Chen", "email": "sarah@co.com" },
+  "license": "MIT"
+}</pre></div>
+      <div class="code-block" style="margin-top:12px;"><span class="code-label">מבנה תיקיות</span><pre>my-plugin/
+├── .claude-plugin/plugin.json
+├── skills/pdf-report/SKILL.md
+├── agents/code-reviewer.md
+├── .mcp.json
+└── hooks/hooks.json</pre></div>
+      <div class="lab-note">💡 שימו לב: זו בדיוק אותה קופסה שנראה בהדגמה למטה - סקיל + hook + חיבור MCP, ארוזים תחת שם וגרסה אחת.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">📦 לחצו כדי לארוז את כל הפריטים לפלאגין אחד, ואז להתקין:</div>
+      <div class="plugin-stage" id="pluginStage">
+        <div class="plugin-item" id="pItem0"><span class="p-em">🧩</span>סקיל</div>
+        <div class="plugin-item" id="pItem1"><span class="p-em">🛡️</span>Hook</div>
+        <div class="plugin-item" id="pItem2"><span class="p-em">🌉</span>MCP</div>
+        <div class="plugin-box" id="pluginBox">📦 document-tools v2.1.0</div>
+      </div>
+      <div class="api-row" style="display:flex;gap:10px;">
+        <button class="btn" onclick="packPlugin()">📦 ארוז לפלאגין</button>
+        <button class="btn green" id="installBtn" onclick="installPlugin()" disabled>⬇️ התקן</button>
+      </div>
+      <div class="slash-effect" id="pluginMsg" style="margin-top:14px;">עדיין לא ארזתם כלום</div>
+    </div>
+    <div class="quiz-card" id="quiz-plugins"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- ALWAYS ON AGENTS -->
+<section class="page" id="page-alwayson">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ מודול 2</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">⏰ סוכנים אוטונומיים - עבודה ללא לולאת שאלה-תשובה</div>
+    <div class="card">
+      <div class="explain">
+        <p>עד כה כל השיעורים הניחו מישהו שמקליד ומחכה לתשובה. סוכנים אוטונומיים הופכים את זה: אתם מגדירים <b>תזמון</b> (cron) או <b>יעד</b> (<code>/goal</code>), וקלוד מתעורר, מבצע את המשימה בעצמו, ומדווח. זו בדיוק אותה לולאה אג'נטית שלמדנו במודול 1, רק שהטריגר לאיטרציה הראשונה הוא <span class="highlight">שעון</span> ולא הודעת משתמש.</p>
+        <p>מנגנונים מעשיים: משימות מתוזמנות (cron expression), <code>/loop</code> שרץ במחזורים חוזרים עד תנאי עצירה, ו-<code>/goal</code> שממשיך אוטומטית בין תורות עד שהמצב הרצוי מתקיים.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: תזמון בפועל</div>
+      <div class="code-block"><span class="code-label">cron expression לדוגמה</span><pre>0 8 * * *   → בכל יום בשעה 08:00
+0 9 * * 1-5 → בימי חול בלבד, בשעה 09:00</pre></div>
+      <div class="lab-note">💡 בדמו למטה כל "מחזור" מייצג ריצה מלאה של הלולאה האג'נטית.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🕗 בחרו מתי הסוכן יעבוד, ולחצו הפעלה:</div>
+      <div class="time-picker" id="timePicker"></div>
+      <div class="api-row" style="display:flex;gap:10px;">
+        <button class="btn" onclick="startClock()">▶️ הפעל סוכן</button>
+        <button class="btn secondary" onclick="stopClock()">⏸ עצור</button>
+      </div>
+      <div class="clock-stage">
+        <div class="clock-face" id="clockFace">🌙</div>
+        <div class="clock-log" id="clockLog"></div>
+      </div>
+    </div>
+    <div class="quiz-card" id="quiz-alwayson"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn green" onclick="goRelative(1)">סיימתי את המודול! 🎉</button>
+    </div>
+  </div>
+</section>
+
+<!-- FINISH -->
+<section class="page" id="page-finish">
+  <div class="page-inner">
+    <div class="finish-emoji">🎉🛠️✨</div>
+    <div class="hero-title">כל הכבוד - סיימתם את מודול 2!</div>
+    <div class="hero-sub">עכשיו יש לכם הבנה אמיתית של איך קלוד קוד בונה סוכנים - Skills, Tools, MCP, Subagents, Hooks, Plugins וסוכנים אוטונומיים.</div>
+    <div class="nav-buttons" style="justify-content:center;gap:16px;">
+      <a class="btn secondary" href="index.html" style="text-decoration:none;">🏠 חזרה לאקדמיה</a>
+      <a class="btn green" href="module3-ai-engineering.html" style="text-decoration:none;">מודול 3: הנדסת AI ⬅</a>
+    </div>
+  </div>
+</section>
+
+<script>
+const THIS_FILE = 'module2-claude-code.html';
+const PROGRESS_KEY = 'academy_progress_v1';
+function loadProgressSet(){
+  try{ return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]')); }
+  catch(e){ return new Set(); }
+}
+function markDone(unitKey){
+  const s = loadProgressSet();
+  s.add(THIS_FILE+'::'+unitKey);
+  try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(Array.from(s))); }catch(e){}
+}
+function isUnitDone(unitKey){ return loadProgressSet().has(THIS_FILE+'::'+unitKey); }
+function safeGetTheme(){ try{ return localStorage.getItem('ai-theme'); }catch(e){ return null; } }
+function safeSetTheme(v){ try{ localStorage.setItem('ai-theme', v); }catch(e){} }
+
+const topics = [
+  {key:'skills', emoji:'🧩', title:'Skills', desc:'יכולות ניתנות לגילוי'},
+  {key:'tools', emoji:'🖐️', title:'Tools', desc:'הממשק לעולם'},
+  {key:'mcp', emoji:'🌉', title:'MCP', desc:'פרוטוקול תקני'},
+  {key:'subagents', emoji:'🕵️', title:'Subagents', desc:'בידוד הקשר'},
+  {key:'slash', emoji:'⚡', title:'Slash Commands', desc:'הפעלה מפורשת'},
+  {key:'hooks', emoji:'🛡️', title:'Hooks', desc:'אכיפה דטרמיניסטית'},
+  {key:'plugins', emoji:'📦', title:'Plugins', desc:'אריזה והפצה'},
+  {key:'alwayson', emoji:'⏰', title:'סוכנים אוטונומיים', desc:'עבודה ללא שאלה-תשובה'}
+];
+let currentPage = 'home';
+
+const quizData = {
+  skills: [
+    {q:'מה השדה הקריטי ביותר ב-SKILL.md שקובע מתי הסקיל "נדלק"?', opts:['name','description','license','context'], correct:1},
+    {q:'מה עושה disable-model-invocation: true?', opts:['מוחק את הסקיל','רק המשתמש יכול להפעיל את הסקיל במפורש, לא קלוד לבד','הופך את הסקיל למהיר יותר','משבית את כל הסקילים'], correct:1},
+    {q:'איפה חי קובץ SKILL.md ברמת פרויקט?', opts:['.claude/agents/name.md','.claude/skills/name/SKILL.md','.mcp.json','plugin.json'], correct:1}
+  ],
+  tools: [
+    {q:'כשקלוד "משתמש בכלי", מה בפועל קורה?', opts:['קלוד מריץ קוד בעצמו ישירות','קלוד מחזיר בלוק tool_use וה-harness מבצע את הפעולה בפועל','שום דבר, זו רק מטאפורה','זה קורה רק בגרסת הדפדפן'], correct:1},
+    {q:'מה מבדיל כלי מובנה (כמו Read) מכלי MCP?', opts:['אין הבדל בכלל','כלים מובנים תמיד זמינים; כלי MCP דורש חיבור מפורש','כלי MCP תמיד מהיר יותר','כלים מובנים דורשים תשלום נוסף'], correct:1},
+    {q:'מה חוזר בהודעה אחרי tool_use?', opts:['tool_result עם תוצאת הכלי','הודעת שגיאה תמיד','בקשת אישור מהמשתמש','כלום, זה חד-כיווני'], correct:0}
+  ],
+  mcp: [
+    {q:'מה תפקיד שרת MCP?', opts:['להריץ את המודל בעצמו','לתרגם בין קלוד לשירות חיצוני ספציפי','להחליף את ה-API key','לשמור היסטוריית שיחות'], correct:1},
+    {q:'מה ההבדל בין שרת stdio לשרת http ב-.mcp.json?', opts:['אין הבדל','stdio מוגדר עם command/args (מקומי), http מוגדר עם url (מרוחק)','http תמיד מהיר יותר','stdio לא נתמך יותר'], correct:1},
+    {q:'איך שומרים סודות בהגדרת MCP בלי לחשוף אותם בקובץ?', opts:['כותבים אותם ישירות בקובץ','באמצעות הרחבת משתני סביבה כמו ${VAR}','אין דרך, זה תמיד גלוי','שומרים אותם ב-plugin.json'], correct:1}
+  ],
+  subagents: [
+    {q:'מה חוזר לסוכן הראשי מ-subagent?', opts:['כל שלבי הביניים','רק התוצאה הסופית','כלום','כל קריאות ה-API הגולמיות'], correct:1},
+    {q:'מה יכול להגביל subagent שסוכן ראשי לא יכול?', opts:['שום דבר, הם זהים תמיד','רשימת כלים מוגבלת ואפילו מודל שונה','subagent תמיד יותר יקר','subagent לא יכול להשתמש בכלים בכלל'], correct:1},
+    {q:'למה subagent טוב למניעת "הצפת הקשר"?', opts:['הוא לא משתמש ב-tokens בכלל','כל העבודה הביניים נשארת בהקשר המבודד שלו','הוא מוחק את ההיסטוריה של הסוכן הראשי','אין לו קשר לזה'], correct:1}
+  ],
+  slash: [
+    {q:'מה ההבדל העיקרי בין slash command ל-Skill?', opts:['אין הבדל','command מופעל רק ידנית; Skill יכול גם להיות מופעל אוטומטית','Skill תמיד איטי יותר','command לא יכול לקבל ארגומנטים'], correct:1},
+    {q:'מה עושה /goal?', opts:['מוחק את השיחה','מגדיר מצב-סיום שקלוד ממשיך לקראתו לבד בין תורות','משנה את המודל','מציג עזרה'], correct:1},
+    {q:'מה עושה /loop until <תנאי>?', opts:['עוצר מיד','מריץ במחזורים חוזרים עד שהתנאי מתקיים','מוחק קבצים','משנה temperature'], correct:1}
+  ],
+  hooks: [
+    {q:'מה קורה כש-hook מחזיר exit code 2?', opts:['הפעולה מאושרת ונמשכת','הפעולה נחסמת לחלוטין','זה מתעלם מהתוצאה','זה מפעיל hook נוסף'], correct:1},
+    {q:'למה hook "חזק" יותר מהוראה ב-system prompt?', opts:['הוא לא באמת חזק יותר','הוא אכיפה דטרמיניסטית בקוד - לא ניתן לעקוף אותו בשכנוע','הוא רץ מהר יותר','הוא זול יותר'], correct:1},
+    {q:'מה עושה שדה matcher בהגדרת hook?', opts:['קובע את שם הפרויקט','קובע על אילו כלים ה-hook חל','קובע את המודל','קובע את ה-temperature'], correct:1}
+  ],
+  plugins: [
+    {q:'מה plugin מוסיף שלא קיים כבר ב-skills/hooks/mcp נפרדים?', opts:['יכולות טכניות חדשות לגמרי','גבול פורמלי - שם, גרסה ומניפסט','מודל AI חדש','זיכרון נוסף'], correct:1},
+    {q:'מה השדה החובה היחיד במניפסט מינימלי?', opts:['version','author','name','license'], correct:2},
+    {q:'היכן חי מניפסט הפלאגין?', opts:['.claude-plugin/plugin.json','SKILL.md','.env','README בלבד'], correct:0}
+  ],
+  alwayson: [
+    {q:'מה משותף לסוכן מתוזמן ולשיחה רגילה?', opts:['שום דבר, הם שונים לגמרי','שניהם מפעילים את אותה הלולאה האג\'נטית - רק הטריגר שונה','סוכן מתוזמן לא משתמש בכלים','סוכן מתוזמן לא יכול לכשול'], correct:1},
+    {q:'מה מייצג ביטוי כמו "0 8 * * *"?', opts:['מחיר ריצה','cron expression - כל יום בשעה 08:00','מספר גרסה','קוד שגיאה'], correct:1},
+    {q:'מה נדרש בעיצוב מוצר של סוכן שרץ ברקע?', opts:['שום דבר נוסף','מנגנון בקרה - מתי לעצור, איך לדווח כשלים','מודל AI קטן יותר','זה תמיד ללא הבדל'], correct:1}
+  ]
+};
+
+function renderQuiz(key){
+  const container = document.getElementById('quiz-'+key);
+  if(!container || container.dataset.built) return;
+  container.dataset.built = '1';
+  const questions = quizData[key];
+  if(!questions) return;
+  let html = '<div class="section-title"><span class="num">📝</span> מבחנון קצר (ענו נכון על הכל כדי לסמן שיעור זה כהושלם)</div>';
+  questions.forEach((item,qi)=>{
+    html += '<div class="quiz-q">'+(qi+1)+'. '+item.q+'</div><div class="quiz-opts" id="qopts-'+key+'-'+qi+'">';
+    item.opts.forEach((opt,oi)=>{
+      html += '<div class="quiz-opt" onclick="answerQuiz(\''+key+'\','+qi+','+oi+')" id="qopt-'+key+'-'+qi+'-'+oi+'">'+opt+'</div>';
+    });
+    html += '</div>';
+  });
+  html += '<div class="quiz-summary" id="qsummary-'+key+'" style="display:none;"></div>';
+  container.innerHTML = html;
+  container._answers = new Array(questions.length).fill(null);
+  if(isUnitDone(key)){
+    questions.forEach((item,qi)=>{
+      document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+      const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+      for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+    });
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display='block'; summary.className='quiz-summary pass';
+    summary.textContent = '🎉 כבר השלמתם שיעור זה בעבר!';
+  }
+}
+function answerQuiz(key, qi, oi){
+  const questions = quizData[key];
+  const item = questions[qi];
+  const container = document.getElementById('quiz-'+key);
+  const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+  for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+  if(oi===item.correct){ document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('correct'); }
+  else {
+    document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('wrong');
+    document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+  }
+  container._answers[qi] = (oi===item.correct);
+  checkQuizComplete(key);
+}
+function checkQuizComplete(key){
+  const container = document.getElementById('quiz-'+key);
+  const answers = container._answers;
+  if(answers.every(a=>a!==null)){
+    const allCorrect = answers.every(a=>a===true);
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display = 'block';
+    const scoreCount = answers.filter(a=>a).length;
+    if(allCorrect){
+      summary.className = 'quiz-summary pass';
+      summary.textContent = '🎉 מעולה! '+scoreCount+'/'+answers.length+' נכון - השיעור סומן כהושלם.';
+      markDone(key);
+    } else {
+      summary.className = 'quiz-summary fail';
+      summary.textContent = '📚 '+scoreCount+'/'+answers.length+' נכון. רעננו את הדף כדי לנסות שוב.';
+    }
+    updateProgress();
+    buildHome();
+  }
+}
+function buildNav(){
+  const nav = document.getElementById('navScroll');
+  nav.innerHTML = '';
+  topics.forEach(t=>{
+    const b = document.createElement('button');
+    b.className='navbtn'; b.id='nav-'+t.key; b.innerHTML=t.emoji+' '+t.title;
+    b.onclick = ()=>showPage(t.key);
+    nav.appendChild(b);
+  });
+}
+function buildHome(){
+  const grid = document.getElementById('lessonGrid');
+  grid.innerHTML = '';
+  topics.forEach(t=>{
+    const done = isUnitDone(t.key);
+    const c = document.createElement('div');
+    c.className = 'lesson-card' + (done ? ' done' : '');
+    c.innerHTML = '<span class="em">'+t.emoji+'</span><div class="tt">'+t.title+'</div><div class="dd">'+t.desc+'</div>'+(done?'<div style="margin-top:6px;">✅</div>':'');
+    c.onclick = ()=>showPage(t.key);
+    grid.appendChild(c);
+  });
+  document.querySelectorAll('.navbtn').forEach(b=>{
+    const key = b.id.replace('nav-','');
+    b.classList.toggle('passed', isUnitDone(key));
+  });
+}
+function showPage(key){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+key).classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+  const nb = document.getElementById('nav-'+key);
+  if(nb) nb.classList.add('active');
+  currentPage = key;
+  if(topics.some(t=>t.key===key)){ renderQuiz(key); }
+  buildHome();
+  updateProgress();
+  if(typeof window.scrollTo === 'function'){
+    try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+  }
+}
+function goHome(){ showPage('home'); }
+function goRelative(dir){
+  const idx = topics.findIndex(t=>t.key===currentPage);
+  if(idx===-1) return;
+  const newIdx = idx+dir;
+  if(newIdx<0){ goHome(); return; }
+  if(newIdx>=topics.length){ showPage('finish'); return; }
+  showPage(topics[newIdx].key);
+}
+function updateProgress(){
+  const done = topics.filter(t=>isUnitDone(t.key)).length;
+  const pct = Math.round((done/topics.length)*100);
+  document.getElementById('progressBar').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = done+' / '+topics.length+' הושלמו';
+}
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+  safeSetTheme(isDark?'dark':'light');
+}
+
+/* ---------- SKILLS ---------- */
+const skillDefs = [
+  {em:'📊', name:'מצגות', keys:['מצגת','שקופיות','פרזנטציה','pptx']},
+  {em:'📄', name:'מסמכים', keys:['מסמך','וורד','word','docx','מכתב']},
+  {em:'📈', name:'גליונות', keys:['גליון','אקסל','excel','xlsx','טבלה']},
+  {em:'🔒', name:'בדיקת אבטחה', keys:['אבטחה','באג','vulnerability','בדוק קוד','security']},
+  {em:'🔍', name:'מחקר מעמיק', keys:['מחקר','חקור','research','תמצא מידע']},
+  {em:'📅', name:'תזמון משימות', keys:['כל בוקר','תזכיר','לוח זמנים','תזמן']}
+];
+function buildSkillGrid(){
+  const grid = document.getElementById('skillGrid');
+  grid.innerHTML='';
+  skillDefs.forEach((s,i)=>{
+    const c=document.createElement('div');
+    c.className='skill-card'; c.id='skillCard'+i;
+    c.innerHTML='<span class="sk-em">'+s.em+'</span>'+s.name;
+    grid.appendChild(c);
+  });
+}
+function matchSkills(text){
+  text = text.toLowerCase();
+  skillDefs.forEach((s,i)=>{
+    const card = document.getElementById('skillCard'+i);
+    const match = text.trim().length>0 && s.keys.some(k=>text.includes(k.toLowerCase()));
+    card.classList.toggle('match', match);
+  });
+}
+
+/* ---------- TOOLS ---------- */
+const toolDefs = [
+  {em:'👀', name:'קריאה (Read)', log:'קלוד קורא את הקובץ README.md... ✅ מצא: "ברוכים הבאים לפרויקט"'},
+  {em:'✍️', name:'כתיבה (Write)', log:'קלוד כותב קובץ חדש בשם notes.txt... ✅ נשמר בהצלחה!'},
+  {em:'⚙️', name:'הרצה (Bash)', log:'קלוד מריץ פקודה בטרמינל: npm install... ✅ הותקן!'},
+  {em:'🔭', name:'חיפוש (Web)', log:'קלוד מחפש באינטרנט "מזג אוויר היום"... ✅ מצא תוצאות!'}
+];
+function buildToolGrid(){
+  const grid = document.getElementById('toolGrid');
+  grid.innerHTML='';
+  toolDefs.forEach((t,i)=>{
+    const b=document.createElement('div');
+    b.className='tool-btn';
+    b.innerHTML='<span class="t-em">'+t.em+'</span>'+t.name;
+    b.onclick=()=>useTool(i);
+    grid.appendChild(b);
+  });
+}
+function useTool(i){
+  const log = document.getElementById('actionLog');
+  log.textContent = '⏳ ...';
+  setTimeout(()=>{ log.textContent = toolDefs[i].log; }, 400);
+}
+
+/* ---------- MCP ---------- */
+const appDefs = [ {em:'💬', name:'Slack'}, {em:'📧', name:'Gmail'}, {em:'🐙', name:'GitHub'} ];
+let mcpSelected = 0;
+function buildAppPicker(){
+  const wrap = document.getElementById('appPicker');
+  wrap.innerHTML='';
+  appDefs.forEach((a,i)=>{
+    const b=document.createElement('button');
+    b.className='app-btn'+(i===0?' selected':'');
+    b.id='appBtn'+i;
+    b.innerHTML=a.em+' '+a.name;
+    b.onclick=()=>selectApp(i);
+    wrap.appendChild(b);
+  });
+  updateMcpAppNode();
+}
+function selectApp(i){
+  mcpSelected = i;
+  appDefs.forEach((a,idx)=>document.getElementById('appBtn'+idx).classList.toggle('selected', idx===i));
+  updateMcpAppNode();
+}
+function updateMcpAppNode(){
+  const node = document.getElementById('mcpAppNode');
+  node.innerHTML = '<div class="mcp-node">'+appDefs[mcpSelected].em+'</div><div class="mcp-label">'+appDefs[mcpSelected].name+'</div>';
+}
+function sendMcpRequest(){
+  const bubble = document.getElementById('mcpBubble');
+  bubble.style.transition='none'; bubble.style.right='8%'; bubble.style.opacity='1';
+  bubble.textContent='📩 בקשה: תבדוק הודעות חדשות';
+  requestAnimationFrame(()=>{ bubble.style.transition='all 1s ease'; bubble.style.right='50%'; });
+  setTimeout(()=>{
+    bubble.style.transition='all 1s ease'; bubble.style.right='8%';
+    bubble.textContent = '✅ תשובה מ-'+appDefs[mcpSelected].name+'!';
+    bubble.className='mcp-bubble';
+    bubble.style.background='linear-gradient(90deg,var(--green),#27ae60)';
+  }, 1100);
+  setTimeout(()=>{ bubble.style.opacity='0'; }, 2600);
+}
+
+/* ---------- SUBAGENTS ---------- */
+function sendSubagent(){
+  const helper = document.getElementById('subHelper');
+  const cloud = document.getElementById('subCloud');
+  const result = document.getElementById('subResult');
+  result.textContent='';
+  helper.style.right = '100px'; helper.style.opacity='1';
+  requestAnimationFrame(()=>{ helper.style.right = 'calc(100% - 90px)'; });
+  const thoughts = ['🤔 חושב...','🔎 מחפש מידע...','📋 בודק תוצאות...'];
+  let i=0; cloud.innerHTML='';
+  const thoughtInterval = setInterval(()=>{
+    if(i<thoughts.length){
+      const div = document.createElement('div');
+      div.className='sub-thought'; div.textContent = thoughts[i];
+      cloud.appendChild(div); i++;
+    }
+  }, 500);
+  setTimeout(()=>{
+    clearInterval(thoughtInterval);
+    cloud.innerHTML = 'כל העבודה נשארה כאן, בהקשר מבודד 🔒';
+    helper.style.right='100px';
+    result.textContent = '✅ ה-subagent חזר: "מצאתי את התשובה - הכל תקין!"';
+  }, 2200);
+}
+
+/* ---------- SLASH COMMANDS ---------- */
+const slashDefs = [
+  {cmd:'/clear', desc:'מנקה את כל השיחה ומתחיל מחדש', effect:'🧹 השיחה נוקתה! לוח חלק וריק.'},
+  {cmd:'/help', desc:'מציג רשימת עזרה ופקודות', effect:'❓ הנה כל הפקודות שאפשר להשתמש בהן!'},
+  {cmd:'/model', desc:'מחליף את מודל ה-AI', effect:'🔄 עברנו למודל אחר!'},
+  {cmd:'/goal', desc:'מגדיר מצב-סיום שקלוד ממשיך לקראתו לבד', effect:'🎯 יעד נקבע - קלוד ימשיך לעבוד עד שהתנאי יתקיים!'},
+  {cmd:'/loop', desc:'מריץ במחזורים חוזרים עד תנאי עצירה', effect:'🔁 מתחילים לרוץ במחזורים...'}
+];
+function buildSlashList(){
+  const list = document.getElementById('slashList');
+  list.innerHTML='';
+  slashDefs.forEach((s,i)=>{
+    const item = document.createElement('div');
+    item.className='slash-item';
+    item.innerHTML = '<span>'+s.cmd+'</span><span class="sd">'+s.desc+'</span>';
+    item.onclick = ()=>{ document.getElementById('slashEffect').textContent = s.effect; };
+    list.appendChild(item);
+  });
+}
+
+/* ---------- HOOKS ---------- */
+function hookDecide(allow){
+  const outcome = document.getElementById('hookOutcome');
+  const guard = document.getElementById('hookGuard');
+  if(allow){
+    guard.textContent='🟢';
+    outcome.textContent = '✅ exit 0 - הפעולה אושרה, קלוד ימשיך וימחק את הקבצים.';
+    outcome.style.color = 'var(--green)';
+  } else {
+    guard.textContent='🔴';
+    outcome.textContent = '🚫 exit 2 - הפעולה נחסמה! הקבצים נשארו בטוחים.';
+    outcome.style.color = '#e74c3c';
+  }
+  setTimeout(()=>{ guard.textContent='🛡️'; }, 1800);
+}
+
+/* ---------- PLUGINS ---------- */
+let pluginPacked = false;
+function packPlugin(){
+  for(let i=0;i<3;i++){
+    const item = document.getElementById('pItem'+i);
+    item.style.transform = 'scale(0)'; item.style.opacity = '0';
+  }
+  setTimeout(()=>{
+    document.getElementById('pluginBox').style.display='block';
+    document.getElementById('pluginMsg').textContent = '📦 הכל ארוז בקופסה אחת - document-tools v2.1.0!';
+    document.getElementById('installBtn').disabled = false;
+    pluginPacked = true;
+  }, 500);
+}
+function installPlugin(){
+  if(!pluginPacked) return;
+  document.getElementById('pluginMsg').textContent = '✅ הפלאגין הותקן! עכשיו יש לכם סקיל + hook + חיבור MCP תחת שם וגרסה אחידה 🎉';
+}
+
+/* ---------- ALWAYS-ON AGENTS ---------- */
+const timeOptions = ['08:00','12:00','18:00'];
+let selectedTime = timeOptions[0];
+let clockInterval = null;
+function buildTimePicker(){
+  const wrap = document.getElementById('timePicker');
+  wrap.innerHTML='';
+  timeOptions.forEach((t,i)=>{
+    const b = document.createElement('button');
+    b.className = 'time-btn'+(i===0?' selected':'');
+    b.id = 'timeBtn'+i; b.textContent = t;
+    b.onclick = ()=>{
+      selectedTime = t;
+      timeOptions.forEach((_,idx)=>document.getElementById('timeBtn'+idx).classList.toggle('selected', idx===i));
+    };
+    wrap.appendChild(b);
+  });
+}
+const clockMessages = ['📋 בודק את המשימות שלך...','📨 מכין סיכום יומי...','✅ הדוח מוכן ונשלח!'];
+function startClock(){
+  stopClock();
+  const face = document.getElementById('clockFace');
+  const log = document.getElementById('clockLog');
+  log.innerHTML = '<div>⏰ הסוכן הופעל - יעבוד כל יום ב-'+selectedTime+'</div>';
+  let cycle = 0;
+  clockInterval = setInterval(()=>{
+    face.textContent = cycle%2===0 ? '☀️' : '🌙';
+    const msg = clockMessages[cycle%clockMessages.length];
+    const div = document.createElement('div');
+    div.textContent = '🕐 '+selectedTime+' (יום '+(Math.floor(cycle/clockMessages.length)+1)+') - '+msg;
+    log.insertBefore(div, log.firstChild);
+    cycle++;
+  }, 1200);
+}
+function stopClock(){ clearInterval(clockInterval); clockInterval = null; }
+
+/* ---------- INIT ---------- */
+buildNav();
+buildHome();
+buildSkillGrid();
+buildToolGrid();
+buildAppPicker();
+buildSlashList();
+buildTimePicker();
+if(safeGetTheme()==='dark'){
+  document.body.classList.add('dark');
+  document.getElementById('themeToggle').textContent='☀️';
+}
+updateProgress();
+</script>
+
+</body>
+</html>

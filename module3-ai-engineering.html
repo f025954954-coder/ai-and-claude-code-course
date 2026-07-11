@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏗️ מודול 3: הנדסת מערכות AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#4A90E2; --purple:#7B68EE; --green:#2ECC71;
+  --bg:#eef2fb; --bg2:#e4ecfb; --card:#ffffff; --text:#2d3142; --text-soft:#5a5f7a;
+  --radius:26px; --radius-sm:16px;
+  --shadow:0 12px 30px rgba(74,144,226,0.18);
+  --shadow-soft:0 6px 16px rgba(74,144,226,0.12);
+  --code-bg:#1e2233; --code-text:#d7dcff;
+}
+body.dark{
+  --bg:#141827; --bg2:#1b2032; --card:#222842; --text:#f2f3fb; --text-soft:#b7bcda;
+  --shadow:0 12px 30px rgba(0,0,0,0.45); --shadow-soft:0 6px 16px rgba(0,0,0,0.35);
+  --code-bg:#0d0f1a; --code-text:#c7d0ff;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:'Heebo',sans-serif; background:linear-gradient(160deg,var(--bg),var(--bg2)); color:var(--text); min-height:100vh; transition:background .4s ease,color .4s ease; padding-top:126px;}
+h1,h2,h3{margin:0 0 8px 0;}
+button{font-family:'Heebo',sans-serif;cursor:pointer;border:none;outline:none;}
+code, pre, .mono{font-family:'JetBrains Mono',monospace;}
+
+.topnav{position:fixed;top:0;right:0;left:0;z-index:100;background:var(--card);box-shadow:var(--shadow-soft);padding:10px 16px 0 16px;transition:background .4s ease;}
+.topnav-row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1200px;margin:0 auto;}
+.logo{font-weight:900;font-size:1.2rem;white-space:nowrap;background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;flex-shrink:0;}
+.hub-link{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 14px;font-size:.8rem;font-weight:700;text-decoration:none;white-space:nowrap;}
+.nav-scroll{display:flex;gap:8px;overflow-x:auto;flex:1;padding:4px 2px;scrollbar-width:thin;align-items:center;}
+.nav-scroll::-webkit-scrollbar{height:6px;}
+.nav-scroll::-webkit-scrollbar-thumb{background:var(--purple);border-radius:10px;}
+.navbtn{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 13px;font-size:0.82rem;font-weight:500;white-space:nowrap;transition:all .25s ease;border:2px solid transparent;position:relative;}
+.navbtn:hover{transform:translateY(-2px) scale(1.04);}
+.navbtn.active{background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;box-shadow:var(--shadow-soft);}
+.navbtn.passed::after{content:'✓';position:absolute;top:-4px;left:-4px;background:var(--green);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
+.theme-toggle{flex-shrink:0;background:var(--bg2);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;transition:transform .3s ease;}
+.theme-toggle:hover{transform:rotate(20deg) scale(1.1);}
+.progress-wrap{max-width:1200px;margin:8px auto 0 auto;height:10px;background:var(--bg2);border-radius:999px;overflow:hidden;}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));border-radius:999px;transition:width .5s ease;}
+.progress-label{max-width:1200px;margin:4px auto 0 auto;font-size:.72rem;color:var(--text-soft);text-align:left;padding:0 4px;}
+
+.page{display:none;animation:fadeIn .5s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.page-inner{max-width:860px;margin:0 auto;padding:18px 16px 60px 16px;}
+.hero-title{font-size:clamp(1.5rem,4vw,2.3rem);font-weight:900;text-align:center;margin-bottom:6px;}
+.hero-sub{text-align:center;color:var(--text-soft);font-size:1.02rem;margin-bottom:22px;}
+.world-tag{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 12px;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--green));color:#fff;margin-bottom:10px;}
+.level-tag{display:inline-block;font-size:.7rem;font-weight:800;padding:3px 12px;border-radius:999px;background:var(--bg2);color:var(--text-soft);margin-bottom:10px;margin-right:6px;}
+
+.card{background:var(--card);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);margin-bottom:20px;}
+.explain{font-size:1.05rem;line-height:1.95;color:var(--text);}
+.explain p{margin:0 0 14px 0;}
+.explain p:last-child{margin-bottom:0;}
+.explain b, .highlight{background:linear-gradient(90deg,rgba(123,104,238,.18),rgba(46,204,113,.18));padding:2px 8px;border-radius:8px;font-weight:700;color:var(--purple);}
+body.dark .explain b, body.dark .highlight{color:#c9c2ff;}
+.callout{background:rgba(241,196,15,.12);border-right:4px solid #f1c40f;padding:12px 16px;border-radius:10px;margin-top:14px;font-size:.95rem;}
+
+.section-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.05rem;margin:0 0 14px 0;}
+.section-title .num{background:var(--purple);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;}
+
+.lab-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.code-block{position:relative;background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px 18px;overflow-x:auto;font-size:.82rem;line-height:1.7;direction:ltr;text-align:left;margin-top:10px;}
+.code-block pre{margin:0;white-space:pre;}
+.code-label{position:absolute;top:8px;left:14px;font-size:.65rem;color:#8891b8;letter-spacing:.05em;text-transform:uppercase;}
+.lab-note{font-size:.92rem;color:var(--text-soft);margin-top:10px;line-height:1.7;}
+
+textarea, input[type=text], select{width:100%;font-family:'Heebo',sans-serif;font-size:1rem;padding:14px 16px;border-radius:var(--radius-sm);border:2px solid var(--bg2);background:var(--bg);color:var(--text);resize:none;transition:border .2s ease;}
+textarea:focus, input[type=text]:focus{border-color:var(--purple);}
+
+.btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;font-weight:700;font-size:0.92rem;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-soft);transition:transform .2s ease, box-shadow .2s ease;}
+.btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 26px rgba(74,144,226,.3);}
+.btn.secondary{background:var(--bg2);color:var(--text);}
+.btn.green{background:linear-gradient(90deg,var(--green),#27ae60);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:10px;}
+
+.quiz-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.quiz-q{font-weight:700;margin:18px 0 10px 0;}
+.quiz-q:first-of-type{margin-top:6px;}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{background:var(--bg);border-radius:12px;padding:11px 16px;text-align:right;font-size:.95rem;border:2px solid transparent;transition:all .2s ease;}
+.quiz-opt:hover{border-color:var(--purple);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(46,204,113,.15);font-weight:700;}
+.quiz-opt.wrong{border-color:#e74c3c;background:rgba(231,76,60,.12);}
+.quiz-opt.disabled{pointer-events:none;}
+.quiz-summary{margin-top:18px;padding:14px 18px;border-radius:14px;background:var(--bg);font-weight:700;text-align:center;}
+.quiz-summary.pass{background:rgba(46,204,113,.15);color:var(--green);}
+.quiz-summary.fail{background:rgba(231,76,60,.12);color:#e74c3c;}
+
+.finish-emoji{font-size:4rem;text-align:center;margin-bottom:10px;}
+.section-header{display:flex;align-items:center;gap:10px;margin:30px 0 14px 0;}
+.section-header h2{font-size:1.25rem;font-weight:900;}
+.section-header .line{flex:1;height:2px;background:var(--bg2);}
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:10px;}
+.lesson-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:transform .25s ease, box-shadow .25s ease;text-align:center;border:3px solid transparent;position:relative;}
+.lesson-card:hover{transform:translateY(-6px) rotate(-1deg);box-shadow:0 16px 32px rgba(74,144,226,.25);}
+.lesson-card .em{font-size:2.2rem;display:block;margin-bottom:8px;}
+.lesson-card .tt{font-weight:800;font-size:1rem;margin-bottom:4px;}
+.lesson-card .dd{font-size:.85rem;color:var(--text-soft);}
+.lesson-card.done{border-color:var(--green);}
+
+.capstone-step{background:var(--bg);border-radius:var(--radius-sm);padding:18px;margin-bottom:14px;}
+.capstone-step h4{margin:0 0 8px 0;font-size:.95rem;display:flex;align-items:center;gap:8px;}
+.capstone-step select, .capstone-step textarea{background:var(--card);}
+.capstone-preview{background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px;font-size:.8rem;white-space:pre-wrap;direction:ltr;text-align:left;margin-top:14px;display:none;}
+
+@media (max-width:600px){
+  body{padding-top:112px;}
+  .logo{font-size:1rem;}
+  .navbtn{font-size:.76rem;padding:6px 10px;}
+  .card,.lab-card,.quiz-card{padding:18px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="topnav-row">
+    <a class="hub-link" href="index.html">🏠 האקדמיה</a>
+    <div class="logo">🏗️ מודול 3: הנדסת מערכות AI</div>
+    <div class="nav-scroll" id="navScroll"></div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 3 הושלמו</div>
+</div>
+
+<section class="page active" id="page-home">
+  <div class="page-inner">
+    <div class="hero-title">🏗️ מודול 3: הנדסת מערכות AI</div>
+    <div class="hero-sub">Frameworks מול API גולמי, ארכיטקטורת Fullstack ל-AI, ופרויקט מסכם: תכננו פלאגין שלם.</div>
+    <div class="lesson-grid" id="lessonGrid"></div>
+  </div>
+</section>
+
+<!-- FRAMEWORKS -->
+<section class="page" id="page-frameworks">
+  <div class="page-inner">
+    <div class="world-tag">🏗️ מודול 3</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🧰 Frameworks - מתי לבנות ומתי להשתמש בכלי מוכן</div>
+    <div class="card">
+      <div class="explain">
+        <p>פריימוורק ל-AI לא מוסיף יכולת AI חדשה - הוא מוסיף <span class="highlight">שכבת הפשטה</span> מעל קריאות API גולמיות: אורקסטרציה של שרשראות קריאות, ניהול זיכרון שיחה, אינטגרציה מובנית עם retrieval/RAG, והפשטות ל-tool calling. שלושה שמות שכדאי להכיר: <b>LangChain</b> - פריימוורק אורקסטרציה כללי עם דגש על "שרשראות" (chains); <b>LlamaIndex</b> - מתמקד בעיקר באינדוקס וניהול נתונים עבור RAG; <b>Claude Agent SDK</b> - ה-SDK הרשמי של Anthropic, שנותן גישה ישירה לאותם פרימיטיבים שממש בונים את Claude Code עצמו.</p>
+        <p>ה<b>יתרון</b> המרכזי: פרוטוטייפ מהיר, פחות boilerplate, אינטגרציות מוכנות. ה<b>חיסרון</b> המרכזי: שכבת ההפשטה יכולה "להסתיר" בדיוק מה שנשלח בפועל למודל, ומוסיפה תלות בקוד צד-שלישי.</p>
+        <p>היוריסטיקת החלטה: עבור סוכן אחד עם מטרה מוגדרת היטב, עבודה ישירה מול ה-API או Claude Agent SDK נותנת שליטה וברירות מלאה. עבור פרויקט עם הרבה מקורות נתונים ושרשראות מורכבות - פריימוורק כללי יכול לחסוך זמן.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: אותה משימה, שתי גישות</div>
+      <div class="code-block"><span class="code-label">גישה א׳: API גולמי (שליטה מלאה)</span><pre>messages = [{"role": "user", "content": question}]
+response = client.messages.create(
+    model="claude-sonnet-5", messages=messages,
+    tools=[search_tool], max_tokens=1024
+)
+while response.stop_reason == "tool_use":
+    result = run_tool(response)
+    messages.append(tool_result(result))
+    response = client.messages.create(model="claude-sonnet-5",
+        messages=messages, tools=[search_tool])</pre></div>
+      <div class="code-block" style="margin-top:12px;"><span class="code-label">גישה ב׳: סגנון פריימוורק (הפשטה)</span><pre>agent = Agent(model="claude-sonnet-5", tools=[search_tool])
+response = agent.run(question)
+// כל הלולאה קורית "מתחת למכסה המנוע"</pre></div>
+      <div class="lab-note">💡 שתי הגישות עושות בדיוק את אותה עבודה - ההבדל הוא כמה מהמנגנון גלוי לכם.</div>
+    </div>
+    <div class="quiz-card" id="quiz-frameworks"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goHome()">🏠 חזרה למפת המודול</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- FULLSTACK -->
+<section class="page" id="page-fullstack">
+  <div class="page-inner">
+    <div class="world-tag">🏗️ מודול 3</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🏛️ ארכיטקטורת Fullstack ל-AI</div>
+    <div class="card">
+      <div class="explain">
+        <p>תכונת AI בפרודקשן היא לא רק "קריאה למודל" - היא ערימת שכבות: <b>Frontend</b>, <b>Backend/API layer</b> (השרת שלכם, שמחזיק את מפתח ה-API בצד השרת), <b>שכבת אורקסטרציה</b>, <b>שכבת נתונים</b>, <b>Observability</b>, ו-<b>Deployment</b>.</p>
+        <div class="callout">🔒 עיקרון אבטחה קריטי: <b>לעולם לא</b> קוראים ל-API של המודל ישירות מקוד frontend/דפדפן עם מפתח API מוטמע. הבקשה תמיד עוברת דרך ה-backend שלכם.</div>
+        <p>נקודה מעשית: מה שראינו כ"מלצר" בשיעור ה-API (מודול 1) הוא בעצם ה-<b>backend שלכם</b> - הוא זה שמדבר עם ה-API החיצוני, לא ה-frontend.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: endpoint שרת שמשמש כ-proxy מאובטח</div>
+      <div class="code-block"><span class="code-label">backend/routes/chat.js (pseudo)</span><pre>app.post('/api/chat', authenticate, rateLimit, async (req, res) => {
+  const { message } = req.body;
+  const stream = await anthropic.messages.create({
+    model: "claude-sonnet-5",
+    messages: [{ role: "user", content: message }],
+    stream: true,
+    apiKey: process.env.ANTHROPIC_API_KEY
+  });
+  res.setHeader('Content-Type', 'text/event-stream');
+  for await (const chunk of stream) res.write(chunk);
+  logUsage(req.user.id, stream.usage);
+  res.end();
+});</pre></div>
+      <div class="lab-note">💡 שימו לב לשלושה דברים: authenticate/rateLimit לפני שמגיעים למודל, מפתח ה-API רק ממשתנה סביבה בצד השרת, וlogUsage למעקב עלויות - כל אלה יתחברו הרבה יותר לעומק במודול 4.</div>
+    </div>
+    <div class="quiz-card" id="quiz-fullstack"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- CAPSTONE -->
+<section class="page" id="page-capstone">
+  <div class="page-inner">
+    <div class="world-tag">🏁 פרויקט מסכם</div><span class="level-tag">⏱️ כ-30 דק'</span>
+    <div class="hero-title">🏗️ תכננו פלאגין: "עוזר מחקר אישי"</div>
+    <div class="card">
+      <div class="explain">
+        <p>עכשיו כשעברתם על מודולים 1-3, הגיע הזמן לחבר הכל יחד. במשימה הזו תתכננו - על הנייר - פלאגין שלם למקרה שימוש אמיתי: <b>"עוזר מחקר אישי"</b>. בכל שלב תבחרו את הרכיב המתאים, ובסוף תקבלו תקציר בסגנון plugin.json אמיתי.</p>
+      </div>
+    </div>
+
+    <div class="capstone-step">
+      <h4>1️⃣ הגדירו את ה-Skill (מתי הוא "נדלק"?)</h4>
+      <textarea id="cap-skill-desc" rows="2" placeholder='לדוגמה: "Research a topic across the web, save key findings to a markdown file. Use when the user asks to research or investigate a subject."'></textarea>
+    </div>
+    <div class="capstone-step">
+      <h4>2️⃣ אילו כלים (Tools) הסקיל צריך?</h4>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;" id="cap-tools-picker"></div>
+    </div>
+    <div class="capstone-step">
+      <h4>3️⃣ הגדירו חיבור MCP</h4>
+      <select id="cap-mcp-select">
+        <option value="none">לא נדרש חיבור MCP</option>
+        <option value="slack">Slack - לשליחת סיכומים לערוץ</option>
+        <option value="gmail">Gmail - לשליחת דוח יומי במייל</option>
+        <option value="notion">Notion - לשמירת ממצאים בבסיס ידע</option>
+      </select>
+    </div>
+    <div class="capstone-step">
+      <h4>4️⃣ הגדירו כלל Hook להגנה</h4>
+      <select id="cap-hook-select">
+        <option value="delete">לחסום מחיקת קבצים (Bash: rm)</option>
+        <option value="send">לדרוש אישור לפני שליחת הודעה/מייל החוצה</option>
+        <option value="write">לחסום כתיבה מחוץ לתיקיית הפרויקט</option>
+      </select>
+    </div>
+    <div class="capstone-step">
+      <h4>5️⃣ הגדירו Subagent ייעודי (אופציונלי)</h4>
+      <select id="cap-subagent-select">
+        <option value="yes">כן - subagent "researcher" עם גישה ל-WebSearch בלבד</option>
+        <option value="no">לא - להריץ הכל בשיחה הראשית</option>
+      </select>
+    </div>
+    <div class="capstone-step">
+      <h4>6️⃣ תזמון - מתי הסוכן ירוץ לבד?</h4>
+      <select id="cap-schedule-select">
+        <option value="0 8 * * *">כל בוקר ב-08:00</option>
+        <option value="0 18 * * 0-4">כל ערב (א'-ה') ב-18:00</option>
+        <option value="0 9 * * 1">כל יום שני ב-09:00 (סיכום שבועי)</option>
+      </select>
+    </div>
+    <div style="text-align:center;margin-top:10px;">
+      <button class="btn green" onclick="generateCapstone()">✨ צור תקציר פלאגין</button>
+    </div>
+    <div class="capstone-preview" id="capstonePreview"></div>
+
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn green" onclick="goRelative(1)">סיימתי את המודול! 🎉</button>
+    </div>
+  </div>
+</section>
+
+<!-- FINISH -->
+<section class="page" id="page-finish">
+  <div class="page-inner">
+    <div class="finish-emoji">🎉🏗️✨</div>
+    <div class="hero-title">כל הכבוד - סיימתם את מודול 3!</div>
+    <div class="hero-sub">עברתם על יסודות ה-AI, עולם קלוד קוד, והנדסת מערכות. עכשיו מגיע החלק המקצועי באמת: תכנות Fullstack מלא.</div>
+    <div class="nav-buttons" style="justify-content:center;gap:16px;">
+      <a class="btn secondary" href="index.html" style="text-decoration:none;">🏠 חזרה לאקדמיה</a>
+      <a class="btn green" href="module4-fullstack-dev.html" style="text-decoration:none;">מודול 4: תכנות Fullstack ⬅</a>
+    </div>
+  </div>
+</section>
+
+<script>
+const THIS_FILE = 'module3-ai-engineering.html';
+const PROGRESS_KEY = 'academy_progress_v1';
+function loadProgressSet(){
+  try{ return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]')); }
+  catch(e){ return new Set(); }
+}
+function markDone(unitKey){
+  const s = loadProgressSet();
+  s.add(THIS_FILE+'::'+unitKey);
+  try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(Array.from(s))); }catch(e){}
+}
+function isUnitDone(unitKey){ return loadProgressSet().has(THIS_FILE+'::'+unitKey); }
+function safeGetTheme(){ try{ return localStorage.getItem('ai-theme'); }catch(e){ return null; } }
+function safeSetTheme(v){ try{ localStorage.setItem('ai-theme', v); }catch(e){} }
+
+const topics = [
+  {key:'frameworks', emoji:'🧰', title:'Frameworks', desc:'מתי לבנות ומתי להשתמש בכלי'},
+  {key:'fullstack', emoji:'🏛️', title:'Fullstack', desc:'איך זה נכנס לאפליקציה אמיתית'},
+  {key:'capstone', emoji:'🏗️', title:'פרויקט מסכם', desc:'תכננו פלאגין שלם', isCapstone:true}
+];
+let currentPage = 'home';
+
+const quizData = {
+  frameworks: [
+    {q:'מה frameworks כמו LangChain מוסיפים מעל קריאות API גולמיות?', opts:['יכולות AI חדשות לגמרי שלא קיימות ב-API','הפשטות לאורקסטרציה - שרשור קריאות, ניהול זיכרון, tool abstractions','הם מחליפים את המודל עצמו','הם מוזילים תמיד את מחיר ה-API'], correct:1},
+    {q:'מה החיסרון האפשרי המרכזי בשימוש בפריימוורק כבד?', opts:['אין שום חיסרון','שכבת ההפשטה יכולה להסתיר בדיוק מה שנשלח למודל','הוא תמיד איטי יותר מ-API גולמי','הוא לא תומך ב-Python'], correct:1},
+    {q:'מה ה-Claude Agent SDK נותן שממנו בנוי גם Claude Code עצמו?', opts:['רק ממשק גרפי','גישה ישירה לפרימיטיבים של הלולאה האג\'נטית - כלים, subagents, hooks','הוא כלי לעיצוב תמונות','הוא מחליף את ה-API לגמרי'], correct:1}
+  ],
+  fullstack: [
+    {q:'למה אסור לחשוף את מפתח ה-API בקוד frontend?', opts:['זה בסדר גמור לעשות זאת','כל אחד שרואה את קוד ה-JS בדפדפן יכול לגנוב את המפתח','זה מאט את הביצועים','זה לא קשור לאבטחה בכלל'], correct:1},
+    {q:'מה תפקיד השכבה "orchestration" בארכיטקטורת fullstack ל-AI?', opts:['רק לעצב את העמוד','להריץ את הלולאה האג\'נטית, לקרוא לכלים, ולשלב retrieval','להחליף את מסד הנתונים','אין שכבה כזו בפועל'], correct:1},
+    {q:'למה כדאי להפריד מסד נתונים רגיל ממסד וקטורים?', opts:['אסור לעולם להשתמש בשניהם יחד','לכל אחד תפקיד שונה, גם אם חלק מהמסדים תומכים בשניהם (כמו pgvector)','מסד וקטורים תמיד מיותר','זה תמיד אותו דבר בדיוק'], correct:1}
+  ]
+};
+
+function renderQuiz(key){
+  const container = document.getElementById('quiz-'+key);
+  if(!container || container.dataset.built) return;
+  container.dataset.built = '1';
+  const questions = quizData[key];
+  if(!questions) return;
+  let html = '<div class="section-title"><span class="num">📝</span> מבחנון קצר (ענו נכון על הכל כדי לסמן שיעור זה כהושלם)</div>';
+  questions.forEach((item,qi)=>{
+    html += '<div class="quiz-q">'+(qi+1)+'. '+item.q+'</div><div class="quiz-opts" id="qopts-'+key+'-'+qi+'">';
+    item.opts.forEach((opt,oi)=>{
+      html += '<div class="quiz-opt" onclick="answerQuiz(\''+key+'\','+qi+','+oi+')" id="qopt-'+key+'-'+qi+'-'+oi+'">'+opt+'</div>';
+    });
+    html += '</div>';
+  });
+  html += '<div class="quiz-summary" id="qsummary-'+key+'" style="display:none;"></div>';
+  container.innerHTML = html;
+  container._answers = new Array(questions.length).fill(null);
+  if(isUnitDone(key)){
+    questions.forEach((item,qi)=>{
+      document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+      const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+      for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+    });
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display='block'; summary.className='quiz-summary pass';
+    summary.textContent = '🎉 כבר השלמתם שיעור זה בעבר!';
+  }
+}
+function answerQuiz(key, qi, oi){
+  const questions = quizData[key];
+  const item = questions[qi];
+  const container = document.getElementById('quiz-'+key);
+  const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+  for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+  if(oi===item.correct){ document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('correct'); }
+  else {
+    document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('wrong');
+    document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+  }
+  container._answers[qi] = (oi===item.correct);
+  checkQuizComplete(key);
+}
+function checkQuizComplete(key){
+  const container = document.getElementById('quiz-'+key);
+  const answers = container._answers;
+  if(answers.every(a=>a!==null)){
+    const allCorrect = answers.every(a=>a===true);
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display = 'block';
+    const scoreCount = answers.filter(a=>a).length;
+    if(allCorrect){
+      summary.className = 'quiz-summary pass';
+      summary.textContent = '🎉 מעולה! '+scoreCount+'/'+answers.length+' נכון - השיעור סומן כהושלם.';
+      markDone(key);
+    } else {
+      summary.className = 'quiz-summary fail';
+      summary.textContent = '📚 '+scoreCount+'/'+answers.length+' נכון. רעננו את הדף כדי לנסות שוב.';
+    }
+    updateProgress();
+    buildHome();
+  }
+}
+function buildNav(){
+  const nav = document.getElementById('navScroll');
+  nav.innerHTML = '';
+  topics.forEach(t=>{
+    const b = document.createElement('button');
+    b.className='navbtn'; b.id='nav-'+t.key; b.innerHTML=t.emoji+' '+t.title;
+    b.onclick = ()=>showPage(t.key);
+    nav.appendChild(b);
+  });
+}
+function buildHome(){
+  const grid = document.getElementById('lessonGrid');
+  grid.innerHTML = '';
+  topics.forEach(t=>{
+    const done = t.isCapstone ? isUnitDone('capstone') : isUnitDone(t.key);
+    const c = document.createElement('div');
+    c.className = 'lesson-card' + (done ? ' done' : '');
+    c.innerHTML = '<span class="em">'+t.emoji+'</span><div class="tt">'+t.title+'</div><div class="dd">'+t.desc+'</div>'+(done?'<div style="margin-top:6px;">✅</div>':'');
+    c.onclick = ()=>showPage(t.key);
+    grid.appendChild(c);
+  });
+  document.querySelectorAll('.navbtn').forEach(b=>{
+    const key = b.id.replace('nav-','');
+    b.classList.toggle('passed', isUnitDone(key));
+  });
+}
+function showPage(key){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+key).classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+  const nb = document.getElementById('nav-'+key);
+  if(nb) nb.classList.add('active');
+  currentPage = key;
+  if(quizData[key]){ renderQuiz(key); }
+  buildHome();
+  updateProgress();
+  if(typeof window.scrollTo === 'function'){
+    try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+  }
+}
+function goHome(){ showPage('home'); }
+function goRelative(dir){
+  const idx = topics.findIndex(t=>t.key===currentPage);
+  if(idx===-1) return;
+  const newIdx = idx+dir;
+  if(newIdx<0){ goHome(); return; }
+  if(newIdx>=topics.length){ showPage('finish'); return; }
+  showPage(topics[newIdx].key);
+}
+function updateProgress(){
+  const done = topics.filter(t=>t.isCapstone?isUnitDone('capstone'):isUnitDone(t.key)).length;
+  const pct = Math.round((done/topics.length)*100);
+  document.getElementById('progressBar').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = done+' / '+topics.length+' הושלמו';
+}
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+  safeSetTheme(isDark?'dark':'light');
+}
+
+/* ---------- CAPSTONE ---------- */
+const capToolLabels = ['Read','Write','WebSearch','Bash','Grep'];
+function buildCapToolsPicker(){
+  const wrap = document.getElementById('cap-tools-picker');
+  if(!wrap) return;
+  wrap.innerHTML='';
+  capToolLabels.forEach(t=>{
+    const b = document.createElement('button');
+    b.type='button'; b.className='btn secondary'; b.textContent = t;
+    b.dataset.selected='0';
+    b.onclick = ()=>{
+      const sel = b.dataset.selected === '1';
+      b.dataset.selected = sel? '0':'1';
+      b.style.outline = sel? 'none' : '3px solid var(--green)';
+    };
+    wrap.appendChild(b);
+  });
+}
+function generateCapstone(){
+  const desc = (document.getElementById('cap-skill-desc').value || 'Research a topic and report findings').trim();
+  const toolBtns = document.querySelectorAll('#cap-tools-picker button');
+  const chosenTools = Array.from(toolBtns).filter(b=>b.dataset.selected==='1').map(b=>b.textContent);
+  const mcp = document.getElementById('cap-mcp-select').value;
+  const hook = document.getElementById('cap-hook-select').value;
+  const subagent = document.getElementById('cap-subagent-select').value;
+  const schedule = document.getElementById('cap-schedule-select').value;
+  const mcpLabel = {none:null, slack:'slack', gmail:'gmail', notion:'notion'}[mcp];
+  const hookLabel = {
+    delete:'Block Bash rm commands (PreToolUse, exit 2 on match)',
+    send:'Require confirmation before outbound send (PreToolUse)',
+    write:'Block writes outside project directory (PreToolUse)'
+  }[hook];
+  let preview = '{\n  "name": "research-assistant",\n  "version": "1.0.0",\n  "description": "'+desc.replace(/"/g,'\\"')+'"\n}\n\n';
+  preview += 'skills/research-assistant/SKILL.md\n';
+  preview += '  allowed-tools: ['+ (chosenTools.length? chosenTools.join(', ') : 'Read')+']\n\n';
+  if(mcpLabel){ preview += '.mcp.json\n  mcpServers.'+mcpLabel+': { ... }\n\n'; }
+  preview += 'hooks/hooks.json\n  PreToolUse rule: '+hookLabel+'\n\n';
+  if(subagent==='yes'){ preview += 'agents/researcher.md\n  tools: [WebSearch]\n\n'; }
+  preview += 'schedule (cron): '+schedule+'\n';
+  const el = document.getElementById('capstonePreview');
+  el.style.display='block'; el.textContent = preview;
+  markDone('capstone');
+  updateProgress();
+  buildHome();
+}
+
+/* ---------- INIT ---------- */
+buildNav();
+buildHome();
+buildCapToolsPicker();
+if(safeGetTheme()==='dark'){
+  document.body.classList.add('dark');
+  document.getElementById('themeToggle').textContent='☀️';
+}
+updateProgress();
+</script>
+
+</body>
+</html>

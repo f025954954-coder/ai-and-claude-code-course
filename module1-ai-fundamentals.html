@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌍 מודול 1: יסודות מודלי השפה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#4A90E2; --purple:#7B68EE; --green:#2ECC71;
+  --bg:#eef2fb; --bg2:#e4ecfb; --card:#ffffff; --text:#2d3142; --text-soft:#5a5f7a;
+  --radius:26px; --radius-sm:16px;
+  --shadow:0 12px 30px rgba(74,144,226,0.18);
+  --shadow-soft:0 6px 16px rgba(74,144,226,0.12);
+  --code-bg:#1e2233; --code-text:#d7dcff;
+}
+body.dark{
+  --bg:#141827; --bg2:#1b2032; --card:#222842; --text:#f2f3fb; --text-soft:#b7bcda;
+  --shadow:0 12px 30px rgba(0,0,0,0.45); --shadow-soft:0 6px 16px rgba(0,0,0,0.35);
+  --code-bg:#0d0f1a; --code-text:#c7d0ff;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Heebo',sans-serif; background:linear-gradient(160deg,var(--bg),var(--bg2)); color:var(--text);
+  min-height:100vh; transition:background .4s ease,color .4s ease; padding-top:126px;
+}
+h1,h2,h3{margin:0 0 8px 0;}
+button{font-family:'Heebo',sans-serif;cursor:pointer;border:none;outline:none;}
+code, pre, .mono{font-family:'JetBrains Mono',monospace;}
+
+.topnav{position:fixed;top:0;right:0;left:0;z-index:100;background:var(--card);box-shadow:var(--shadow-soft);padding:10px 16px 0 16px;transition:background .4s ease;}
+.topnav-row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1200px;margin:0 auto;}
+.logo{font-weight:900;font-size:1.2rem;white-space:nowrap;background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;cursor:pointer;user-select:none;flex-shrink:0;text-decoration:none;}
+.hub-link{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 14px;font-size:.8rem;font-weight:700;text-decoration:none;white-space:nowrap;}
+.nav-scroll{display:flex;gap:8px;overflow-x:auto;flex:1;padding:4px 2px;scrollbar-width:thin;align-items:center;}
+.nav-scroll::-webkit-scrollbar{height:6px;}
+.nav-scroll::-webkit-scrollbar-thumb{background:var(--purple);border-radius:10px;}
+.navbtn{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 13px;font-size:0.82rem;font-weight:500;white-space:nowrap;transition:all .25s ease;border:2px solid transparent;position:relative;}
+.navbtn:hover{transform:translateY(-2px) scale(1.04);}
+.navbtn.active{background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;box-shadow:var(--shadow-soft);}
+.navbtn.passed::after{content:'✓';position:absolute;top:-4px;left:-4px;background:var(--green);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
+.theme-toggle{flex-shrink:0;background:var(--bg2);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;transition:transform .3s ease;}
+.theme-toggle:hover{transform:rotate(20deg) scale(1.1);}
+.progress-wrap{max-width:1200px;margin:8px auto 0 auto;height:10px;background:var(--bg2);border-radius:999px;overflow:hidden;}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));border-radius:999px;transition:width .5s ease;}
+.progress-label{max-width:1200px;margin:4px auto 0 auto;font-size:.72rem;color:var(--text-soft);text-align:left;padding:0 4px;}
+
+.page{display:none;animation:fadeIn .5s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.page-inner{max-width:860px;margin:0 auto;padding:18px 16px 60px 16px;}
+.hero-title{font-size:clamp(1.5rem,4vw,2.3rem);font-weight:900;text-align:center;margin-bottom:6px;}
+.hero-sub{text-align:center;color:var(--text-soft);font-size:1.02rem;margin-bottom:22px;}
+.world-tag{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 12px;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--green));color:#fff;margin-bottom:10px;}
+.level-tag{display:inline-block;font-size:.7rem;font-weight:800;padding:3px 12px;border-radius:999px;background:var(--bg2);color:var(--text-soft);margin-bottom:10px;margin-right:6px;}
+
+.card{background:var(--card);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);margin-bottom:20px;}
+.explain{font-size:1.05rem;line-height:1.95;color:var(--text);}
+.explain p{margin:0 0 14px 0;}
+.explain p:last-child{margin-bottom:0;}
+.explain b, .highlight{background:linear-gradient(90deg,rgba(123,104,238,.18),rgba(46,204,113,.18));padding:2px 8px;border-radius:8px;font-weight:700;color:var(--purple);}
+body.dark .explain b, body.dark .highlight{color:#c9c2ff;}
+.callout{background:rgba(241,196,15,.12);border-right:4px solid #f1c40f;padding:12px 16px;border-radius:10px;margin-top:14px;font-size:.95rem;}
+.callout.info{background:rgba(74,144,226,.1);border-color:var(--blue);}
+
+.section-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.05rem;margin:0 0 14px 0;}
+.section-title .num{background:var(--purple);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;}
+
+.demo-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.demo-label{font-weight:700;margin-bottom:12px;font-size:1rem;color:var(--text-soft);}
+
+.lab-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.code-block{position:relative;background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px 18px;overflow-x:auto;font-size:.82rem;line-height:1.7;direction:ltr;text-align:left;margin-top:10px;}
+.code-block pre{margin:0;white-space:pre;}
+.code-label{position:absolute;top:8px;left:14px;font-size:.65rem;color:#8891b8;letter-spacing:.05em;text-transform:uppercase;}
+.lab-note{font-size:.92rem;color:var(--text-soft);margin-top:10px;line-height:1.7;}
+
+textarea, input[type=text]{width:100%;font-family:'Heebo',sans-serif;font-size:1rem;padding:14px 16px;border-radius:var(--radius-sm);border:2px solid var(--bg2);background:var(--bg);color:var(--text);resize:none;transition:border .2s ease;}
+textarea:focus, input[type=text]:focus{border-color:var(--purple);}
+
+.btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;font-weight:700;font-size:0.92rem;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-soft);transition:transform .2s ease, box-shadow .2s ease;}
+.btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 26px rgba(74,144,226,.3);}
+.btn:active{transform:translateY(0) scale(.98);}
+.btn.secondary{background:var(--bg2);color:var(--text);}
+.btn.green{background:linear-gradient(90deg,var(--green),#27ae60);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:10px;}
+
+.quiz-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.quiz-q{font-weight:700;margin:18px 0 10px 0;}
+.quiz-q:first-of-type{margin-top:6px;}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{background:var(--bg);border-radius:12px;padding:11px 16px;text-align:right;font-size:.95rem;border:2px solid transparent;transition:all .2s ease;}
+.quiz-opt:hover{border-color:var(--purple);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(46,204,113,.15);font-weight:700;}
+.quiz-opt.wrong{border-color:#e74c3c;background:rgba(231,76,60,.12);}
+.quiz-opt.disabled{pointer-events:none;}
+.quiz-summary{margin-top:18px;padding:14px 18px;border-radius:14px;background:var(--bg);font-weight:700;text-align:center;}
+.quiz-summary.pass{background:rgba(46,204,113,.15);color:var(--green);}
+.quiz-summary.fail{background:rgba(231,76,60,.12);color:#e74c3c;}
+
+.cube-box{display:flex;flex-wrap:wrap;gap:8px;min-height:60px;margin-top:16px;align-items:center;}
+.cube{padding:8px 12px;border-radius:12px;color:#fff;font-weight:700;font-size:.92rem;transform:scale(0);animation:cubeIn .35s ease forwards;box-shadow:0 6px 14px rgba(0,0,0,.15);}
+@keyframes cubeIn{to{transform:scale(1);}}
+.token-count{margin-top:14px;font-weight:700;font-size:1.1rem;color:var(--purple);}
+
+.temp-slider{width:100%;-webkit-appearance:none;height:10px;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--purple),#e74c3c);outline:none;margin:16px 0;}
+.temp-slider::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--purple);cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.25);}
+.temp-value{text-align:center;font-weight:900;font-size:1.4rem;margin-bottom:6px;}
+.temp-output{text-align:center;font-size:1.2rem;font-weight:600;padding:22px;border-radius:var(--radius-sm);background:var(--bg);min-height:70px;display:flex;align-items:center;justify-content:center;transition:color .3s ease;}
+.wobble{animation:wobble linear infinite;}
+@keyframes wobble{0%{transform:rotate(-1deg) translateY(0);}25%{transform:rotate(1.5deg) translateY(-2px);}50%{transform:rotate(-1deg) translateY(1px);}75%{transform:rotate(2deg) translateY(-1px);}100%{transform:rotate(-1deg) translateY(0);}}
+
+.ctx-bar-wrap{height:34px;border-radius:999px;background:var(--bg);overflow:hidden;margin-top:14px;box-shadow:inset 0 2px 6px rgba(0,0,0,.08);}
+.ctx-bar{height:100%;width:0%;border-radius:999px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;transition:width .4s ease, background .4s ease;}
+.ctx-msg{text-align:center;margin-top:12px;font-weight:700;min-height:24px;}
+
+.api-stage{position:relative;height:260px;background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:16px 0;}
+.api-node{font-size:2.4rem;text-align:center;}
+.api-node-label{font-size:.8rem;color:var(--text-soft);text-align:center;font-weight:700;}
+.api-bubble{position:absolute;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;padding:8px 16px;border-radius:999px;font-size:.85rem;font-weight:700;max-width:78%;text-align:center;white-space:normal;opacity:0;box-shadow:var(--shadow-soft);}
+.api-bubble.response{background:linear-gradient(90deg,var(--green),#27ae60);}
+.api-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+
+.rag-stage{background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;padding:20px;min-height:220px;position:relative;}
+.rag-dots{position:relative;height:150px;margin-top:12px;}
+.rag-dot{position:absolute;width:16px;height:16px;border-radius:50%;transform:scale(0);animation:cubeIn .4s ease forwards;box-shadow:0 4px 10px rgba(0,0,0,.2);}
+.rag-dot.found{outline:3px solid var(--green);outline-offset:3px;}
+.rag-result{margin-top:14px;font-weight:700;text-align:center;min-height:24px;color:var(--green);}
+
+.embed-scene{height:280px;margin-top:14px;background:var(--bg);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;perspective:900px;overflow:hidden;}
+.embed-space{position:relative;width:220px;height:220px;transform-style:preserve-3d;animation:spin3d 14s linear infinite;}
+@keyframes spin3d{from{transform:rotateY(0deg) rotateX(10deg);}to{transform:rotateY(360deg) rotateX(10deg);}}
+.embed-point{position:absolute;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;box-shadow:0 8px 18px rgba(0,0,0,.25);transform-style:preserve-3d;}
+.embed-legend{margin-top:12px;text-align:center;color:var(--text-soft);font-size:.9rem;}
+
+.agent-stage{height:300px;position:relative;margin-top:14px;background:var(--bg);border-radius:var(--radius-sm);}
+.agent-node{position:absolute;width:110px;padding:12px 8px;border-radius:var(--radius-sm);background:var(--card);box-shadow:var(--shadow-soft);text-align:center;font-weight:700;font-size:.85rem;transition:all .3s ease;border:3px solid transparent;}
+.agent-node.active{border-color:var(--green);transform:scale(1.1);box-shadow:0 0 0 6px rgba(46,204,113,.2);}
+.agent-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2.2rem;}
+
+.finish-emoji{font-size:4rem;text-align:center;margin-bottom:10px;}
+.confetti{position:fixed;top:0;font-size:1.6rem;pointer-events:none;animation:fall linear forwards;z-index:200;}
+@keyframes fall{to{transform:translateY(100vh) rotate(360deg);opacity:0;}}
+
+.section-header{display:flex;align-items:center;gap:10px;margin:30px 0 14px 0;}
+.section-header h2{font-size:1.25rem;font-weight:900;}
+.section-header .line{flex:1;height:2px;background:var(--bg2);}
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:10px;}
+.lesson-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:transform .25s ease, box-shadow .25s ease;text-align:center;border:3px solid transparent;position:relative;}
+.lesson-card:hover{transform:translateY(-6px) rotate(-1deg);box-shadow:0 16px 32px rgba(74,144,226,.25);}
+.lesson-card .em{font-size:2.2rem;display:block;margin-bottom:8px;}
+.lesson-card .tt{font-weight:800;font-size:1rem;margin-bottom:4px;}
+.lesson-card .dd{font-size:.85rem;color:var(--text-soft);}
+.lesson-card.done{border-color:var(--green);}
+
+@media (max-width:600px){
+  body{padding-top:112px;}
+  .logo{font-size:1rem;}
+  .navbtn{font-size:.76rem;padding:6px 10px;}
+  .card,.demo-card,.lab-card,.quiz-card{padding:18px;}
+  .agent-node{width:88px;font-size:.72rem;padding:8px 4px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="topnav-row">
+    <a class="hub-link" href="index.html">🏠 האקדמיה</a>
+    <div class="logo">🌍 מודול 1: יסודות מודלי השפה</div>
+    <div class="nav-scroll" id="navScroll"></div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 8 הושלמו</div>
+</div>
+
+<!-- HOME -->
+<section class="page active" id="page-home">
+  <div class="page-inner">
+    <div class="hero-title">🌍 מודול 1: יסודות מודלי השפה</div>
+    <div class="hero-sub">איך LLM עובד באמת - מהטרנספורמר ועד ללולאה האג'נטית. 8 שיעורים מעמיקים עם מעבדות קוד אמיתיות ומבחנונים.</div>
+    <div class="lesson-grid" id="lessonGrid"></div>
+  </div>
+</section>
+
+<!-- LLMS -->
+<section class="page" id="page-llms">
+  <div class="page-inner">
+    <div class="world-tag">🌍 מודול 1</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🧠 LLMs - מה זה בכלל "מודל שפה גדול"</div>
+    <div class="card">
+      <div class="explain">
+        <p>LLM (Large Language Model) הוא רשת נוירונים מסוג <span class="highlight">Transformer</span> - לרוב בארכיטקטורת decoder-only - עם מיליארדי פרמטרים (משקלים נלמדים), שאומנה למשימה מתמטית פשוטה להפליא: <b>חיזוי הטוקן הבא</b> בהינתן כל הטוקנים שלפניו. כל היכולות ה"חכמות" שאנחנו רואים - כתיבה, קוד, נימוק - מתפתחות כתופעת-לוואי של אימון בקנה מידה עצום על המשימה הזו.</p>
+        <p>המנגנון המרכזי שמאפשר את זה הוא <span class="highlight">Self-Attention</span>: בכל שכבה, כל טוקן "מביט" בכל הטוקנים האחרים בהקשר ומחשב כמה כל אחד מהם רלוונטי אליו כרגע (באמצעות מטריצות Query/Key/Value), ומצרף מידע בהתאם. כמה "ראשי קשב" (attention heads) פועלים במקביל ולוכדים סוגי קשרים שונים (תחביריים, סמנטיים, ארוכי-טווח), והכל נערם על פני עשרות שכבות.</p>
+        <p>האימון עצמו מתבצע במספר שלבים נפרדים: <b>Pretraining</b> - חיזוי הטוקן הבא על קורפוס טקסט אדיר (טריליוני טוקנים) - זה המקור העיקרי לידע וליכולת שפה. <b>Fine-tuning/Instruction tuning</b> - מלמד את המודל לעקוב אחר הוראות בפורמט שיחה. <b>RLHF / Constitutional AI</b> וטכניקות דומות - מיישרות את הפלט להעדפות אנושיות ולעקרונות בטיחות. ההבדל בין <span class="highlight">base model</span> (שרק ממשיך טקסט בצורה גולמית) ל-<span class="highlight">instruct/chat model</span> (כמו קלוד, שמתנהג כעוזר שיחתי) הוא בדיוק תוצאה של השלבים הנוספים האלה.</p>
+        <div class="callout">🤔 הערה אפיסטמית: השאלה האם מודל "מבין" באמת את מה שהוא כותב היא שאלה פילוסופית שנויה במחלוקת. הניסוח המדויק והזהיר: המודל לומד מבנה סטטיסטי עמוק של שפה, שמתברר כמקודד בתוכו כמות עצומה של ידע עולם ויכולות דמויות-נימוק - בלי לקבוע באופן חד-משמעי אם זו "הבנה" במובן האנושי.</div>
+        <p>מגמת <b>Scaling Laws</b>: במשך שנים, יכולות המודל השתפרו בצורה צפויה יחסית עם יותר פרמטרים, יותר נתונים, ויותר חישוב אימון. בשנים האחרונות נוספו מקורות שיפור נוספים שלא תלויים רק ב"גודל" - איכות הנתונים, שיטות post-training מתקדמות, וחישוב בזמן ההסקה עצמה (inference-time compute / "חשיבה" מורחבת לפני מתן תשובה).</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: הנוסחה מאחורי Self-Attention</div>
+      <div class="code-block"><span class="code-label">Scaled Dot-Product Attention</span><pre>Attention(Q, K, V) = softmax( (Q · K^T) / sqrt(d_k) ) · V
+
+// Q (Query), K (Key), V (Value) - הטלות לינאריות של embedding הטוקן
+// d_k - מימד וקטור ה-Key (הגורם sqrt(d_k) מייצב את הגרדיאנטים)
+// softmax הופך את הציונים להתפלגות משקלים שמסכמת ל-1
+// התוצאה: כל טוקן מקבל "ממוצע משוקלל" של כל הטוקנים הרלוונטיים לו</pre></div>
+      <div class="lab-note">💡 בלוק טרנספורמר בודד נראה בערך כך: <code>קלט → Self-Attention → Add&Norm → Feed-Forward → Add&Norm</code> - וזה נערם N פעמים (עשרות שכבות במודלים גדולים) לפני הטלה סופית להתפלגות הסתברות על פני אוצר המילים כולו, בדיוק כמו שנראה בשיעור הבא על Temperature.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🔍 המחשה: לפני שהמודל "בוחר" מילה, כל טוקן קודם מביט בשאר הטוקנים (Attention). לחצו כדי להדגים סבב קשב פשוט:</div>
+      <div class="api-row"><button class="btn" onclick="runAttentionDemo()">▶️ הרץ סבב Attention</button></div>
+      <div class="action-log" id="attnLog" style="margin-top:16px;background:var(--bg);border-radius:var(--radius-sm);padding:16px;min-height:50px;font-size:.95rem;font-weight:600;">לחצו כדי לראות דוגמת קשב על המשפט: "הכלב רדף אחרי החתול כי הוא רעב"</div>
+    </div>
+    <div class="quiz-card" id="quiz-llms"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goHome()">🏠 חזרה למפת המודול</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- TOKENS -->
+<section class="page" id="page-tokens">
+  <div class="page-inner">
+    <div class="world-tag">🌍 מודול 1</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">🧱 Tokenization - איך טקסט הופך למספרים</div>
+    <div class="card">
+      <div class="explain">
+        <p>מודל שפה לא "רואה" אותיות או מילים שלמות. לפני שהטקסט מגיע למודל, רכיב בשם <b>Tokenizer</b> מפרק אותו ליחידות קטנות בשם <b>tokens</b> - לרוב באמצעות אלגוריתם כמו <span class="highlight">Byte-Pair Encoding (BPE)</span>, שבונה אוצר מילים של עשרות אלפי עד מאות אלפי "חתיכות" נפוצות מתוך קורפוס טקסט ענק.</p>
+        <p>מילים נפוצות (כמו "the" או "שלום") הופכות לרוב לטוקן בודד. מילים נדירות, שמות פרטיים, קוד תכנות או מספרים מתפצלים למספר טוקנים. שפות שאינן אנגלית - כולל עברית - נוטות "לצרוך" יותר טוקנים לאותה כמות תווים, כי אוצר המילים של רוב המודלים אומן בעיקר על טקסט אנגלי. זו לא רק סוגיה טכנית: היא משפיעה ישירות על <span class="highlight">מחיר</span> (חיוב הוא לפי מספר טוקנים), על <span class="highlight">מהירות</span>, ועל כמה טקסט נכנס ב-Context Window (השיעור הבא).</p>
+        <p>חוק אצבע גס: בטקסט אנגלי, טוקן אחד ≈ 4 תווים בממוצע. בעברית היחס פחות נוח ולעיתים קרוב יותר לטוקן על כל מילה או חצי מילה. חשוב גם לזכור: <b>אין תקן אחיד</b> - לכל משפחת מודלים יש Tokenizer משלה, כך שאותו משפט יכול להיספר אחרת ב-Claude לעומת מודלים אחרים.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: איך זה נראה בתשובת API אמיתית</div>
+      <div class="lab-note">כל תשובה מ-Claude API מגיעה עם אובייקט <code>usage</code> שמדווח בדיוק כמה טוקנים נצרכו - זה הבסיס לחיוב:</div>
+      <div class="code-block"><span class="code-label">JSON response (מקוצר)</span><pre>{
+  "id": "msg_01XyZ...",
+  "role": "assistant",
+  "content": [{ "type": "text", "text": "..." }],
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 15,
+    "output_tokens": 42
+  }
+}</pre></div>
+      <div class="lab-note">💡 המחיר הסופי = (input_tokens × מחיר-לקלט) + (output_tokens × מחיר-לפלט). זה גם ההסבר לפרקטיקה של "לקצר פרומפטים" בסביבות production - כל טוקן מיותר חוזר על עצמו בכל קריאה ומצטבר לעלות.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">✍️ נסו בעצמכם - כתבו משפט ותראו הערכת חלוקה לטוקנים (הערכה גסה, לא ה-Tokenizer האמיתי של Claude):</div>
+      <textarea id="tokenInput" rows="3" placeholder="כתבו כאן משהו... לדוגמה: שלום, מה שלומך היום?"></textarea>
+      <div class="cube-box" id="cubeBox"></div>
+      <div class="token-count" id="tokenCount">0 tokens 🧱</div>
+    </div>
+    <div class="quiz-card" id="quiz-tokens"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- TEMPERATURE -->
+<section class="page" id="page-temperature">
+  <div class="page-inner">
+    <div class="world-tag">🌍 מודול 1</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">🌡️ Temperature - שליטה בהתפלגות ההסתברות</div>
+    <div class="card">
+      <div class="explain">
+        <p>בכל צעד, המודל לא "בוחר" את הטוקן הבא - הוא מחשב <span class="highlight">התפלגות הסתברויות</span> על פני כל אוצר המילים (למשל, "80% סיכוי שהמילה הבאה היא 'שמח', 12% 'עצוב'..."). <b>Temperature</b> הוא פרמטר שמשנה את "חדות" ההתפלגות הזו לפני הדגימה (טכנית: הוא מחלק את ה-logits לפני הפעלת softmax).</p>
+        <p>ב-<span class="highlight">Temperature נמוך</span> ההתפלגות נהיית חדה מאוד - כמעט כל המשקל עובר לטוקן הכי סביר, והתוצאה קרובה לדטרמיניסטית (אך לא בהכרח זהה ב-100% מהמקרים, כי יש עוד גורמי דגימה). ב-<span class="highlight">Temperature גבוה</span> ההתפלגות משתטחת - גם טוקנים פחות סבירים מקבלים סיכוי הגון להיבחר, מה שמייצר יותר יצירתיות אך גם יותר סיכון לחוסר קוהרנטיות.</p>
+        <div class="callout info">📌 דיוק חשוב: ה-API של Anthropic מקבל Temperature בטווח <b>0 עד 1</b> (לא 0 עד 2 כמו בממשקים מסוימים של ספקים אחרים). בדמו למטה השתמשנו בטווח 0-2 להמחשה חינוכית מוגזמת - כדאי לזכור את ההבדל כשעובדים עם APIs אמיתיים.</div>
+        <p>פרמטרים קרובים שכדאי להכיר: <b>top_p</b> (Nucleus Sampling - שוקל רק את קבוצת הטוקנים המצטברת שמגיעה לאחוז הסתברות מסוים) ו-<b>top_k</b> (מגביל את הדגימה ל-K הטוקנים הכי סבירים בלבד). לרוב לא משנים את כולם יחד - Anthropic ממליצה לשנות temperature <b>או</b> top_p, לא את שניהם בו-זמנית.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: הפרמטר בבקשת API אמיתית</div>
+      <div class="code-block"><span class="code-label">Request body</span><pre>{
+  "model": "claude-sonnet-5",
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "messages": [
+    { "role": "user", "content": "תכתוב לי שיר קצר" }
+  ]
+}</pre></div>
+      <div class="lab-note">💡 שימו לב: אין פרמטר "seed" אמיתי שמבטיח תוצאה זהה ב-100% מהמקרים בין קריאות שונות, גם ב-temperature=0 - יש עדיין שונות זעירה שנובעת מאופן חישוב מקבילי (floating point non-determinism). "דטרמיניסטי" הוא קירוב, לא הבטחה מוחלטת.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🔥 הזיזו את הסליידר ותראו איך ההתפלגות "משתטחת":</div>
+      <div class="temp-value" id="tempValue">🥶 0.0</div>
+      <input type="range" min="0" max="2" step="0.1" value="0" class="temp-slider" id="tempSlider" oninput="updateTemperature(this.value)">
+      <div style="text-align:center;color:var(--text-soft);font-size:.85rem;margin-bottom:8px;">שאלה: "איך השמיים היום?"</div>
+      <div class="temp-output" id="tempOutput">השמיים היום בהירים. ☀️</div>
+    </div>
+    <div class="quiz-card" id="quiz-temperature"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- CONTEXT WINDOW -->
+<section class="page" id="page-context">
+  <div class="page-inner">
+    <div class="world-tag">🌍 מודול 1</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">🧠 Context Window - גבול הזיכרון בפועל</div>
+    <div class="card">
+      <div class="explain">
+        <p><b>Context Window</b> הוא מספר הטוקנים המקסימלי שמודל יכול "להביט" בו בבת אחת בקריאה בודדת - system prompt + היסטוריית שיחה + ההודעה הנוכחית + מקום שמור לתשובה, הכל ביחד. זה לא "זיכרון לטווח ארוך" - ברגע שהשיחה מסתיימת, שום דבר לא נשמר אלא אם אפליקציה חיצונית שומרת ומזינה אותו מחדש בפעם הבאה.</p>
+        <p>גודל החלון משתנה בין דורות מודלים ומשפחות שונות, וגדל באופן עקבי עם הזמן - חלק מהמודלים תומכים כיום בחלונות של מאות אלפי טוקנים ואף יותר. אבל חלון גדול יותר לא פותר הכל: מחקרים מראים תופעה שנקראת <span class="highlight">"lost in the middle"</span> - מידע שנמצא באמצע הקשר ארוך מאוד נוטה להיזכר פחות טוב מאשר מידע שבתחילת או בסוף ההקשר.</p>
+        <p>כשההקשר מתמלא, יש כמה אסטרטגיות מקובלות: <b>חיתוך</b> (זריקת ההודעות הישנות ביותר), <b>סיכום</b> (החלפת היסטוריה ארוכה בתקציר קצר), ו-<b>RAG</b> (השיעור הבא) - שבמקום להכניס את כל המידע לקונטקסט, שולף רק את הקטעים הרלוונטיים לשאלה הנוכחית.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: תקציב הטוקנים של קריאה בודדת</div>
+      <div class="code-block"><span class="code-label">budget (pseudo)</span><pre>system_prompt_tokens
++ conversation_history_tokens
++ current_user_message_tokens
++ reserved_for_output_tokens (max_tokens)
+─────────────────────────────
+≤ context_window_limit   // אחרת: שגיאת "context length exceeded"</pre></div>
+      <div class="lab-note">💡 שימו לב ל־<code>max_tokens</code> בבקשה: זה לא "כמה שהמודל צריך" אלא תקרה שאתם קובעים מראש. אם היא נמוכה מדי, התשובה תיחתך גם אם עדיין נשאר מקום בחלון ההקשר.</div>
+    </div>
+    <div class="card">
+      <div class="explain">
+        <p><b>ניהול הקשר ברמת האפליקציה</b>: כשהשיחה מתארכת, יש כמה תבניות נפוצות מעבר לחיתוך גס - <span class="highlight">Sliding Window</span> (שמירת ה-N ההודעות האחרונות בלבד), <span class="highlight">Summarization Chain</span> (סיכום אוטומטי של הודעות ישנות לפסקה קצרה במקום למחוק אותן לגמרי), ו-<span class="highlight">Hierarchical Memory</span> (שילוב של זיכרון קצר-טווח בהקשר עצמו + זיכרון ארוך-טווח חיצוני שנשלף לפי הצורך דרך RAG).</p>
+        <p><b>Prompt Caching</b> - טכניקה אמיתית וזמינה בפועל ב-API: כאשר חלק גדול מהפרומפט חוזר על עצמו בין קריאות (system prompt ארוך, מסמך רקע קבוע), אפשר לסמן אותו כ"נקודת cache" - השרת שומר את מצב החישוב הפנימי (Key/Value) של אותו קידומת, וקריאות עוקבות שמשתמשות באותה קידומת בדיוק נהנות מזמן עיבוד וממחיר נמוכים משמעותית, במקום לעבד את אותו טקסט מחדש בכל פעם.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: סימון cache breakpoint בבקשה</div>
+      <div class="code-block"><span class="code-label">Request with cache_control</span><pre>{
+  "model": "claude-sonnet-5",
+  "system": [
+    {
+      "type": "text",
+      "text": "...system prompt ארוך עם הרבה הוראות...",
+      "cache_control": { "type": "ephemeral" }
+    }
+  ],
+  "messages": [ { "role": "user", "content": "שאלה קצרה" } ]
+}</pre></div>
+      <div class="lab-note">💡 בקריאה הראשונה עם הקידומת הזו יש עלות "כתיבה ל-cache" מעט גבוהה יותר; בכל קריאה חוזרת עם אותה קידומת בדיוק, יש חיסכון משמעותי - יעיל במיוחד לשיחות ארוכות עם system prompt כבד או agent שקורא שוב ושוב לאותו הקשר.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">📝 כתבו טקסט ותראו את הזיכרון מתמלא:</div>
+      <textarea id="ctxInput" rows="4" placeholder="תמשיכו לכתוב... הבר יתמלא ככל שתוסיפו טקסט"></textarea>
+      <div class="ctx-bar-wrap"><div class="ctx-bar" id="ctxBar">0%</div></div>
+      <div class="ctx-msg" id="ctxMsg"></div>
+    </div>
+    <div class="quiz-card" id="quiz-context"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- API -->
+<section class="page" id="page-api">
+  <div class="page-inner">
+    <div class="world-tag">🌍 מודול 1</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🍽️ API - החוזה הפורמלי מול המודל</div>
+    <div class="card">
+      <div class="explain">
+        <p>API (Application Programming Interface) הוא חוזה מוגדר: כתובת (endpoint), פורמט בקשה, פורמט תשובה, ואימות הרשאות - שמאפשר לתוכנה שלכם "לדבר" עם שרתי הספק בלי שתריצו את המודל בעצמכם. אנלוגיית המלצר נכונה ברמת העיקרון, אבל ה-API האמיתי מוסיף שכבות: <b>מפתח API</b> (אישור זהות וחיוב), <b>גרסת API</b> (headers כמו <code>anthropic-version</code>), <b>הגבלות קצב</b> (rate limits), <b>קודי שגיאה</b> סטנדרטיים (400, 401, 429, 500...), ו-<b>ניסיונות חוזרים</b> (retries) בכשלים זמניים.</p>
+        <p>בקשה טיפוסית כוללת: שם מודל, מערך <code>messages</code> עם תפקידים (<code>user</code>/<code>assistant</code>), ופרמטרים כמו <code>temperature</code> ו-<code>max_tokens</code>. התשובה כוללת בלוקי תוכן, <code>stop_reason</code> (למה המודל הפסיק - סיים תשובה? הגיע למגבלת טוקנים? ביקש להשתמש בכלי?), ואת אובייקט ה-<code>usage</code> שראינו בשיעור על Tokens.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: קריאת API אמיתית</div>
+      <div class="code-block"><span class="code-label">bash / curl</span><pre>curl https://api.anthropic.com/v1/messages \
+  -H "x-api-key: $ANTHROPIC_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "content-type: application/json" \
+  -d '{
+    "model": "claude-sonnet-5",
+    "max_tokens": 1024,
+    "messages": [
+      { "role": "user", "content": "מה זה API בשתי שורות?" }
+    ]
+  }'</pre></div>
+      <div class="lab-note">💡 שימו לב שהמפתח (<code>x-api-key</code>) נשלח כ-header, לא בגוף הבקשה - כלל אצבע אבטחתי: סודות לא נכנסים ל-body או לכתובת ה-URL, כי אלו נוטים להישמר בלוגים.</div>
+    </div>
+    <div class="card">
+      <div class="explain">
+        <p><b>Streaming</b>: בממשקי צ'אט אמיתיים המודל לא "נעלם" לכמה שניות ואז מחזיר הכל בבת אחת - הבקשה נשלחת עם <code>"stream": true</code>, והשרת מחזיר את התשובה כזרם אירועים (Server-Sent Events) שמגיעים טוקן-טוקן, כדי שהמשתמש יראה טקסט מופיע בזמן אמת במקום לחכות לכל התשובה.</p>
+        <p><b>התמודדות עם כשלים</b>: קריאות API אמיתיות נכשלות מדי פעם - עומס זמני (429), תקלת שרת (5xx), או timeout ברשת. התבנית הסטנדרטית היא <span class="highlight">exponential backoff with jitter</span>: בכל ניסיון חוזר מחכים זמן שגדל אקספוננציאלית (1s, 2s, 4s...) בתוספת רעש אקראי קטן.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: זרם SSE אמיתי</div>
+      <div class="code-block"><span class="code-label">Server-Sent Events stream</span><pre>event: content_block_delta
+data: {"type":"text_delta","text":"שלום"}
+
+event: content_block_delta
+data: {"type":"text_delta","text":" עולם"}
+
+event: message_delta
+data: {"stop_reason":"end_turn"}
+
+event: message_stop
+data: {}</pre></div>
+      <div class="lab-note">💡 הצד הלקוח מצרף (concatenate) את כל ה-<code>text_delta</code> events בזמן אמת ומרנדר אותם לתוך ה-UI - זו בדיוק ההרגשה של "המודל כותב לפנייך".</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">💬 כתבו שאלה ולחצו "שלח" כדי לראות את מסלול הבקשה:</div>
+      <input type="text" id="apiInput" placeholder="לדוגמה: מה השעה?">
+      <div class="api-row"><button class="btn" onclick="sendApiRequest()">📨 שלח</button></div>
+      <div class="api-stage">
+        <div style="text-align:center;"><div class="api-node">🧑</div><div class="api-node-label">אתם (client)</div></div>
+        <div style="text-align:center;"><div class="api-node">🧑‍🍳</div><div class="api-node-label">API endpoint → מודל</div></div>
+        <div id="apiBubble" class="api-bubble"></div>
+      </div>
+    </div>
+    <div class="quiz-card" id="quiz-api"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- RAG -->
+<section class="page" id="page-rag">
+  <div class="page-inner">
+    <div class="world-tag">🌍 מודול 1</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🔍 RAG - שליפה מבוססת-עדות לפני יצירה</div>
+    <div class="card">
+      <div class="explain">
+        <p>Retrieval-Augmented Generation הוא Pipeline בן כמה שלבים: (1) <b>חיתוך</b> מסמכים לקטעים (chunks), (2) <b>הטמעה</b> (embedding) של כל קטע לוקטור מספרי, (3) שמירה במסד וקטורים (Vector DB / אינדקס ANN כמו HNSW), (4) בזמן שאלה - הטמעת השאלה עצמה, (5) <b>שליפה</b> של ה-K הקטעים הכי דומים (לרוב לפי Cosine Similarity), (6) הזרקת הקטעים שנשלפו כהקשר לתוך הפרומפט, (7) המודל מייצר תשובה המבוססת (מקווים) על הטקסט שנשלף.</p>
+        <p>למה זה חשוב: זו דרך לתת למודל גישה למידע עדכני או פרטי בלי לאמן אותו מחדש, ולהפחית הזיות (Hallucinations) על ידי "עיגון" התשובה בעדות ממשית. אבל יש כאן נקודת תורפה קריטית: <span class="highlight">איכות התשובה חסומה על ידי איכות השליפה</span> - "garbage in, garbage out". אם החיתוך גרוע או ההטמעה לא מדויקת, המודל יקבל הקשר לא רלוונטי ועדיין "יאמין" שהוא נכון.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: הנוסחה שמאחורי "החיפוש החכם"</div>
+      <div class="code-block"><span class="code-label">Cosine Similarity</span><pre>similarity(A, B) = (A · B) / (‖A‖ × ‖B‖)
+
+// דוגמה מספרית עם שני וקטורים דו-ממדיים:
+A = [0.9, 0.1]   // "כלב רץ בפארק"
+B = [0.8, 0.2]   // "כלבלב משחק בחוץ"
+A·B = 0.9*0.8 + 0.1*0.2 = 0.74
+‖A‖ = 0.906, ‖B‖ = 0.825
+similarity ≈ 0.74 / (0.906*0.825) ≈ 0.99  →  קרובים מאוד במשמעות</pre></div>
+      <div class="lab-note">💡 ערך קרוב ל-1 = כמעט זהים במשמעות. ערך קרוב ל-0 = לא קשורים. ערך שלילי (בטווח -1 עד 1) = מנוגדים סמנטית. זה בדיוק המנוע מאחורי "החיפוש" בדמו למטה.</div>
+    </div>
+    <div class="card">
+      <div class="explain">
+        <p><b>איפה שומרים את הוקטורים?</b> במסד וקטורים (Vector Database) - כלים ייעודיים כמו Pinecone, Weaviate, Qdrant או Chroma, לעומת הרחבות וקטוריות למסדי נתונים קיימים כמו pgvector עבור Postgres. הבחירה תלויה בקנה מידה, בדרישות latency, ובכמה חשוב לכם לא להוסיף עוד מערכת נפרדת לתחזק.</p>
+        <p><b>אסטרטגיית חיתוך (Chunking)</b> משפיעה ישירות על איכות השליפה: chunks קטנים מדי מאבדים הקשר; chunks גדולים מדי "מדללים" את האות הרלוונטי בתוך רעש. פרקטיקה נפוצה: chunks בגודל 200-500 טוקנים עם <span class="highlight">overlap</span> (חפיפה) של 10-20% ביניהם.</p>
+      </div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">📤 שלב 1: "העלו" קובץ (מדמה חיתוך + הטמעה לוקטורים)</div>
+      <button class="btn" onclick="uploadFile()">📄 העלה קובץ</button>
+      <div class="rag-stage"><div class="rag-dots" id="ragDots"></div></div>
+      <div class="demo-label" style="margin-top:16px;">❓ שלב 2: שאלו שאלה (מדמה שליפה לפי דמיון וקטורי)</div>
+      <input type="text" id="ragInput" placeholder="לדוגמה: מה כתוב בקובץ?">
+      <div class="api-row"><button class="btn green" onclick="ragSearch()">🔎 חפש</button></div>
+      <div class="rag-result" id="ragResult"></div>
+    </div>
+    <div class="quiz-card" id="quiz-rag"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- EMBEDDINGS -->
+<section class="page" id="page-embeddings">
+  <div class="page-inner">
+    <div class="world-tag">🌍 מודול 1</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">🗺️ Embeddings - משמעות כגיאומטריה</div>
+    <div class="card">
+      <div class="explain">
+        <p>Embedding הוא וקטור מספרי צפוף (בפועל - לרוב מאות עד אלפי ממדים, לא 3 כמו בדמו למטה) שמיוצר על ידי רשת נוירונים מאומנת, כך שקלטים בעלי משמעות דומה ממופים לנקודות קרובות במרחב הווקטורי. מרחק בין נקודות נמדד לרוב ב-Cosine Similarity או במרחק אוקלידי.</p>
+        <p>איך זה מתאמן, בקצרה: <span class="highlight">Contrastive Learning</span> - במהלך האימון, המודל נענש כשהוא ממקם זוגות "דומים" רחוק, ומתוגמל כשהוא ממקם אותם קרוב, ולהיפך עבור זוגות "שונים". מודלי Embedding הם בדרך כלל מודלים <b>נפרדים</b> ומתמחים - לא אותו מודל גנרטיבי שעונה לכם על שאלות.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: חישוב דמיון אמיתי בין שלוש מילים</div>
+      <div class="code-block"><span class="code-label">toy vectors (2D, להמחשה)</span><pre>חתול  = [0.90, 0.85]
+כלב   = [0.88, 0.80]
+אוטו  = [0.10, 0.95]
+
+similarity(חתול, כלב) ≈ 0.999   →  קרובים מאוד (שתיהן חיות מחמד)
+similarity(חתול, אוטו) ≈ 0.79   →  רחוקים משמעותית פחות</pre></div>
+      <div class="lab-note">💡 בעולם האמיתי הווקטורים ארוכים בהרבה, אבל העיקרון זהה לחלוטין.</div>
+    </div>
+    <div class="card">
+      <div class="explain">
+        <p><b>טרייד-אוף מימדיות</b>: מודל embedding עם יותר מימדים (למשל 3072 לעומת 384) לרוב לוכד יותר ניואנס סמנטי, אבל עולה יותר באחסון ובזמן חיפוש. השוואת איכות בין מודלי embedding נעשית בדרך כלל מול benchmarks סטנדרטיים (כמו MTEB).</p>
+        <p><b>Matryoshka Embeddings</b> - טכניקה חדשה יחסית: מודלים מסוימים מאומנים כך שאפשר "לקצץ" (truncate) את הוקטור למימדים פחותים ועדיין לקבל דמיון סמנטי שמיש, עם ירידה הדרגתית באיכות ולא קריסה מוחלטת.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: קיצוץ מימדים (Matryoshka) להמחשה</div>
+      <div class="code-block"><span class="code-label">truncation example</span><pre>full_vector (1536 dims)  → similarity(A,B) = 0.912
+truncated to 512 dims    → similarity(A,B) = 0.905   // כמעט זהה
+truncated to 128 dims    → similarity(A,B) = 0.861   // ירידה מתונה
+truncated to 32 dims     → similarity(A,B) = 0.640   // ירידה משמעותית</pre></div>
+      <div class="lab-note">💡 שימו לב לירידה ה"חלקה" - זה ההבדל בין matryoshka embeddings לחיתוך מקרי של מודל רגיל.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🔄 שימו לב: חתול וכלב קרובים (שניהם חיות), אבל אוטו רחוק יותר במרחב:</div>
+      <div class="embed-scene">
+        <div class="embed-space">
+          <div class="embed-point" style="background:var(--blue);transform:translate3d(-40px,-20px,30px);">🐱 חתול</div>
+          <div class="embed-point" style="background:var(--purple);transform:translate3d(10px,10px,40px);">🐶 כלב</div>
+          <div class="embed-point" style="background:var(--green);transform:translate3d(60px,30px,-60px);">🚗 אוטו</div>
+        </div>
+      </div>
+      <div class="embed-legend">המרחב מסתובב לבד - שימו לב שהמרחק בין המילים נשמר מכל זווית 👀</div>
+    </div>
+    <div class="quiz-card" id="quiz-embeddings"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- AGENT LOOP -->
+<section class="page" id="page-agent">
+  <div class="page-inner">
+    <div class="world-tag">🌍 מודול 1</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🔁 Agentic Loop - מלולאת חשיבה ליישות פועלת</div>
+    <div class="card">
+      <div class="explain">
+        <p>לולאה אג'נטית (מוכרת גם בשם דפוס <span class="highlight">ReAct</span> - Reasoning + Acting) עובדת כך: <b>Observe</b> (המודל רואה את מצב השיחה הנוכחי) → <b>Think</b> (מנמק מה השלב הבא) → <b>Act</b> (בוחר ומפעיל כלי - tool call) → <b>Observe</b> את תוצאת הכלי → וחוזר חלילה, עד לתנאי עצירה.</p>
+        <p>זו בדיוק הארכיטקטורה שמפעילה בפועל את Claude Code ואת Claude Agent SDK: כל איטרציה היא קריאת API בודדת שעשויה להחזיר בלוק מסוג <code>tool_use</code>; ה-harness מבצע את הפעולה בפועל, ומזין את תוצאת הכלי (<code>tool_result</code>) בחזרה כהודעה בהיסטוריה עבור האיטרציה הבאה.</p>
+        <p>מוקשים אמיתיים: לולאות אינסופיות, שימוש שגוי בכלים, וההיסטוריה שגדלה בכל איטרציה. זו בדיוק הסיבה ש-<b>Subagents</b> (מודול 2) קיימים: הם "מכילים" גידול הקשר בלתי נשלט עבור תת-משימות מסוימות.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: פסאודוקוד של הלולאה בפועל</div>
+      <div class="code-block"><span class="code-label">pseudo-python</span><pre>messages = [system_prompt, user_message]
+done = False
+while not done:
+    response = model.call(messages)
+    if response.stop_reason == "tool_use":
+        result = run_tool(response.tool_call)
+        messages.append(tool_result(result))
+    else:
+        done = True
+        final_answer = response.text</pre></div>
+      <div class="lab-note">💡 העצירה קורית כי <code>stop_reason</code> כבר לא <code>tool_use</code>. אם המודל תמיד מחזיר tool_use, הלולאה לא תיעצר לבד - מכאן חשיבות ה-max_turns וה-timeout.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">▶️ לחצו "התחל" ותראו את הלולאה בפעולה:</div>
+      <div class="api-row">
+        <button class="btn" id="agentStartBtn" onclick="startAgentLoop()">▶️ התחל</button>
+        <button class="btn secondary" onclick="stopAgentLoop()">⏸ עצור</button>
+      </div>
+      <div class="agent-stage">
+        <div class="agent-center">🤖</div>
+        <div class="agent-node" id="agentNode0" style="top:6px;right:calc(50% - 55px);">🤔<br>1. Think</div>
+        <div class="agent-node" id="agentNode1" style="top:calc(50% - 30px);right:8px;">🛠️<br>2. Act (tool)</div>
+        <div class="agent-node" id="agentNode2" style="bottom:6px;right:calc(50% - 55px);">⚡<br>3. Execute</div>
+        <div class="agent-node" id="agentNode3" style="top:calc(50% - 30px);left:8px;">✅<br>4. Observe</div>
+      </div>
+    </div>
+    <div class="quiz-card" id="quiz-agent"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn green" onclick="goRelative(1)">סיימתי את המודול! 🎉</button>
+    </div>
+  </div>
+</section>
+
+<!-- FINISH -->
+<section class="page" id="page-finish">
+  <div class="page-inner">
+    <div class="finish-emoji">🎉🌍✨</div>
+    <div class="hero-title">כל הכבוד - סיימתם את מודול 1!</div>
+    <div class="hero-sub">עכשיו יש לכם הבנה אמיתית של איך מודלי שפה עובדים - מהטרנספורמר ועד ללולאה האג'נטית. מוכנים למודול הבא?</div>
+    <div class="nav-buttons" style="justify-content:center;gap:16px;">
+      <a class="btn secondary" href="index.html" style="text-decoration:none;">🏠 חזרה לאקדמיה</a>
+      <a class="btn green" href="module2-claude-code.html" style="text-decoration:none;">מודול 2: קלוד קוד ⬅</a>
+    </div>
+  </div>
+</section>
+
+<script>
+const THIS_FILE = 'module1-ai-fundamentals.html';
+const PROGRESS_KEY = 'academy_progress_v1';
+function loadProgressSet(){
+  try{ return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]')); }
+  catch(e){ return new Set(); }
+}
+function markDone(unitKey){
+  const s = loadProgressSet();
+  s.add(THIS_FILE+'::'+unitKey);
+  try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(Array.from(s))); }catch(e){}
+}
+function isUnitDone(unitKey){ return loadProgressSet().has(THIS_FILE+'::'+unitKey); }
+function safeGetTheme(){ try{ return localStorage.getItem('ai-theme'); }catch(e){ return null; } }
+function safeSetTheme(v){ try{ localStorage.setItem('ai-theme', v); }catch(e){} }
+
+const topics = [
+  {key:'llms', emoji:'🧠', title:'LLMs', desc:'מה זה מודל שפה גדול'},
+  {key:'tokens', emoji:'🧱', title:'Tokenization', desc:'איך טקסט הופך למספרים'},
+  {key:'temperature', emoji:'🌡️', title:'Temperature', desc:'שליטה בהתפלגות'},
+  {key:'context', emoji:'🧠', title:'Context Window', desc:'גבול הזיכרון'},
+  {key:'api', emoji:'🍽️', title:'API', desc:'החוזה הפורמלי'},
+  {key:'rag', emoji:'🔍', title:'RAG', desc:'שליפה מבוססת-עדות'},
+  {key:'embeddings', emoji:'🗺️', title:'Embeddings', desc:'משמעות כגיאומטריה'},
+  {key:'agent', emoji:'🔁', title:'Agentic Loop', desc:'לולאת חשיבה-פעולה'}
+];
+const palette = ['#4A90E2','#7B68EE','#2ECC71'];
+let currentPage = 'home';
+
+const quizData = {
+  llms: [
+    {q:'מהו המנגנון המרכזי שמאפשר לטרנספורמר "לשקלל" רלוונטיות בין טוקנים בהקשר?', opts:['Self-Attention','Tokenization','Temperature','Context Window'], correct:0},
+    {q:'מה ההבדל בין base model ל-instruct/chat model?', opts:['אין הבדל טכני','base model רק ממשיך טקסט; instruct model עבר אימון נוסף (fine-tuning/RLHF) לעקוב אחר הוראות','instruct model קטן יותר תמיד','base model מהיר יותר תמיד'], correct:1},
+    {q:'מה תפקיד ה-pretraining בשלבי אימון LLM?', opts:['רק ליישר את המודל לבטיחות','לימוד חיזוי הטוקן הבא על קורפוס עצום - מקור עיקרי לידע ויכולת שפה','רק לכייל את ה-temperature','הוא שלב אופציונלי שרוב המודלים מדלגים עליו'], correct:1}
+  ],
+  tokens: [
+    {q:'מה קובע כמה tokens יעלה לכם משפט מסוים?', opts:['מספר האותיות בלבד','אלגוריתם ה-Tokenizer של המודל הספציפי','מספר המילים בלבד','הזמן שלוקח לקרוא את המשפט'], correct:1},
+    {q:'מה נכון לגבי טקסט בעברית לעומת אנגלית?', opts:['עברית תמיד צורכת פחות טוקנים','בד״כ עברית צורכת יותר טוקנים לאותה כמות תווים','אין שום הבדל','זה תלוי רק בגופן'], correct:1},
+    {q:'מה כולל אובייקט ה-usage בתשובת API?', opts:['רק input_tokens','רק output_tokens','גם input_tokens וגם output_tokens','זמן התגובה בשניות'], correct:2}
+  ],
+  temperature: [
+    {q:'מה temperature משנה טכנית?', opts:['את גודל אוצר המילים','את חדות התפלגות ההסתברות לפני הדגימה (softmax)','את מספר הטוקנים המקסימלי','את מהירות השרת'], correct:1},
+    {q:'מה טווח ה-temperature הרשמי ב-API של Anthropic?', opts:['0 עד 2','0 עד 1','-1 עד 1','1 עד 10'], correct:1},
+    {q:'האם temperature=0 מבטיח תוצאה זהה ב-100% מהמקרים?', opts:['כן, תמיד','לא, יש עדיין שונות זעירה אפשרית','רק במודלים ישנים','רק אם max_tokens=1'], correct:1}
+  ],
+  context: [
+    {q:'context window כולל...', opts:['רק את ההודעה האחרונה','system prompt + היסטוריה + הודעה נוכחית + מקום לתשובה','רק תשובות קודמות','רק את ה-system prompt'], correct:1},
+    {q:'מהי תופעת lost in the middle?', opts:['המודל שוכח הכל אחרי 5 דקות','מידע באמצע הקשר ארוך נזכר פחות טוב ממידע בקצוות','המודל מאבד חיבור לאינטרנט','טוקנים באמצע המשפט נחתכים'], correct:1},
+    {q:'איזו טכניקה עוזרת להתמודד עם הקשר מוגבל?', opts:['הגדלת temperature','RAG - שליפת קטעים רלוונטיים בלבד במקום הכל','הפחתת max_tokens ל-0','שינוי שם המודל'], correct:1}
+  ],
+  api: [
+    {q:'איפה אמור להישלח מפתח ה-API?', opts:['בתוך גוף הבקשה (body)','כ-header נפרד (למשל x-api-key)','בכתובת ה-URL','הוא לא נדרש'], correct:1},
+    {q:'מה זה stop_reason?', opts:['קוד שגיאה של השרת','הסיבה שהמודל הפסיק לייצר טקסט','הזמן שחלף מתחילת הבקשה','מזהה ייחודי של הבקשה'], correct:1},
+    {q:'מה תפקיד ה-header anthropic-version?', opts:['קובע את השפה','מציין גרסת API כדי לשמור על תאימות','מציין את גרסת הדפדפן','קובע את המחיר'], correct:1}
+  ],
+  rag: [
+    {q:'מה הסדר הנכון בפייפליין RAG?', opts:['שליפה → חיתוך → הטמעה','חיתוך → הטמעה → שמירה → שליפה בזמן שאילתה','יצירה → חיתוך → מחיקה','הטמעה → חיתוך → יצירה'], correct:1},
+    {q:'מדד נפוץ למדידת דמיון בין וקטורים ב-RAG?', opts:['Cosine Similarity','מספר התווים','זמן טעינה','צבע הטקסט'], correct:0},
+    {q:'למה RAG לא "פותר את הכל" אוטומטית?', opts:['הוא תמיד איטי מדי','איכות התשובה חסומה על ידי איכות השליפה','הוא לא תואם לעברית','הוא דורש GPU בלבד'], correct:1}
+  ],
+  embeddings: [
+    {q:'embedding הוא...', opts:['קובץ טקסט רגיל','וקטור מספרי שמייצג משמעות במרחב רב-ממדי','סוג של temperature','שם אחר ל-API key'], correct:1},
+    {q:'איך מודל embedding "לומד" קרבה סמנטית?', opts:['Contrastive Learning - קירוב זוגות דומים והרחקת זוגות שונים','על ידי ספירת אותיות','באמצעות טבלת מילים נרדפות ידנית','הוא לא לומד, הוא מקודד קשיח'], correct:0},
+    {q:'מודל embedding ומודל השיחה הגנרטיבי - זה...', opts:['תמיד אותו מודל בדיוק','בדרך כלל שני מודלים נפרדים ומתמחים','זה אותו דבר במובן טכני','embedding לא צריך מודל בכלל'], correct:1}
+  ],
+  agent: [
+    {q:'מה הסדר בלולאה האג\'נטית (ReAct)?', opts:['Act→Think→Observe בלבד פעם אחת','Observe→Think→Act→Observe וחוזר חלילה עד תנאי עצירה','Think פעם אחת ואז עצירה תמיד','אין סדר קבוע'], correct:1},
+    {q:'מתי הלולאה האג\'נטית עוצרת (טכנית)?', opts:['כשה-stop_reason כבר לא tool_use, או תנאי עצירה אחר','אחרי בדיוק 3 שניות','היא לעולם לא עוצרת','כשה-temperature=0'], correct:0},
+    {q:'למה subagents רלוונטיים ללולאה אג\'נטית ארוכה?', opts:['הם מהירים יותר תמיד','הם מכילים גידול הקשר בלתי-נשלט עבור תת-משימות','הם מוזילים את המחיר ל-0','אין קשר ביניהם'], correct:1}
+  ]
+};
+
+function renderQuiz(key){
+  const container = document.getElementById('quiz-'+key);
+  if(!container || container.dataset.built) return;
+  container.dataset.built = '1';
+  const questions = quizData[key];
+  if(!questions) return;
+  let html = '<div class="section-title"><span class="num">📝</span> מבחנון קצר (ענו נכון על הכל כדי לסמן שיעור זה כהושלם)</div>';
+  questions.forEach((item,qi)=>{
+    html += '<div class="quiz-q">'+(qi+1)+'. '+item.q+'</div><div class="quiz-opts" id="qopts-'+key+'-'+qi+'">';
+    item.opts.forEach((opt,oi)=>{
+      html += '<div class="quiz-opt" onclick="answerQuiz(\''+key+'\','+qi+','+oi+')" id="qopt-'+key+'-'+qi+'-'+oi+'">'+opt+'</div>';
+    });
+    html += '</div>';
+  });
+  html += '<div class="quiz-summary" id="qsummary-'+key+'" style="display:none;"></div>';
+  container.innerHTML = html;
+  container._answers = new Array(questions.length).fill(null);
+  if(isUnitDone(key)){
+    questions.forEach((item,qi)=>{
+      document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+      const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+      for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+    });
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display='block'; summary.className='quiz-summary pass';
+    summary.textContent = '🎉 כבר השלמתם שיעור זה בעבר!';
+  }
+}
+function answerQuiz(key, qi, oi){
+  const questions = quizData[key];
+  const item = questions[qi];
+  const container = document.getElementById('quiz-'+key);
+  const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+  for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+  if(oi===item.correct){ document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('correct'); }
+  else {
+    document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('wrong');
+    document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+  }
+  container._answers[qi] = (oi===item.correct);
+  checkQuizComplete(key);
+}
+function checkQuizComplete(key){
+  const container = document.getElementById('quiz-'+key);
+  const answers = container._answers;
+  if(answers.every(a=>a!==null)){
+    const allCorrect = answers.every(a=>a===true);
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display = 'block';
+    const scoreCount = answers.filter(a=>a).length;
+    if(allCorrect){
+      summary.className = 'quiz-summary pass';
+      summary.textContent = '🎉 מעולה! '+scoreCount+'/'+answers.length+' נכון - השיעור סומן כהושלם.';
+      markDone(key);
+    } else {
+      summary.className = 'quiz-summary fail';
+      summary.textContent = '📚 '+scoreCount+'/'+answers.length+' נכון. כדאי לחזור על החומר - רעננו את הדף כדי לנסות שוב.';
+    }
+    updateProgress();
+    buildHome();
+  }
+}
+
+function buildNav(){
+  const nav = document.getElementById('navScroll');
+  nav.innerHTML = '';
+  topics.forEach(t=>{
+    const b = document.createElement('button');
+    b.className='navbtn'; b.id='nav-'+t.key; b.innerHTML=t.emoji+' '+t.title;
+    b.onclick = ()=>showPage(t.key);
+    nav.appendChild(b);
+  });
+}
+function buildHome(){
+  const grid = document.getElementById('lessonGrid');
+  grid.innerHTML = '';
+  topics.forEach(t=>{
+    const done = isUnitDone(t.key);
+    const c = document.createElement('div');
+    c.className = 'lesson-card' + (done ? ' done' : '');
+    c.innerHTML = '<span class="em">'+t.emoji+'</span><div class="tt">'+t.title+'</div><div class="dd">'+t.desc+'</div>'+(done?'<div style="margin-top:6px;">✅</div>':'');
+    c.onclick = ()=>showPage(t.key);
+    grid.appendChild(c);
+  });
+  document.querySelectorAll('.navbtn').forEach(b=>{
+    const key = b.id.replace('nav-','');
+    b.classList.toggle('passed', isUnitDone(key));
+  });
+}
+function showPage(key){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+key).classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+  const nb = document.getElementById('nav-'+key);
+  if(nb) nb.classList.add('active');
+  currentPage = key;
+  if(topics.some(t=>t.key===key)){ renderQuiz(key); }
+  buildHome();
+  updateProgress();
+  if(typeof window.scrollTo === 'function'){
+    try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+  }
+}
+function goHome(){ showPage('home'); }
+function goRelative(dir){
+  const idx = topics.findIndex(t=>t.key===currentPage);
+  if(idx===-1) return;
+  const newIdx = idx+dir;
+  if(newIdx<0){ goHome(); return; }
+  if(newIdx>=topics.length){ showPage('finish'); return; }
+  showPage(topics[newIdx].key);
+}
+function updateProgress(){
+  const done = topics.filter(t=>isUnitDone(t.key)).length;
+  const pct = Math.round((done/topics.length)*100);
+  document.getElementById('progressBar').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = done+' / '+topics.length+' הושלמו';
+}
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+  safeSetTheme(isDark?'dark':'light');
+}
+
+/* ---------- LLMS / ATTENTION DEMO ---------- */
+function runAttentionDemo(){
+  const log = document.getElementById('attnLog');
+  const sentence = ['הכלב','רדף','אחרי','החתול','כי','הוא','רעב'];
+  log.innerHTML = '⏳ מחשב ציוני קשב עבור המילה "הוא"...';
+  setTimeout(()=>{
+    const weights = {'הכלב':0.62,'רדף':0.05,'אחרי':0.02,'החתול':0.18,'כי':0.03,'הוא':0.02,'רעב':0.08};
+    let html = '<div style="text-align:right;">מודל הקשב עבור המילה <b>"הוא"</b>:<br><br>';
+    sentence.forEach(w=>{
+      const wt = weights[w]||0;
+      const opacity = 0.25 + wt*1.2;
+      html += '<span style="display:inline-block;margin:3px;padding:6px 10px;border-radius:8px;background:rgba(123,104,238,'+Math.min(opacity,1).toFixed(2)+');font-weight:'+(wt>0.3?'800':'500')+';">'+w+' <span style="font-size:.7rem;opacity:.7;">('+(wt*100).toFixed(0)+'%)</span></span>';
+    });
+    html += '<br><br>💡 שימו לב: המודל "מקצה" הכי הרבה משקל קשב ל-<b>"הכלב"</b> (62%) - כך הוא פותר את העמימות של "הוא" ומבין שהכלב הוא הרעב, לא החתול.</div>';
+    log.innerHTML = html;
+  }, 500);
+}
+
+/* ---------- TOKENS ---------- */
+function estimateTokens(text){
+  text = text.trim();
+  if(!text) return [];
+  const words = text.split(/\s+/);
+  let tokens = [];
+  words.forEach(w=>{
+    const matches = w.match(/[֐-׿a-zA-Z0-9']+|[^\sa-zA-Z0-9֐-׿']/g);
+    if(matches) tokens.push(...matches); else tokens.push(w);
+  });
+  return tokens;
+}
+document.getElementById('tokenInput').addEventListener('input', function(){
+  const tokens = estimateTokens(this.value);
+  const box = document.getElementById('cubeBox');
+  box.innerHTML='';
+  tokens.forEach((tok,i)=>{
+    const c=document.createElement('div');
+    c.className='cube'; c.textContent=tok;
+    c.style.background = palette[i%palette.length];
+    c.style.animationDelay = (i*0.04)+'s';
+    box.appendChild(c);
+  });
+  document.getElementById('tokenCount').textContent = tokens.length+' tokens 🧱 (הערכה גסה)';
+});
+
+/* ---------- TEMPERATURE ---------- */
+const tempLow = ['השמיים היום בהירים. ☀️'];
+const tempMid = ['השמיים היום בהירים ונעימים. 🌤️','השמיים היום מלאים בעננים לבנים. ⛅','השמיים היום כחולים עם ענן קטן. ☁️'];
+const tempHigh = ['השמיים היום מלאים בדינוזאורים מרוקדים! 🦖','השמיים היום עשויים מריבס ירוק! 🍬','השמיים היום שרים שיר בטורקית! 🎵','השמיים היום הפכו לים של שוקולד! 🍫','השמיים היום ברחו למאדים! 🚀'];
+let tempInterval=null;
+function updateTemperature(val){
+  val = parseFloat(val);
+  const iconMap = val<0.6?'🥶':val<1.3?'🙂':'🤪';
+  document.getElementById('tempValue').textContent = iconMap+' '+val.toFixed(1);
+  const out = document.getElementById('tempOutput');
+  out.classList.remove('wobble');
+  clearInterval(tempInterval);
+  let text;
+  if(val<0.5){ text = tempLow[0]; }
+  else if(val<1.2){ text = tempMid[Math.floor(Math.random()*tempMid.length)]; }
+  else { text = tempHigh[Math.floor(Math.random()*tempHigh.length)]; }
+  out.textContent = text;
+  const hue = Math.round(val*140);
+  out.style.color = 'hsl('+hue+',70%,45%)';
+  if(val>0.05){ out.classList.add('wobble'); out.style.animationDuration = Math.max(0.3, 1.6-val*0.7)+'s'; }
+  if(val>=1.2){
+    tempInterval = setInterval(()=>{ out.textContent = tempHigh[Math.floor(Math.random()*tempHigh.length)]; }, 1200);
+  }
+}
+
+/* ---------- CONTEXT WINDOW ---------- */
+const CTX_MAX = 60;
+document.getElementById('ctxInput').addEventListener('input', function(){
+  const tokens = estimateTokens(this.value);
+  const pct = Math.min(100, Math.round((tokens.length/CTX_MAX)*100));
+  const bar = document.getElementById('ctxBar');
+  bar.style.width = pct+'%';
+  bar.textContent = tokens.length+' / '+CTX_MAX;
+  let color = 'var(--green)';
+  if(pct>=85) color='#e74c3c'; else if(pct>=60) color='#f1c40f';
+  bar.style.background = color;
+  const msg = document.getElementById('ctxMsg');
+  if(pct>=100){ msg.textContent='🧠 הזיכרון מלא! אני מתחיל לשכוח את ההתחלה...'; msg.style.color='#e74c3c'; }
+  else if(pct>=85){ msg.textContent='⚠️ כמעט מלא!'; msg.style.color='#e67e22'; }
+  else { msg.textContent=''; }
+});
+
+/* ---------- API ---------- */
+function sendApiRequest(){
+  const input = document.getElementById('apiInput');
+  const q = input.value.trim() || 'שאלה כלשהי';
+  const bubble = document.getElementById('apiBubble');
+  const responses = ['הנה התשובה שלך, בתאבון! 🍽️','השף (המודל) הכין את זה בשבילך! ✅','הזמנה הוגשה חמה מהמטבח! 🔥'];
+  bubble.textContent = q; bubble.className = 'api-bubble';
+  bubble.style.bottom='10px'; bubble.style.opacity='1'; bubble.style.transition='none';
+  requestAnimationFrame(()=>{ bubble.style.transition='all 1s ease'; bubble.style.bottom='calc(100% - 60px)'; });
+  setTimeout(()=>{
+    bubble.style.opacity='0';
+    setTimeout(()=>{
+      bubble.textContent = responses[Math.floor(Math.random()*responses.length)];
+      bubble.className='api-bubble response';
+      bubble.style.transition='none'; bubble.style.bottom='calc(100% - 60px)'; bubble.style.opacity='1';
+      requestAnimationFrame(()=>{ bubble.style.transition='all 1s ease'; bubble.style.bottom='10px'; });
+      setTimeout(()=>{ bubble.style.opacity='0'; }, 2400);
+    }, 350);
+  }, 1300);
+}
+
+/* ---------- RAG ---------- */
+let ragUploaded = false;
+function uploadFile(){
+  const dots = document.getElementById('ragDots');
+  dots.innerHTML=''; ragUploaded = true;
+  for(let i=0;i<14;i++){
+    const d=document.createElement('div');
+    d.className='rag-dot';
+    d.style.background = palette[i%palette.length];
+    d.style.left = (5+Math.random()*90)+'%';
+    d.style.top = (5+Math.random()*80)+'%';
+    d.style.animationDelay = (i*0.05)+'s';
+    dots.appendChild(d);
+  }
+  document.getElementById('ragResult').textContent = '📄 הקובץ פוצל וקודד ל-14 וקטורים!';
+  document.getElementById('ragResult').style.color = 'var(--purple)';
+}
+function ragSearch(){
+  if(!ragUploaded){
+    document.getElementById('ragResult').textContent = '⚠️ קודם תעלו קובץ!';
+    document.getElementById('ragResult').style.color = '#e67e22';
+    return;
+  }
+  document.querySelectorAll('.rag-dot').forEach(d=>d.classList.remove('found'));
+  const allDots = Array.from(document.querySelectorAll('.rag-dot'));
+  const picked = allDots.sort(()=>0.5-Math.random()).slice(0,3);
+  picked.forEach(d=>d.classList.add('found'));
+  document.getElementById('ragResult').textContent = '🔎 נמצאו 3 הקטעים הכי דומים וקטורית 🟢';
+  document.getElementById('ragResult').style.color = 'var(--green)';
+}
+
+/* ---------- AGENT LOOP ---------- */
+let agentIdx = 0;
+let agentInterval = null;
+function startAgentLoop(){
+  stopAgentLoop(); agentIdx = 0; setAgentActive(agentIdx);
+  agentInterval = setInterval(()=>{ agentIdx = (agentIdx+1)%4; setAgentActive(agentIdx); }, 1000);
+}
+function stopAgentLoop(){
+  clearInterval(agentInterval); agentInterval = null;
+  for(let i=0;i<4;i++) document.getElementById('agentNode'+i).classList.remove('active');
+}
+function setAgentActive(i){
+  for(let j=0;j<4;j++) document.getElementById('agentNode'+j).classList.remove('active');
+  document.getElementById('agentNode'+i).classList.add('active');
+}
+
+/* ---------- INIT ---------- */
+buildNav();
+buildHome();
+if(safeGetTheme()==='dark'){
+  document.body.classList.add('dark');
+  document.getElementById('themeToggle').textContent='☀️';
+}
+updateTemperature(0);
+updateProgress();
+</script>
+
+</body>
+</html>

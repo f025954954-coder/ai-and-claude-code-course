@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💻 מודול 4: תכנות Fullstack מקצועי</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#4A90E2; --purple:#7B68EE; --green:#2ECC71;
+  --bg:#eef2fb; --bg2:#e4ecfb; --card:#ffffff; --text:#2d3142; --text-soft:#5a5f7a;
+  --radius:26px; --radius-sm:16px;
+  --shadow:0 12px 30px rgba(74,144,226,0.18);
+  --shadow-soft:0 6px 16px rgba(74,144,226,0.12);
+  --code-bg:#1e2233; --code-text:#d7dcff;
+}
+body.dark{
+  --bg:#141827; --bg2:#1b2032; --card:#222842; --text:#f2f3fb; --text-soft:#b7bcda;
+  --shadow:0 12px 30px rgba(0,0,0,0.45); --shadow-soft:0 6px 16px rgba(0,0,0,0.35);
+  --code-bg:#0d0f1a; --code-text:#c7d0ff;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:'Heebo',sans-serif; background:linear-gradient(160deg,var(--bg),var(--bg2)); color:var(--text); min-height:100vh; transition:background .4s ease,color .4s ease; padding-top:126px;}
+h1,h2,h3{margin:0 0 8px 0;}
+button{font-family:'Heebo',sans-serif;cursor:pointer;border:none;outline:none;}
+code, pre, .mono{font-family:'JetBrains Mono',monospace;}
+
+.topnav{position:fixed;top:0;right:0;left:0;z-index:100;background:var(--card);box-shadow:var(--shadow-soft);padding:10px 16px 0 16px;transition:background .4s ease;}
+.topnav-row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1200px;margin:0 auto;}
+.logo{font-weight:900;font-size:1.15rem;white-space:nowrap;background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;flex-shrink:0;}
+.hub-link{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 14px;font-size:.8rem;font-weight:700;text-decoration:none;white-space:nowrap;}
+.nav-scroll{display:flex;gap:8px;overflow-x:auto;flex:1;padding:4px 2px;scrollbar-width:thin;align-items:center;}
+.nav-scroll::-webkit-scrollbar{height:6px;}
+.nav-scroll::-webkit-scrollbar-thumb{background:var(--purple);border-radius:10px;}
+.navbtn{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 13px;font-size:0.8rem;font-weight:500;white-space:nowrap;transition:all .25s ease;border:2px solid transparent;position:relative;}
+.navbtn:hover{transform:translateY(-2px) scale(1.04);}
+.navbtn.active{background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;box-shadow:var(--shadow-soft);}
+.navbtn.passed::after{content:'✓';position:absolute;top:-4px;left:-4px;background:var(--green);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
+.theme-toggle{flex-shrink:0;background:var(--bg2);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;transition:transform .3s ease;}
+.theme-toggle:hover{transform:rotate(20deg) scale(1.1);}
+.progress-wrap{max-width:1200px;margin:8px auto 0 auto;height:10px;background:var(--bg2);border-radius:999px;overflow:hidden;}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));border-radius:999px;transition:width .5s ease;}
+.progress-label{max-width:1200px;margin:4px auto 0 auto;font-size:.72rem;color:var(--text-soft);text-align:left;padding:0 4px;}
+
+.page{display:none;animation:fadeIn .5s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.page-inner{max-width:860px;margin:0 auto;padding:18px 16px 60px 16px;}
+.hero-title{font-size:clamp(1.5rem,4vw,2.3rem);font-weight:900;text-align:center;margin-bottom:6px;}
+.hero-sub{text-align:center;color:var(--text-soft);font-size:1.02rem;margin-bottom:22px;}
+.world-tag{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 12px;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--green));color:#fff;margin-bottom:10px;}
+.level-tag{display:inline-block;font-size:.7rem;font-weight:800;padding:3px 12px;border-radius:999px;background:var(--bg2);color:var(--text-soft);margin-bottom:10px;margin-right:6px;}
+
+.card{background:var(--card);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);margin-bottom:20px;}
+.explain{font-size:1.05rem;line-height:1.95;color:var(--text);}
+.explain p{margin:0 0 14px 0;}
+.explain p:last-child{margin-bottom:0;}
+.explain b, .highlight{background:linear-gradient(90deg,rgba(123,104,238,.18),rgba(46,204,113,.18));padding:2px 8px;border-radius:8px;font-weight:700;color:var(--purple);}
+body.dark .explain b, body.dark .highlight{color:#c9c2ff;}
+.callout{background:rgba(241,196,15,.12);border-right:4px solid #f1c40f;padding:12px 16px;border-radius:10px;margin-top:14px;font-size:.95rem;}
+.callout.info{background:rgba(74,144,226,.1);border-color:var(--blue);}
+
+.section-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.05rem;margin:0 0 14px 0;}
+.section-title .num{background:var(--purple);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;}
+
+.demo-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.demo-label{font-weight:700;margin-bottom:12px;font-size:1rem;color:var(--text-soft);}
+
+.lab-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.code-block{position:relative;background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px 18px;overflow-x:auto;font-size:.82rem;line-height:1.7;direction:ltr;text-align:left;margin-top:10px;}
+.code-block pre{margin:0;white-space:pre;}
+.code-label{position:absolute;top:8px;left:14px;font-size:.65rem;color:#8891b8;letter-spacing:.05em;text-transform:uppercase;}
+.lab-note{font-size:.92rem;color:var(--text-soft);margin-top:10px;line-height:1.7;}
+
+textarea, input[type=text], select{width:100%;font-family:'Heebo',sans-serif;font-size:1rem;padding:14px 16px;border-radius:var(--radius-sm);border:2px solid var(--bg2);background:var(--bg);color:var(--text);resize:none;transition:border .2s ease;}
+input[type=text].mono-input{font-family:'JetBrains Mono',monospace;direction:ltr;text-align:left;}
+textarea:focus, input[type=text]:focus, select:focus{border-color:var(--purple);}
+
+.btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;font-weight:700;font-size:0.92rem;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-soft);transition:transform .2s ease, box-shadow .2s ease;}
+.btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 26px rgba(74,144,226,.3);}
+.btn:active{transform:translateY(0) scale(.98);}
+.btn.secondary{background:var(--bg2);color:var(--text);}
+.btn.green{background:linear-gradient(90deg,var(--green),#27ae60);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn.small{padding:8px 14px;font-size:.8rem;}
+.row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:10px;}
+
+.quiz-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.quiz-q{font-weight:700;margin:18px 0 10px 0;}
+.quiz-q:first-of-type{margin-top:6px;}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{background:var(--bg);border-radius:12px;padding:11px 16px;text-align:right;font-size:.95rem;border:2px solid transparent;transition:all .2s ease;}
+.quiz-opt:hover{border-color:var(--purple);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(46,204,113,.15);font-weight:700;}
+.quiz-opt.wrong{border-color:#e74c3c;background:rgba(231,76,60,.12);}
+.quiz-opt.disabled{pointer-events:none;}
+.quiz-summary{margin-top:18px;padding:14px 18px;border-radius:14px;background:var(--bg);font-weight:700;text-align:center;}
+.quiz-summary.pass{background:rgba(46,204,113,.15);color:var(--green);}
+.quiz-summary.fail{background:rgba(231,76,60,.12);color:#e74c3c;}
+
+.finish-emoji{font-size:4rem;text-align:center;margin-bottom:10px;}
+.section-header{display:flex;align-items:center;gap:10px;margin:30px 0 14px 0;}
+.section-header h2{font-size:1.25rem;font-weight:900;}
+.section-header .line{flex:1;height:2px;background:var(--bg2);}
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:10px;}
+.lesson-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:transform .25s ease, box-shadow .25s ease;text-align:center;border:3px solid transparent;position:relative;}
+.lesson-card:hover{transform:translateY(-6px) rotate(-1deg);box-shadow:0 16px 32px rgba(74,144,226,.25);}
+.lesson-card .em{font-size:2.2rem;display:block;margin-bottom:8px;}
+.lesson-card .tt{font-weight:800;font-size:1rem;margin-bottom:4px;}
+.lesson-card .dd{font-size:.85rem;color:var(--text-soft);}
+.lesson-card.done{border-color:var(--green);}
+
+/* Python type demo */
+.type-result{margin-top:14px;padding:16px;border-radius:var(--radius-sm);background:var(--bg);font-size:1rem;font-weight:700;text-align:center;min-height:24px;}
+
+/* Git graph demo */
+.git-stage{background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;padding:20px;min-height:160px;}
+.git-lane{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
+.git-commit{width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;flex-shrink:0;box-shadow:0 4px 10px rgba(0,0,0,.15);}
+.git-commit.branch{background:var(--purple);}
+.git-commit.merge{background:var(--green);}
+.git-line{width:20px;height:2px;background:var(--text-soft);opacity:.4;flex-shrink:0;}
+.git-label{font-size:.7rem;color:var(--text-soft);font-weight:700;margin-left:8px;}
+
+/* SQL demo */
+.sql-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.85rem;}
+.sql-table th, .sql-table td{border:1px solid var(--bg2);padding:8px 10px;text-align:right;}
+.sql-table th{background:var(--bg);font-weight:800;}
+
+/* generic scaffold code preview */
+.scaffold-preview{background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px;font-size:.8rem;white-space:pre-wrap;direction:ltr;text-align:left;margin-top:14px;}
+
+.capstone-step{background:var(--bg);border-radius:var(--radius-sm);padding:18px;margin-bottom:14px;}
+.capstone-step h4{margin:0 0 8px 0;font-size:.95rem;display:flex;align-items:center;gap:8px;}
+
+@media (max-width:600px){
+  body{padding-top:112px;}
+  .logo{font-size:.92rem;}
+  .navbtn{font-size:.72rem;padding:6px 9px;}
+  .card,.demo-card,.lab-card,.quiz-card{padding:18px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="topnav-row">
+    <a class="hub-link" href="index.html">🏠 האקדמיה</a>
+    <div class="logo">💻 מודול 4: תכנות Fullstack</div>
+    <div class="nav-scroll" id="navScroll"></div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 10 הושלמו</div>
+</div>
+
+<section class="page active" id="page-home">
+  <div class="page-inner">
+    <div class="hero-title">💻 מודול 4: תכנות Fullstack מקצועי</div>
+    <div class="hero-sub">Python מהיסוד, OOP, Git, SQL, Django (models/views/REST API), Frontend, Docker - ופרויקט מסכם: בניית CRM מינימלי. המודול הכי מקיף באקדמיה - כ-3 שעות של תוכן.</div>
+    <div class="lesson-grid" id="lessonGrid"></div>
+  </div>
+</section>
+
+<!-- PYTHON BASICS -->
+<section class="page" id="page-py-basics">
+  <div class="page-inner">
+    <div class="world-tag">💻 מודול 4</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🐍 Python - היסודות שכל מפתח צריך</div>
+    <div class="card">
+      <div class="explain">
+        <p>Python היא שפה <span class="highlight">מוקלדת דינמית</span> (dynamically typed) - לא מצהירים על טיפוס המשתנה מראש, המשתנה מקבל את הטיפוס של הערך שהוקצה לו, ויכול להשתנות. הטיפוסים הבסיסיים: <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, ואוספים כמו <code>list</code> (רשימה ניתנת לשינוי), <code>tuple</code> (רשימה קבועה), <code>dict</code> (מיפוי key-value), ו-<code>set</code> (אוסף ייחודי ללא סדר).</p>
+        <p>מבני בקרה: <code>if/elif/else</code>, <code>for</code> (איטרציה על אוסף, לא לולאת מונה קלאסית כמו ב-C), ו-<code>while</code>. Python משתמשת ב<span class="highlight">הזחה (indentation)</span> במקום סוגריים מסולסלים כדי לסמן בלוקים - זו לא רק סטייל, זו תחביר מחייב.</p>
+        <p><b>פונקציות</b> מוגדרות עם <code>def</code>, יכולות לקבל ארגומנטים עם ברירת מחדל, ולהחזיר ערך עם <code>return</code>. <b>List comprehension</b> היא תחביר תמציתי ואידיומטי ליצירת רשימות: <code>[x*2 for x in range(5)]</code> במקום לולאת for מפורשת.</p>
+        <div class="callout info">📌 ניהול תלויות: <code>pip</code> הוא מנהל החבילות של Python, ו-<code>venv</code> (virtual environment) יוצר סביבה מבודדת לפרויקט כדי שחבילות של פרויקט אחד לא יתנגשו עם פרויקט אחר. כלל אצבע: כל פרויקט Python מקבל venv משלו.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: הטיפוסים הבסיסיים בפעולה</div>
+      <div class="code-block"><span class="code-label">basics.py</span><pre>name = "Dana"              # str
+age = 29                   # int
+score = 91.5                # float
+is_active = True           # bool
+tags = ["vip", "new"]       # list - ניתן לשינוי
+contact = {"name": name, "age": age}  # dict
+
+def greet(name, greeting="Hello"):
+    return f"{greeting}, {name}!"
+
+doubled = [x * 2 for x in range(5)]   # [0, 2, 4, 6, 8]
+
+for tag in tags:
+    print(f"- {tag}")</pre></div>
+      <div class="lab-note">💡 שימו לב ל-f-string (<code>f"..."</code>) - הדרך המודרנית והמומלצת לשלב משתנים בתוך מחרוזת, במקום קונקטנציה עם +.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🔍 כתבו ערך בסגנון Python (למשל <code>42</code>, <code>"שלום"</code>, <code>[1,2,3]</code>, <code>True</code>, <code>{'a':1}</code>) ותראו איזה טיפוס זה:</div>
+      <input type="text" class="mono-input" id="pyTypeInput" placeholder='נסו: 3.14  או  "hello"  או  [1, 2, 3]' oninput="detectPyType(this.value)">
+      <div class="type-result" id="pyTypeResult">הקלידו ערך למעלה 👆</div>
+    </div>
+    <div class="quiz-card" id="quiz-py-basics"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goHome()">🏠 חזרה למפת המודול</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- PYTHON OOP -->
+<section class="page" id="page-py-oop">
+  <div class="page-inner">
+    <div class="world-tag">💻 מודול 4</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🧱 תכנות מונחה-עצמים ב-Python</div>
+    <div class="card">
+      <div class="explain">
+        <p><b>Class</b> הוא תבנית להגדרת סוג נתונים חדש - מגדירה אילו <span class="highlight">תכונות (attributes)</span> ואילו <span class="highlight">התנהגויות (methods)</span> יהיו לכל אובייקט מהסוג הזה. <b>Object (instance)</b> הוא מופע קונקרטי שנוצר מהמחלקה - כמו ההבדל בין "תבנית טופס" לבין "טופס מלא ספציפי".</p>
+        <p><code>__init__</code> הוא ה-constructor - רץ אוטומטית כשיוצרים אובייקט חדש, ומקבל <code>self</code> (הפניה לאובייקט עצמו) כפרמטר ראשון תמיד. <b>ירושה (inheritance)</b> מאפשרת למחלקה "לרשת" תכונות והתנהגויות ממחלקת-אב, ולהוסיף או לדרוס (override) חלק מהן.</p>
+        <p>זה בדיוק המודל שעליו בנוי Django (השיעורים הבאים): כל טבלה במסד הנתונים שלכם תהיה מחלקת Python (Model) שיורשת ממחלקת בסיס של Django ומקבלת אוטומטית התנהגויות שמירה/שליפה/מחיקה.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: מחלקה + ירושה בפעולה</div>
+      <div class="code-block"><span class="code-label">crm_models.py</span><pre>class Contact:
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+        self.deals = []
+
+    def add_deal(self, deal):
+        self.deals.append(deal)
+
+    def __repr__(self):
+        return f"Contact({self.name})"
+
+class VipContact(Contact):          # ירושה
+    def __init__(self, name, email, discount):
+        super().__init__(name, email)   # קורא ל-constructor של האב
+        self.discount = discount
+
+dana = VipContact("Dana", "dana@co.com", 0.15)
+dana.add_deal("Enterprise Plan")
+print(dana)   # Contact(Dana) - עדיין נגיש כי VipContact יורש מ-Contact</pre></div>
+      <div class="lab-note">💡 <code>super().__init__(...)</code> קורא ל-constructor של מחלקת האב, כדי לא לשכפל קוד. זה דפוס סטנדרטי כמעט בכל שפת OOP.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🏗️ לחצו כדי "ליצור אובייקט" מהמחלקה ולראות את ה-attributes שלו:</div>
+      <div class="row"><button class="btn" onclick="instantiateContact()">▶️ dana = VipContact("Dana", "dana@co.com", 0.15)</button></div>
+      <div class="type-result" id="oopResult" style="text-align:right;white-space:pre-wrap;">לחצו כדי ליצור את האובייקט 👆</div>
+    </div>
+    <div class="quiz-card" id="quiz-py-oop"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- GIT -->
+<section class="page" id="page-git">
+  <div class="page-inner">
+    <div class="world-tag">💻 מודול 4</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🌿 Git - ניהול גרסאות ועבודת צוות</div>
+    <div class="card">
+      <div class="explain">
+        <p>Git הוא מערכת בקרת גרסאות <span class="highlight">מבוזרת</span> - לכל מפתח יש עותק מלא של ההיסטוריה, לא רק גישה למסד נתונים מרכזי. היחידה הבסיסית היא <b>commit</b> - תמונת מצב (snapshot) של כל הקבצים בנקודת זמן מסוימת, עם הודעה מסבירה, מזהה ייחודי (hash), והפניה ל-commit הקודם.</p>
+        <p><b>Branch</b> הוא פשוט מצביע (pointer) נייד שמצביע על commit מסוים - זה מה שהופך יצירת branch ל"זולה" כל כך ב-Git (בניגוד למערכות ישנות יותר). זרימת עבודה סטנדרטית: יוצרים branch חדש לפיצ'ר (<code>feature/add-crm-search</code>), עובדים ומקמיטים עליו, ואז <b>ממזגים (merge)</b> בחזרה ל-<code>main</code> - לרוב דרך Pull Request שעובר code review לפני המיזוג.</p>
+        <p>שלושה אזורים חשובים להבין: <b>Working Directory</b> (הקבצים על הדיסק שלכם), <b>Staging Area</b> (<code>git add</code> - "מה ייכנס ל-commit הבא"), ו-<b>Repository</b> (<code>git commit</code> - ההיסטוריה השמורה בפועל).</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: זרימת עבודה טיפוסית</div>
+      <div class="code-block"><span class="code-label">bash</span><pre>git checkout -b feature/add-crm-search   # branch חדש
+git add crm/search.py                     # staging
+git commit -m "Add fuzzy search to CRM"   # commit
+git push origin feature/add-crm-search    # דחיפה לריפו מרוחק
+# ...פותחים Pull Request, מקבלים review...
+git checkout main
+git merge feature/add-crm-search          # מיזוג חזרה</pre></div>
+      <div class="lab-note">💡 <code>git diff</code> מראה שינויים שעדיין לא ב-staging; <code>git log</code> מראה את היסטוריית ה-commits; <code>git status</code> הוא הפקודה שתריצו הכי הרבה - היא תמיד אומרת לכם איפה אתם נמצאים.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🌳 לחצו על הפעולות ותראו את גרף ה-commits נבנה:</div>
+      <div class="row">
+        <button class="btn small" onclick="gitCommit()">📝 git commit</button>
+        <button class="btn small secondary" onclick="gitBranch()">🌿 git checkout -b</button>
+        <button class="btn small green" onclick="gitMerge()">🔀 git merge</button>
+        <button class="btn small secondary" onclick="gitReset()">🔄 איפוס</button>
+      </div>
+      <div class="git-stage" id="gitStage"></div>
+    </div>
+    <div class="quiz-card" id="quiz-git"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- SQL -->
+<section class="page" id="page-sql">
+  <div class="page-inner">
+    <div class="world-tag">💻 מודול 4</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🗄️ מסדי נתונים יחסיים ו-SQL</div>
+    <div class="card">
+      <div class="explain">
+        <p>מסד נתונים יחסי (כמו PostgreSQL או MySQL) מארגן מידע ב<span class="highlight">טבלאות</span> - שורות (records) ועמודות (fields) עם טיפוסים מוגדרים. כל טבלה מקבלת <b>Primary Key</b> (מזהה ייחודי, בד"כ <code>id</code>), וטבלאות מתקשרות ביניהן דרך <b>Foreign Key</b> - עמודה בטבלה אחת שמצביעה על ה-Primary Key של טבלה אחרת. זו בדיוק הדרך למדל מערכת CRM: טבלת <code>contacts</code>, טבלת <code>deals</code> עם <code>contact_id</code> שמצביע חזרה על איש הקשר.</p>
+        <p>שאילתות SQL בנויות מפקודות כמו <code>SELECT</code> (שליפה), <code>WHERE</code> (סינון), <code>JOIN</code> (חיבור טבלאות לפי מפתח), <code>GROUP BY</code> (קיבוץ וצבירה), ו-<code>ORDER BY</code> (מיון). <b>Index</b> הוא מבנה נתונים נוסף שמאיץ חיפוש בעמודה מסוימת במחיר של מקום אחסון וזמן כתיבה מעט איטי יותר - שימושי מאוד על עמודות ש-<code>WHERE</code> או <code>JOIN</code> מסננים לפיהן הרבה.</p>
+        <div class="callout">📌 קשר בין Django ל-SQL: כשתגדירו Model ב-Django (השיעור הבא), ה-ORM (Object-Relational Mapper) מייצר עבורכם את ה-SQL הזה אוטומטית - אבל ההבנה של מה שקורה "מתחת למכסה המנוע" קריטית לדיבוג ולביצועים.</div>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: JOIN בפעולה</div>
+      <div class="code-block"><span class="code-label">SQL</span><pre>SELECT contacts.name, deals.title, deals.amount
+FROM deals
+JOIN contacts ON deals.contact_id = contacts.id
+WHERE deals.status = 'open'
+ORDER BY deals.amount DESC;</pre></div>
+      <div class="lab-note">💡 ה-JOIN "מחבר" כל שורת deal לאיש הקשר שלה לפי contact_id = id. בלי JOIN, הייתם צריכים שתי שאילתות נפרדות ולחבר את התוצאות בקוד.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🔍 בנו שאילתה: בחרו טבלה, עמודה למיון, וכיוון - ותראו SQL וטבלת תוצאות לדוגמה:</div>
+      <div class="row">
+        <select id="sqlTable" onchange="renderSqlDemo()">
+          <option value="contacts">contacts</option>
+          <option value="deals">deals</option>
+        </select>
+        <select id="sqlOrder" onchange="renderSqlDemo()">
+          <option value="ASC">מיון עולה (ASC)</option>
+          <option value="DESC">מיון יורד (DESC)</option>
+        </select>
+      </div>
+      <div class="code-block"><span class="code-label">generated SQL</span><pre id="sqlGenerated">SELECT * FROM contacts ORDER BY id ASC;</pre></div>
+      <div id="sqlResultWrap"></div>
+    </div>
+    <div class="quiz-card" id="quiz-sql"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- DJANGO MODELS -->
+<section class="page" id="page-django-models">
+  <div class="page-inner">
+    <div class="world-tag">💻 מודול 4</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🎯 Django - Models ו-ORM</div>
+    <div class="card">
+      <div class="explain">
+        <p>Django הוא פריימוורק Python <span class="highlight">"batteries included"</span> לבניית אתרים - כולל ORM, מערכת ניהול (Admin), אימות משתמשים, וטיפול בטפסים, מוכנים מהקופסה. זה בדיוק מה שהופך אותו לבחירה כל כך פופולרית לבניית מערכות כמו CRM.</p>
+        <p><b>Model</b> ב-Django הוא מחלקת Python (בדיוק כמו שראינו בשיעור ה-OOP) שיורשת מ-<code>models.Model</code>. כל attribute במחלקה מוגדר כ-<code>Field</code> (למשל <code>CharField</code>, <code>EmailField</code>, <code>ForeignKey</code>), ו-Django הופך את זה אוטומטית לטבלת SQL תואמת - כולל Primary Key אוטומטי.</p>
+        <p><b>Migrations</b> הן הדרך של Django לנהל שינויים בסכמה של מסד הנתונים לאורך זמן: כשמשנים Model, מריצים <code>makemigrations</code> (Django מזהה את השינוי ומייצר קובץ migration) ואז <code>migrate</code> (מריץ בפועל את ה-SQL על מסד הנתונים). זה בדיוק "Git להיסטוריית הסכמה" של מסד הנתונים.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: Model אמיתי ל-CRM</div>
+      <div class="code-block"><span class="code-label">crm/models.py</span><pre>from django.db import models
+
+class Contact(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Deal(models.Model):
+    STATUS_CHOICES = [("open", "Open"), ("won", "Won"), ("lost", "Lost")]
+    contact = models.ForeignKey(Contact, on_delete=models.CASCADE,
+                                 related_name="deals")
+    title = models.CharField(max_length=200)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES,
+                               default="open")</pre></div>
+      <div class="code-block" style="margin-top:12px;"><span class="code-label">bash</span><pre>python manage.py makemigrations crm
+python manage.py migrate</pre></div>
+      <div class="lab-note">💡 <code>ForeignKey(Contact, on_delete=models.CASCADE)</code> בדיוק מיישם את קשר ה-JOIN שראינו בשיעור SQL - ומגדיר גם מה קורה אם ה-Contact נמחק (כאן: כל ה-Deals שלו נמחקים אוטומטית).</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🏗️ בנו Model: הוסיפו שדות ותראו את קוד ה-models.py נבנה בזמן אמת:</div>
+      <div class="row">
+        <input type="text" class="mono-input" id="fieldName" placeholder="שם שדה, לדוגמה: phone" style="flex:2;">
+        <select id="fieldType" style="flex:1;">
+          <option value="CharField(max_length=100)">CharField</option>
+          <option value="EmailField()">EmailField</option>
+          <option value="IntegerField()">IntegerField</option>
+          <option value="DecimalField(max_digits=10, decimal_places=2)">DecimalField</option>
+          <option value="DateTimeField(auto_now_add=True)">DateTimeField</option>
+          <option value="BooleanField(default=False)">BooleanField</option>
+        </select>
+        <button class="btn small" onclick="addModelField()">➕ הוסף שדה</button>
+      </div>
+      <div class="scaffold-preview" id="modelPreview">class Contact(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)</div>
+    </div>
+    <div class="quiz-card" id="quiz-django-models"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- DJANGO VIEWS -->
+<section class="page" id="page-django-views">
+  <div class="page-inner">
+    <div class="world-tag">💻 מודול 4</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🔀 Django - URLs, Views ו-Templates</div>
+    <div class="card">
+      <div class="explain">
+        <p>Django עוקב אחר תבנית שנקראת <span class="highlight">MVT</span> (Model-View-Template) - גרסה של MVC: <b>URLconf</b> (<code>urls.py</code>) ממפה כתובת URL לפונקציית View; <b>View</b> (<code>views.py</code>) מכיל את הלוגיקה - שולף נתונים מה-Model, מחליט מה להחזיר; <b>Template</b> הוא קובץ HTML עם תחביר מיוחד (<code>{% %}</code> ו-<code>{{ }}</code>) שמרנדר את הנתונים לדף.</p>
+        <p>זרימת בקשה טיפוסית: דפדפן שולח בקשת HTTP → Django בודק ב-<code>urls.py</code> איזה View מתאים לנתיב → ה-View רץ, שולף נתונים (למשל <code>Contact.objects.all()</code>), ומחזיר תשובה - HTML מרונדר, redirect, או JSON (לשיעור הבא).</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: מסלול בקשה מלא ב-CRM</div>
+      <div class="code-block"><span class="code-label">crm/urls.py</span><pre>from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("contacts/", views.contact_list, name="contact-list"),
+    path("contacts/<int:pk>/", views.contact_detail, name="contact-detail"),
+]</pre></div>
+      <div class="code-block" style="margin-top:12px;"><span class="code-label">crm/views.py</span><pre>from django.shortcuts import render, get_object_or_404
+from .models import Contact
+
+def contact_list(request):
+    contacts = Contact.objects.all().order_by("name")
+    return render(request, "crm/contact_list.html", {"contacts": contacts})
+
+def contact_detail(request, pk):
+    contact = get_object_or_404(Contact, pk=pk)
+    return render(request, "crm/contact_detail.html", {"contact": contact})</pre></div>
+      <div class="lab-note">💡 <code>Contact.objects.all()</code> הוא ה-ORM בפעולה - זה מתורגם מאחורי הקלעים ל-<code>SELECT * FROM contact ORDER BY name</code>, בדיוק כמו בשיעור SQL.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">▶️ לחצו כדי לדמות בקשת דפדפן ל-<code>/contacts/</code> ולראות את המסלול המלא:</div>
+      <div class="row"><button class="btn" onclick="runDjangoRequest()">🌐 GET /contacts/</button></div>
+      <div class="type-result" id="djangoFlowResult" style="text-align:right;white-space:pre-wrap;">לחצו כדי להריץ את הבקשה 👆</div>
+    </div>
+    <div class="quiz-card" id="quiz-django-views"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- DJANGO REST -->
+<section class="page" id="page-django-rest">
+  <div class="page-inner">
+    <div class="world-tag">💻 מודול 4</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🔌 Django REST Framework - בניית API</div>
+    <div class="card">
+      <div class="explain">
+        <p>אתר Django "קלאסי" מחזיר HTML מרונדר בשרת. אבל frontend מודרני (השיעור הבא) לרוב מעדיף לקבל <span class="highlight">JSON</span> ולבנות את ה-UI בעצמו. <b>Django REST Framework (DRF)</b> הוא התוסף הסטנדרטי שהופך Models ל-API: <b>Serializer</b> ממיר אובייקט Model ל-JSON (ובחזרה - ומאמת קלט נכנס), ו-<b>ViewSet</b> מספק אוטומטית endpoints סטנדרטיים ל-CRUD (Create/Read/Update/Delete).</p>
+        <p>זה בדיוק אותו עיקרון של REST API שראינו במודול 1 (שיעור ה-API) - רק עכשיו אתם בונים אחד בעצמכם, לא רק צורכים אחד קיים כמו Claude API.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: Serializer + endpoint אוטומטי</div>
+      <div class="code-block"><span class="code-label">crm/serializers.py</span><pre>from rest_framework import serializers
+from .models import Contact
+
+class ContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
+        fields = ["id", "name", "email", "created_at"]</pre></div>
+      <div class="code-block" style="margin-top:12px;"><span class="code-label">crm/views.py (API)</span><pre>from rest_framework import viewsets
+from .models import Contact
+from .serializers import ContactSerializer
+
+class ContactViewSet(viewsets.ModelViewSet):
+    queryset = Contact.objects.all()
+    serializer_class = ContactSerializer
+# מקבל אוטומטית: GET/POST /contacts/, GET/PUT/DELETE /contacts/{id}/</pre></div>
+      <div class="lab-note">💡 שורה אחת - <code>viewsets.ModelViewSet</code> - נותנת חמישה endpoints שלמים (list, create, retrieve, update, delete). זו בדיוק ה"מגייה" שפריימוורקים נותנים שדיברנו עליה במודול 3.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">📤 לחצו לראות איך Model הופך ל-JSON דרך ה-Serializer:</div>
+      <div class="row"><button class="btn" onclick="runSerializerDemo()">🔄 serialize(contact)</button></div>
+      <div class="code-block" id="serializerOutput"><span class="code-label">JSON output</span><pre>לחצו כדי להריץ</pre></div>
+    </div>
+    <div class="quiz-card" id="quiz-django-rest"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- FRONTEND -->
+<section class="page" id="page-frontend">
+  <div class="page-inner">
+    <div class="world-tag">💻 מודול 4</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🎨 Frontend - HTML/CSS/JS וקריאה ל-API</div>
+    <div class="card">
+      <div class="explain">
+        <p>שלוש השכבות הבסיסיות: <b>HTML</b> - מבנה ותוכן (מה יש בדף), <b>CSS</b> - עיצוב (איך זה נראה), <b>JavaScript</b> - התנהגות (מה קורה כשמשתמש מקליק). ה-<span class="highlight">DOM</span> (Document Object Model) הוא הייצוג החי של ה-HTML בזיכרון שג'אווהסקריפט יכול לקרוא ולשנות - זו הסיבה ש-<code>document.getElementById(...)</code> "עובד": הוא מוצא צומת בעץ ה-DOM.</p>
+        <p>כדי ש-frontend "ידבר" עם backend (כמו ה-Django API שבנינו), משתמשים ב-<code>fetch()</code> - פונקציית JS מובנית שמבצעת בקשת HTTP ומחזירה Promise. זה בדיוק אותו עיקרון של בקשות API שראינו במודול 1, רק עכשיו מהצד הלקוח.</p>
+        <p>פריימוורקים כמו React/Vue מוסיפים שכבת הפשטה (בדומה למה שראינו במודול 3 על LangChain): במקום לתפעל את ה-DOM ידנית, מתארים "איך התצוגה אמורה להיראות עבור מצב נתון", והפריימוורק דואג לעדכן את ה-DOM בעצמו.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: fetch אמיתי אל ה-API שבנינו</div>
+      <div class="code-block"><span class="code-label">crm-frontend.js</span><pre>async function loadContacts() {
+  const res = await fetch("/api/contacts/");
+  if (!res.ok) throw new Error("Failed to load contacts");
+  const contacts = await res.json();
+
+  const list = document.getElementById("contact-list");
+  list.innerHTML = contacts
+    .map(c => `<li>${c.name} - ${c.email}</li>`)
+    .join("");
+}
+loadContacts();</pre></div>
+      <div class="lab-note">💡 <code>await</code> "משהה" את הפונקציה עד שהתשובה מגיעה, בלי לחסום את שאר הדף - זו בדיוק אותה תבנית async שראינו ב-streaming (מודול 1), רק ברמת שפה כללית ולא ספציפית ל-LLM.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🔄 לחצו כדי להריץ fetch() מדומה אל ה-API ולראות את הרשימה מתעדכנת:</div>
+      <div class="row"><button class="btn" onclick="runFetchDemo()">📡 fetch('/api/contacts/')</button></div>
+      <div class="action-log" id="fetchLog" style="margin-top:14px;background:var(--bg);border-radius:var(--radius-sm);padding:16px;min-height:40px;">לחצו כדי לטעון אנשי קשר</div>
+      <ul id="contactListDemo" style="margin-top:10px;padding-right:20px;"></ul>
+    </div>
+    <div class="quiz-card" id="quiz-frontend"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- DOCKER -->
+<section class="page" id="page-docker">
+  <div class="page-inner">
+    <div class="world-tag">💻 מודול 4</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🐳 Docker - "זה עובד אצלי במחשב" נגמר כאן</div>
+    <div class="card">
+      <div class="explain">
+        <p>Docker אורז אפליקציה יחד עם <span class="highlight">כל</span> מה שהיא צריכה כדי לרוץ - גרסת Python, חבילות pip, משתני סביבה, קבצי מערכת - לתוך <b>image</b> אחד ניתן להרצה בכל מקום שיש בו Docker. <b>Container</b> הוא מופע רץ של image - בדיוק כמו ההבדל בין class ל-instance ששרשור ב-OOP.</p>
+        <p><code>Dockerfile</code> הוא מתכון: רשימת הוראות איך לבנות את ה-image (איזה בסיס להתחיל ממנו, אילו חבילות להתקין, אילו קבצים להעתיק, איזו פקודה להריץ כשהcontainer עולה). <code>docker-compose.yml</code> מתאם כמה containers יחד - למשל, container לאפליקציית Django + container נפרד למסד הנתונים PostgreSQL, שמדברים ביניהם ברשת פנימית.</p>
+        <p>למה זה חשוב לפרודקשן: זה פותר בדיוק את הבעיה "אצלי זה עבד" - אם זה רץ ב-container, זה ירוץ באותה צורה על השרת של הפיתוח, השרת של הבדיקות, ושרת הפרודקשן, כי כולם מריצים בדיוק את אותו image.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: Dockerfile + docker-compose ל-CRM</div>
+      <div class="code-block"><span class="code-label">Dockerfile</span><pre>FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["gunicorn", "crm.wsgi:application", "--bind", "0.0.0.0:8000"]</pre></div>
+      <div class="code-block" style="margin-top:12px;"><span class="code-label">docker-compose.yml</span><pre>services:
+  web:
+    build: .
+    ports: ["8000:8000"]
+    env_file: .env
+    depends_on: [db]
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: crm
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+volumes:
+  pgdata:</pre></div>
+      <div class="lab-note">💡 שימו לב ל-<code>${DB_PASSWORD}</code> - בדיוק אותו עיקרון של הרחבת משתני סביבה שראינו ב-.mcp.json (מודול 2): סודות לא נכתבים ישירות בקובץ.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🐳 לחצו כדי לדמות build + run של ה-CRM:</div>
+      <div class="row"><button class="btn" onclick="runDockerDemo()">▶️ docker compose up --build</button></div>
+      <div class="clock-log" id="dockerLog" style="margin-top:14px;text-align:left;direction:ltr;background:var(--card);border-radius:var(--radius-sm);padding:12px 16px;min-height:100px;box-shadow:var(--shadow-soft);font-family:'JetBrains Mono',monospace;font-size:.78rem;"></div>
+    </div>
+    <div class="quiz-card" id="quiz-docker"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn green" onclick="goRelative(1)">לפרויקט המסכם ⬅ 🏁</button>
+    </div>
+  </div>
+</section>
+
+<!-- CRM CAPSTONE -->
+<section class="page" id="page-crm-capstone">
+  <div class="page-inner">
+    <div class="world-tag">🏁 פרויקט מסכם</div><span class="level-tag">⏱️ כ-30 דק'</span>
+    <div class="hero-title">🏗️ בניית CRM מינימלי - חיברו הכל יחד</div>
+    <div class="card">
+      <div class="explain">
+        <p>עברתם על Python, Git, SQL, Django (Models/Views/REST), Frontend ו-Docker. עכשיו תתכננו - על הנייר - את מערכת ה-CRM המלאה שלכם: תבחרו את שדות המודל, את ה-endpoints, את דף ה-frontend, ואיך תפרסו את זה. בסוף תקבלו סיכום פרויקט מלא בסגנון תיעוד טכני אמיתי.</p>
+      </div>
+    </div>
+
+    <div class="capstone-step">
+      <h4>1️⃣ אילו שדות יהיו במודל Contact?</h4>
+      <div class="row" id="crm-fields-picker"></div>
+    </div>
+    <div class="capstone-step">
+      <h4>2️⃣ איזה סטטוסים יהיו למודל Deal?</h4>
+      <select id="crm-status-select">
+        <option value="open,won,lost">open / won / lost (בסיסי)</option>
+        <option value="new,contacted,negotiation,won,lost">new / contacted / negotiation / won / lost (מתקדם)</option>
+      </select>
+    </div>
+    <div class="capstone-step">
+      <h4>3️⃣ אילו endpoints ה-API יחשוף?</h4>
+      <div class="row" id="crm-endpoints-picker"></div>
+    </div>
+    <div class="capstone-step">
+      <h4>4️⃣ איזה frontend תבנו?</h4>
+      <select id="crm-frontend-select">
+        <option value="server">Django Templates (רינדור בצד השרת)</option>
+        <option value="spa">SPA נפרד (React) שקורא ל-API</option>
+      </select>
+    </div>
+    <div class="capstone-step">
+      <h4>5️⃣ איך תפרסו את זה?</h4>
+      <select id="crm-deploy-select">
+        <option value="docker-single">Docker Compose על שרת יחיד</option>
+        <option value="docker-cloud">Docker + פריסה בענן (managed Postgres)</option>
+      </select>
+    </div>
+
+    <div style="text-align:center;margin-top:10px;">
+      <button class="btn green" onclick="generateCrmCapstone()">✨ צור תיעוד פרויקט</button>
+    </div>
+    <div class="scaffold-preview" id="crmPreview" style="display:none;"></div>
+
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn green" onclick="goRelative(1)">סיימתי את כל האקדמיה! 🎓</button>
+    </div>
+  </div>
+</section>
+
+<!-- FINISH -->
+<section class="page" id="page-finish">
+  <div class="page-inner">
+    <div class="finish-emoji">🎓🏆✨</div>
+    <div class="hero-title">כל הכבוד - סיימתם את כל 4 המודולים!</div>
+    <div class="hero-sub">עברתם דרך שלמה: מהבנת מודלי שפה מהיסוד, דרך בניית סוכנים עם קלוד קוד והנדסת מערכות AI, ועד תכנות Fullstack מקצועי אמיתי - Python, Django, SQL, Frontend ו-Docker. זו רמה מקצועית של ממש. 🚀</div>
+    <div class="nav-buttons" style="justify-content:center;">
+      <a class="btn" href="index.html" style="text-decoration:none;">🏠 חזרה לאקדמיה</a>
+    </div>
+  </div>
+</section>
+
+<script>
+const THIS_FILE = 'module4-fullstack-dev.html';
+const PROGRESS_KEY = 'academy_progress_v1';
+function loadProgressSet(){
+  try{ return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]')); }
+  catch(e){ return new Set(); }
+}
+function markDone(unitKey){
+  const s = loadProgressSet();
+  s.add(THIS_FILE+'::'+unitKey);
+  try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(Array.from(s))); }catch(e){}
+}
+function isUnitDone(unitKey){ return loadProgressSet().has(THIS_FILE+'::'+unitKey); }
+function safeGetTheme(){ try{ return localStorage.getItem('ai-theme'); }catch(e){ return null; } }
+function safeSetTheme(v){ try{ localStorage.setItem('ai-theme', v); }catch(e){} }
+
+const topics = [
+  {key:'py-basics', emoji:'🐍', title:'Python Basics', desc:'היסודות שכל מפתח צריך'},
+  {key:'py-oop', emoji:'🧱', title:'Python OOP', desc:'מחלקות, אובייקטים, ירושה'},
+  {key:'git', emoji:'🌿', title:'Git', desc:'ניהול גרסאות ועבודת צוות'},
+  {key:'sql', emoji:'🗄️', title:'SQL', desc:'מסדי נתונים יחסיים'},
+  {key:'django-models', emoji:'🎯', title:'Django Models', desc:'ORM ומיגרציות'},
+  {key:'django-views', emoji:'🔀', title:'Django Views', desc:'URLs, Views, Templates'},
+  {key:'django-rest', emoji:'🔌', title:'Django REST', desc:'בניית API'},
+  {key:'frontend', emoji:'🎨', title:'Frontend', desc:'HTML/CSS/JS ו-fetch'},
+  {key:'docker', emoji:'🐳', title:'Docker', desc:'קונטיינריזציה ו-deploy'},
+  {key:'crm-capstone', emoji:'🏗️', title:'CRM מסכם', desc:'בנו CRM מינימלי', isCapstone:true}
+];
+let currentPage = 'home';
+
+const quizData = {
+  'py-basics': [
+    {q:'מה קורה אם תשנו את הערך שהוקצה למשתנה ב-Python?', opts:['אסור, המשתנה נעול','המשתנה פשוט מקבל את הטיפוס של הערך החדש - Python מוקלדת דינמית','המשתנה נשאר מהטיפוס הישן ותהיה שגיאה','צריך להצהיר מראש על כל טיפוס אפשרי'], correct:1},
+    {q:'מה מייחד את Python מבחינת בלוקים של קוד?', opts:['סוגריים מסולסלים {}','מילת מפתח end בסוף כל בלוק','הזחה (indentation) מחייבת תחבירית','נקודה-פסיק חובה בסוף כל שורה'], correct:2},
+    {q:'מה עושה list comprehension כמו [x*2 for x in range(5)]?', opts:['יוצר משתנה בודד','יוצר רשימה חדשה בצורה תמציתית במקום לולאת for מפורשת','מוחק את הרשימה range(5)','זו שגיאת תחביר'], correct:1}
+  ],
+  'py-oop': [
+    {q:'מה תפקיד __init__ במחלקה?', opts:['מוחק את האובייקט','constructor שרץ אוטומטית ביצירת אובייקט חדש','הופך את המחלקה לפרטית','מריץ בדיקות יחידה'], correct:1},
+    {q:'מה עושה super().__init__(...) במחלקת בת?', opts:['יוצר מחלקת אב חדשה','קורא ל-constructor של מחלקת האב כדי לא לשכפל קוד','מוחק את מחלקת האב','זה אופציונלי ותמיד מיותר'], correct:1},
+    {q:'למה ההבנה של OOP חשובה ללימוד Django?', opts:['היא לא רלוונטית','כי Models ב-Django הם בעצם מחלקות Python שיורשות ממחלקת בסיס','Django לא משתמש ב-Python','OOP רלוונטי רק ל-Java'], correct:1}
+  ],
+  git: [
+    {q:'מה זה בעצם Branch ב-Git?', opts:['עותק מלא של כל הקבצים','מצביע (pointer) נייד שמצביע על commit מסוים','תיקייה נפרדת בדיסק','גיבוי בענן'], correct:1},
+    {q:'מה הסדר הנכון בזרימת עבודה טיפוסית?', opts:['commit → add → branch','branch → add → commit → push → merge','merge → branch → commit','push → branch → commit'], correct:1},
+    {q:'מה ההבדל בין Working Directory ל-Staging Area?', opts:['אין הבדל','Working Directory הם הקבצים על הדיסק; Staging הוא מה שייכנס ל-commit הבא (git add)','Staging הוא רק לענן','Working Directory הוא רק לbranch ראשי'], correct:1}
+  ],
+  sql: [
+    {q:'מה תפקיד Foreign Key?', opts:['מזהה ייחודי של השורה עצמה','עמודה שמצביעה על Primary Key בטבלה אחרת - מייצרת קשר בין טבלאות','הצפנת הטבלה','אינדקס אוטומטי בלבד'], correct:1},
+    {q:'מה עושה JOIN בשאילתת SQL?', opts:['מוחק שורות כפולות','מחבר שורות משתי טבלאות (או יותר) לפי עמודת קשר','ממיין את התוצאות','יוצר טבלה חדשה קבועה'], correct:1},
+    {q:'מה התפקיד של Index בעמודה?', opts:['מונע כתיבה לעמודה','מאיץ חיפוש/סינון על אותה עמודה, במחיר אחסון וכתיבה איטית יותר','הופך את הטבלה לפרטית','מוחק כפילויות אוטומטית'], correct:1}
+  ],
+  'django-models': [
+    {q:'מה Model ב-Django בפועל?', opts:['קובץ HTML','מחלקת Python שיורשת מ-models.Model ומתורגמת אוטומטית לטבלת SQL','קובץ CSS','פונקציית view'], correct:1},
+    {q:'מה עושות migrations?', opts:['מוחקות את מסד הנתונים','מנהלות שינויים בסכמת מסד הנתונים לאורך זמן, כמו Git להיסטוריית הסכמה','מריצות טסטים','מגבות את הקוד'], correct:1},
+    {q:'מה עושה on_delete=models.CASCADE ב-ForeignKey?', opts:['שום דבר, זה אופציונלי לגמרי','קובע שכאשר הרשומה המקושרת נמחקת, גם הרשומות התלויות בה יימחקו אוטומטית','מונע מחיקה לצמיתות','יוצר גיבוי אוטומטי'], correct:1}
+  ],
+  'django-views': [
+    {q:'מה תפקיד urls.py?', opts:['מעצב את הדף','ממפה כתובת URL לפונקציית View מתאימה','שומר את מסד הנתונים','מריץ טסטים'], correct:1},
+    {q:'מה עושה Contact.objects.all()?', opts:['מוחק את כל אנשי הקשר','שולף את כל הרשומות מהטבלה - מתורגם ל-SELECT * FROM contact','יוצר איש קשר חדש','זו שגיאת תחביר'], correct:1},
+    {q:'מה זה MVT ב-Django?', opts:['שם של מסד נתונים','Model-View-Template - חלוקת האחריות בין נתונים, לוגיקה, ותצוגה','פרוטוקול רשת','כלי לבדיקות'], correct:1}
+  ],
+  'django-rest': [
+    {q:'מה תפקיד Serializer ב-DRF?', opts:['מעצב CSS','ממיר אובייקט Model ל-JSON (ובחזרה) ומאמת קלט','מריץ migrations','מנהל branches ב-git'], correct:1},
+    {q:'מה נותן viewsets.ModelViewSet בשורה אחת?', opts:['רק endpoint אחד לקריאה','חמישה endpoints סטנדרטיים ל-CRUD מלא','רק ממשק admin','אבטחה אוטומטית ללא הגדרה'], correct:1},
+    {q:'מה ההבדל בין Django "קלאסי" ל-DRF?', opts:['אין הבדל','Django קלאסי מחזיר HTML מרונדר; DRF מחזיר JSON לצריכה על ידי frontend נפרד','DRF לא תומך ב-Models','Django קלאסי לא תומך במסד נתונים'], correct:1}
+  ],
+  frontend: [
+    {q:'מה זה ה-DOM?', opts:['שפת תכנות חדשה','הייצוג החי של ה-HTML בזיכרון שג\'אווהסקריפט קורא ומשנה','מסד נתונים בצד הלקוח','פרוטוקול אבטחה'], correct:1},
+    {q:'מה עושה fetch() ב-JS?', opts:['טוען קובץ CSS בלבד','מבצע בקשת HTTP ומחזיר Promise לתשובה','מוחק את ה-DOM','מריץ קוד Python'], correct:1},
+    {q:'מה התפקיד של await מול fetch?', opts:['חוסם את כל הדפדפן עד שהתשובה מגיעה','משהה את הפונקציה הנוכחית עד שהתשובה מגיעה בלי לחסום את שאר הדף','מבטל את הבקשה','זה אופציונלי לגמרי וללא השפעה'], correct:1}
+  ],
+  docker: [
+    {q:'מה ההבדל בין Image ל-Container?', opts:['אין הבדל','Image הוא התבנית; Container הוא מופע רץ שלה - כמו class מול instance','Container הוא קובץ; Image הוא תהליך רץ','Image רץ רק על לינוקס'], correct:1},
+    {q:'מה תפקיד docker-compose.yml?', opts:['מריץ טסטים בלבד','מתאם כמה containers יחד (למשל אפליקציה + מסד נתונים)','מחליף את ה-Dockerfile','מנהל branches ב-git'], correct:1},
+    {q:'למה Docker פותר את בעיית "אצלי זה עבד"?', opts:['הוא לא פותר את זה בכלל','כי כל הסביבה ארוזה יחד ורצה זהה בכל מקום שיש בו Docker','כי הוא מוחק קוד ישן','כי הוא לא דורש חיבור לאינטרנט'], correct:1}
+  ]
+};
+
+function renderQuiz(key){
+  const container = document.getElementById('quiz-'+key);
+  if(!container || container.dataset.built) return;
+  container.dataset.built = '1';
+  const questions = quizData[key];
+  if(!questions) return;
+  let html = '<div class="section-title"><span class="num">📝</span> מבחנון קצר (ענו נכון על הכל כדי לסמן שיעור זה כהושלם)</div>';
+  questions.forEach((item,qi)=>{
+    html += '<div class="quiz-q">'+(qi+1)+'. '+item.q+'</div><div class="quiz-opts" id="qopts-'+key+'-'+qi+'">';
+    item.opts.forEach((opt,oi)=>{
+      html += '<div class="quiz-opt" onclick="answerQuiz(\''+key+'\','+qi+','+oi+')" id="qopt-'+key+'-'+qi+'-'+oi+'">'+opt+'</div>';
+    });
+    html += '</div>';
+  });
+  html += '<div class="quiz-summary" id="qsummary-'+key+'" style="display:none;"></div>';
+  container.innerHTML = html;
+  container._answers = new Array(questions.length).fill(null);
+  if(isUnitDone(key)){
+    questions.forEach((item,qi)=>{
+      document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+      const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+      for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+    });
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display='block'; summary.className='quiz-summary pass';
+    summary.textContent = '🎉 כבר השלמתם שיעור זה בעבר!';
+  }
+}
+function answerQuiz(key, qi, oi){
+  const questions = quizData[key];
+  const item = questions[qi];
+  const container = document.getElementById('quiz-'+key);
+  const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+  for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+  if(oi===item.correct){ document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('correct'); }
+  else {
+    document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('wrong');
+    document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+  }
+  container._answers[qi] = (oi===item.correct);
+  checkQuizComplete(key);
+}
+function checkQuizComplete(key){
+  const container = document.getElementById('quiz-'+key);
+  const answers = container._answers;
+  if(answers.every(a=>a!==null)){
+    const allCorrect = answers.every(a=>a===true);
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display = 'block';
+    const scoreCount = answers.filter(a=>a).length;
+    if(allCorrect){
+      summary.className = 'quiz-summary pass';
+      summary.textContent = '🎉 מעולה! '+scoreCount+'/'+answers.length+' נכון - השיעור סומן כהושלם.';
+      markDone(key);
+    } else {
+      summary.className = 'quiz-summary fail';
+      summary.textContent = '📚 '+scoreCount+'/'+answers.length+' נכון. רעננו את הדף כדי לנסות שוב.';
+    }
+    updateProgress();
+    buildHome();
+  }
+}
+function buildNav(){
+  const nav = document.getElementById('navScroll');
+  nav.innerHTML = '';
+  topics.forEach(t=>{
+    const b = document.createElement('button');
+    b.className='navbtn'; b.id='nav-'+t.key; b.innerHTML=t.emoji+' '+t.title;
+    b.onclick = ()=>showPage(t.key);
+    nav.appendChild(b);
+  });
+}
+function buildHome(){
+  const grid = document.getElementById('lessonGrid');
+  grid.innerHTML = '';
+  topics.forEach(t=>{
+    const done = isUnitDone(t.key);
+    const c = document.createElement('div');
+    c.className = 'lesson-card' + (done ? ' done' : '');
+    c.innerHTML = '<span class="em">'+t.emoji+'</span><div class="tt">'+t.title+'</div><div class="dd">'+t.desc+'</div>'+(done?'<div style="margin-top:6px;">✅</div>':'');
+    c.onclick = ()=>showPage(t.key);
+    grid.appendChild(c);
+  });
+  document.querySelectorAll('.navbtn').forEach(b=>{
+    const key = b.id.replace('nav-','');
+    b.classList.toggle('passed', isUnitDone(key));
+  });
+}
+function showPage(key){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+key).classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+  const nb = document.getElementById('nav-'+key);
+  if(nb) nb.classList.add('active');
+  currentPage = key;
+  if(quizData[key]){ renderQuiz(key); }
+  buildHome();
+  updateProgress();
+  if(typeof window.scrollTo === 'function'){
+    try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+  }
+}
+function goHome(){ showPage('home'); }
+function goRelative(dir){
+  const idx = topics.findIndex(t=>t.key===currentPage);
+  if(idx===-1) return;
+  const newIdx = idx+dir;
+  if(newIdx<0){ goHome(); return; }
+  if(newIdx>=topics.length){ showPage('finish'); return; }
+  showPage(topics[newIdx].key);
+}
+function updateProgress(){
+  const done = topics.filter(t=>isUnitDone(t.key)).length;
+  const pct = Math.round((done/topics.length)*100);
+  document.getElementById('progressBar').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = done+' / '+topics.length+' הושלמו';
+}
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+  safeSetTheme(isDark?'dark':'light');
+}
+
+/* ---------- PYTHON BASICS ---------- */
+function detectPyType(val){
+  const out = document.getElementById('pyTypeResult');
+  const v = val.trim();
+  if(!v){ out.textContent = 'הקלידו ערך למעלה 👆'; return; }
+  let type = null;
+  if(/^-?\d+$/.test(v)) type = 'int';
+  else if(/^-?\d+\.\d+$/.test(v)) type = 'float';
+  else if((v.startsWith('"')&&v.endsWith('"')&&v.length>=2) || (v.startsWith("'")&&v.endsWith("'")&&v.length>=2)) type = 'str';
+  else if(v==='True' || v==='False') type = 'bool';
+  else if(v.startsWith('[') && v.endsWith(']')) type = 'list';
+  else if(v.startsWith('(') && v.endsWith(')')) type = 'tuple';
+  else if(v.startsWith('{') && v.endsWith('}')) type = v.includes(':') ? 'dict' : 'set';
+  if(type){ out.textContent = 'type('+v+') → '+type+' 🐍'; }
+  else { out.textContent = '🤔 לא זוהה טיפוס ברור - נסו int, float, "str", [list], {"a":1} (dict), True/False'; }
+}
+
+/* ---------- PYTHON OOP ---------- */
+function instantiateContact(){
+  const out = document.getElementById('oopResult');
+  out.textContent = '⏳ מריץ: dana = VipContact("Dana", "dana@co.com", 0.15)...';
+  setTimeout(()=>{
+    out.textContent =
+`✅ נוצר אובייקט חדש בזיכרון:
+dana.name     = "Dana"
+dana.email    = "dana@co.com"
+dana.discount = 0.15
+dana.deals    = []
+
+dana.add_deal("Enterprise Plan")
+dana.deals    = ["Enterprise Plan"]
+
+type(dana)              → VipContact
+isinstance(dana, Contact) → True   (בזכות הירושה!)`;
+  }, 500);
+}
+
+/* ---------- GIT ---------- */
+let gitMain = ['M1'];
+let gitFeature = [];
+let gitOnFeature = false;
+let gitMerged = false;
+function renderGitStage(){
+  const stage = document.getElementById('gitStage');
+  let html = '<div class="git-lane"><span class="git-label">main</span>';
+  gitMain.forEach((c,i)=>{
+    html += '<div class="git-commit'+(c.startsWith('MERGE')?' merge':'')+'">'+(c.startsWith('MERGE')?'🔀':c)+'</div>';
+    if(i<gitMain.length-1) html += '<div class="git-line"></div>';
+  });
+  html += '</div>';
+  if(gitFeature.length>0 || gitOnFeature){
+    html += '<div class="git-lane"><span class="git-label">feature</span>';
+    gitFeature.forEach((c,i)=>{
+      html += '<div class="git-commit branch">'+c+'</div>';
+      if(i<gitFeature.length-1) html += '<div class="git-line"></div>';
+    });
+    if(gitFeature.length===0) html += '<span style="font-size:.75rem;color:var(--text-soft);">(עדיין בלי commits)</span>';
+    html += '</div>';
+  }
+  stage.innerHTML = html;
+}
+function gitCommit(){
+  if(gitOnFeature && !gitMerged){ gitFeature.push('F'+gitFeature.length); }
+  else { gitMain.push('M'+gitMain.length); }
+  renderGitStage();
+}
+function gitBranch(){
+  gitOnFeature = true;
+  renderGitStage();
+}
+function gitMerge(){
+  if(gitOnFeature && gitFeature.length>0 && !gitMerged){
+    gitMain.push('MERGE');
+    gitMerged = true;
+    gitOnFeature = false;
+  }
+  renderGitStage();
+}
+function gitReset(){
+  gitMain=['M1']; gitFeature=[]; gitOnFeature=false; gitMerged=false;
+  renderGitStage();
+}
+
+/* ---------- SQL ---------- */
+const sqlData = {
+  contacts: [ {id:1,name:'Dana Levi',email:'dana@co.com'}, {id:2,name:'Omer Cohen',email:'omer@co.com'}, {id:3,name:'Tal Amar',email:'tal@co.com'} ],
+  deals: [ {id:1,title:'Enterprise Plan',amount:12000,status:'open'}, {id:2,title:'Starter Plan',amount:2000,status:'won'}, {id:3,title:'Pro Plan',amount:5400,status:'open'} ]
+};
+function renderSqlDemo(){
+  const table = document.getElementById('sqlTable').value;
+  const dir = document.getElementById('sqlOrder').value;
+  const orderCol = table==='contacts' ? 'id' : 'amount';
+  document.getElementById('sqlGenerated').textContent = 'SELECT * FROM '+table+' ORDER BY '+orderCol+' '+dir+';';
+  let rows = sqlData[table].slice();
+  rows.sort((a,b)=> dir==='ASC' ? a[orderCol]-b[orderCol] : b[orderCol]-a[orderCol]);
+  const cols = Object.keys(rows[0]);
+  let html = '<table class="sql-table"><tr>'+cols.map(c=>'<th>'+c+'</th>').join('')+'</tr>';
+  rows.forEach(r=>{ html += '<tr>'+cols.map(c=>'<td>'+r[c]+'</td>').join('')+'</tr>'; });
+  html += '</table>';
+  document.getElementById('sqlResultWrap').innerHTML = html;
+}
+
+/* ---------- DJANGO MODELS ---------- */
+let modelFields = ['name = models.CharField(max_length=100)', 'email = models.EmailField(unique=True)'];
+function addModelField(){
+  const name = document.getElementById('fieldName').value.trim();
+  const type = document.getElementById('fieldType').value;
+  if(!name) return;
+  modelFields.push(name+' = models.'+type);
+  document.getElementById('fieldName').value = '';
+  renderModelPreview();
+}
+function renderModelPreview(){
+  const el = document.getElementById('modelPreview');
+  el.textContent = 'class Contact(models.Model):\n' + modelFields.map(f=>'    '+f).join('\n');
+}
+
+/* ---------- DJANGO VIEWS ---------- */
+function runDjangoRequest(){
+  const out = document.getElementById('djangoFlowResult');
+  out.textContent = '⏳ שולח בקשה...';
+  setTimeout(()=>{
+    out.textContent =
+`🌐 GET /contacts/
+1) urls.py מתאים את הנתיב ל-views.contact_list
+2) views.py מריץ: Contact.objects.all().order_by("name")
+   → SQL: SELECT * FROM contact ORDER BY name ASC
+3) render() ממזג את התוצאות עם contact_list.html
+4) תשובה חוזרת לדפדפן: 200 OK, Content-Type: text/html`;
+  }, 600);
+}
+
+/* ---------- DJANGO REST ---------- */
+function runSerializerDemo(){
+  const el = document.getElementById('serializerOutput');
+  el.innerHTML = '<span class="code-label">JSON output</span><pre>⏳ מסריאליזציה...</pre>';
+  setTimeout(()=>{
+    el.innerHTML = '<span class="code-label">JSON output</span><pre>{\n  "id": 1,\n  "name": "Dana Levi",\n  "email": "dana@co.com",\n  "created_at": "2026-07-01T10:15:00Z"\n}</pre>';
+  }, 500);
+}
+
+/* ---------- FRONTEND ---------- */
+function runFetchDemo(){
+  const log = document.getElementById('fetchLog');
+  const list = document.getElementById('contactListDemo');
+  list.innerHTML = '';
+  log.textContent = '⏳ fetch("/api/contacts/")...';
+  setTimeout(()=>{
+    log.textContent = '✅ 200 OK - התקבלו 3 אנשי קשר, מרנדר ל-DOM...';
+    sqlData.contacts.forEach(c=>{
+      const li = document.createElement('li');
+      li.textContent = c.name+' - '+c.email;
+      list.appendChild(li);
+    });
+  }, 700);
+}
+
+/* ---------- DOCKER ---------- */
+function runDockerDemo(){
+  const log = document.getElementById('dockerLog');
+  log.innerHTML = '';
+  const lines = [
+    '[+] Building web...',
+    'Step 1/6 : FROM python:3.12-slim',
+    'Step 4/6 : RUN pip install -r requirements.txt',
+    'Step 6/6 : CMD ["gunicorn", ...]',
+    'Successfully built web image ✅',
+    'Creating network "crm_default"',
+    'Creating db  ... done',
+    'Creating web ... done',
+    'web  | Starting gunicorn...',
+    'web  | Listening at http://0.0.0.0:8000',
+    '✅ CRM is running at http://localhost:8000'
+  ];
+  lines.forEach((l,i)=>{
+    setTimeout(()=>{
+      const div = document.createElement('div');
+      div.textContent = l;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }, i*350);
+  });
+}
+
+/* ---------- CRM CAPSTONE ---------- */
+const crmFieldOptions = ['Name','Email','Phone','Company','Notes'];
+const crmEndpointOptions = ['GET /contacts/','POST /contacts/','GET /contacts/{id}/','PUT /contacts/{id}/','DELETE /contacts/{id}/'];
+function buildTogglePicker(containerId, options){
+  const wrap = document.getElementById(containerId);
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  options.forEach(opt=>{
+    const b = document.createElement('button');
+    b.type='button'; b.className='btn secondary small'; b.textContent = opt;
+    b.dataset.selected='0';
+    b.onclick = ()=>{
+      const sel = b.dataset.selected==='1';
+      b.dataset.selected = sel?'0':'1';
+      b.style.outline = sel?'none':'3px solid var(--green)';
+    };
+    wrap.appendChild(b);
+  });
+}
+function generateCrmCapstone(){
+  const fieldBtns = document.querySelectorAll('#crm-fields-picker button');
+  const chosenFields = Array.from(fieldBtns).filter(b=>b.dataset.selected==='1').map(b=>b.textContent);
+  const statuses = document.getElementById('crm-status-select').value.split(',');
+  const endpointBtns = document.querySelectorAll('#crm-endpoints-picker button');
+  const chosenEndpoints = Array.from(endpointBtns).filter(b=>b.dataset.selected==='1').map(b=>b.textContent);
+  const frontend = document.getElementById('crm-frontend-select').value;
+  const deploy = document.getElementById('crm-deploy-select').value;
+
+  let preview = '# CRM Project Summary\n\n';
+  preview += 'models.py -> Contact fields: '+(chosenFields.length?chosenFields.join(', '):'Name, Email')+'\n';
+  preview += 'models.py -> Deal.status choices: '+statuses.join(' / ')+'\n\n';
+  preview += 'API endpoints:\n';
+  (chosenEndpoints.length?chosenEndpoints:['GET /contacts/']).forEach(e=>{ preview += '  '+e+'\n'; });
+  preview += '\nFrontend: '+(frontend==='server'?'Django Templates (server-rendered)':'Separate SPA (React) calling the API')+'\n';
+  preview += 'Deployment: '+(deploy==='docker-single'?'docker compose up on a single server':'Docker + cloud deploy with managed Postgres')+'\n';
+
+  const el = document.getElementById('crmPreview');
+  el.style.display='block'; el.textContent = preview;
+  markDone('crm-capstone');
+  updateProgress();
+  buildHome();
+}
+
+/* ---------- INIT ---------- */
+buildNav();
+buildHome();
+renderGitStage();
+renderSqlDemo();
+renderModelPreview();
+buildTogglePicker('crm-fields-picker', crmFieldOptions);
+buildTogglePicker('crm-endpoints-picker', crmEndpointOptions);
+if(safeGetTheme()==='dark'){
+  document.body.classList.add('dark');
+  document.getElementById('themeToggle').textContent='☀️';
+}
+updateProgress();
+</script>
+
+</body>
+</html>

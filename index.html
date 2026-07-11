@@ -2,11 +2,163 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=olam-ha-ai.html">
-<title>🤖 עולם ה-AI - קורס מתקדם</title>
-<link rel="canonical" href="olam-ha-ai.html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤖 האקדמיה - AI + פיתוח Fullstack מקצועי</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#4A90E2; --purple:#7B68EE; --green:#2ECC71;
+  --bg:#eef2fb; --bg2:#e4ecfb; --card:#ffffff; --text:#2d3142; --text-soft:#5a5f7a;
+  --radius:26px; --radius-sm:16px;
+  --shadow:0 12px 30px rgba(74,144,226,0.18);
+  --shadow-soft:0 6px 16px rgba(74,144,226,0.12);
+}
+body.dark{
+  --bg:#141827; --bg2:#1b2032; --card:#222842; --text:#f2f3fb; --text-soft:#b7bcda;
+  --shadow:0 12px 30px rgba(0,0,0,0.45); --shadow-soft:0 6px 16px rgba(0,0,0,0.35);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:'Heebo',sans-serif;background:linear-gradient(160deg,var(--bg),var(--bg2));color:var(--text);min-height:100vh;transition:background .4s ease,color .4s ease;}
+h1,h2,h3{margin:0 0 8px 0;}
+button,a.btn{font-family:'Heebo',sans-serif;cursor:pointer;}
+
+.topbar{position:sticky;top:0;z-index:50;background:var(--card);box-shadow:var(--shadow-soft);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-weight:900;font-size:1.3rem;background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.theme-toggle{background:var(--bg2);width:42px;height:42px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;font-size:1.2rem;transition:transform .3s ease;}
+.theme-toggle:hover{transform:rotate(20deg) scale(1.1);}
+
+.wrap{max-width:1100px;margin:0 auto;padding:30px 20px 70px 20px;}
+.hero{text-align:center;margin-bottom:10px;}
+.hero-title{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:900;margin-bottom:8px;}
+.hero-sub{color:var(--text-soft);font-size:1.05rem;max-width:700px;margin:0 auto 22px auto;line-height:1.8;}
+
+.overall-progress{background:var(--card);border-radius:var(--radius);padding:22px 26px;box-shadow:var(--shadow);margin-bottom:34px;}
+.overall-progress .label{display:flex;justify-content:space-between;font-weight:700;margin-bottom:10px;}
+.overall-bar-wrap{height:14px;border-radius:999px;background:var(--bg2);overflow:hidden;}
+.overall-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));border-radius:999px;transition:width .6s ease;}
+
+.modules{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;}
+.module-card{background:var(--card);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;position:relative;transition:transform .25s ease;border:3px solid transparent;}
+.module-card:hover{transform:translateY(-4px);}
+.module-card.done{border-color:var(--green);}
+.module-num{position:absolute;top:20px;left:20px;background:var(--bg2);color:var(--text-soft);font-weight:800;font-size:.75rem;padding:3px 10px;border-radius:999px;}
+.module-badge-new{position:absolute;top:20px;right:20px;background:linear-gradient(90deg,#f39c12,#e67e22);color:#fff;font-weight:800;font-size:.7rem;padding:4px 10px;border-radius:999px;}
+.module-em{font-size:2.6rem;}
+.module-title{font-size:1.25rem;font-weight:900;}
+.module-desc{color:var(--text-soft);font-size:.92rem;line-height:1.7;flex-grow:1;}
+.module-meta{display:flex;gap:14px;font-size:.78rem;color:var(--text-soft);font-weight:700;}
+.module-bar-wrap{height:9px;border-radius:999px;background:var(--bg2);overflow:hidden;margin-top:4px;}
+.module-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:999px;transition:width .5s ease;}
+.module-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;font-weight:700;padding:12px 20px;border-radius:999px;text-decoration:none;box-shadow:var(--shadow-soft);transition:transform .2s ease;}
+.module-link:hover{transform:translateY(-3px) scale(1.02);}
+.module-link.done-link{background:linear-gradient(90deg,var(--green),#27ae60);}
+
+.footer-note{text-align:center;color:var(--text-soft);font-size:.85rem;margin-top:40px;line-height:1.8;}
+
+@media (max-width:600px){
+  .wrap{padding:20px 14px 50px 14px;}
+}
+</style>
 </head>
 <body>
-<p>מעביר אתכם לקורס... אם זה לא קורה אוטומטית, <a href="olam-ha-ai.html">לחצו כאן</a>.</p>
+
+<div class="topbar">
+  <div class="logo">🤖 האקדמיה</div>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-title">✨ AI + פיתוח Fullstack מקצועי ✨</div>
+    <div class="hero-sub">4 מודולים, 29 שיעורים ופרויקטים מסכמים - מהבנת מודלי שפה מהיסוד, דרך בניית סוכנים עם קלוד קוד, ועד תכנות Python/Django/Frontend/Docker אמיתי לבניית מערכת CRM. שבוע שלם של תוכן מקצועי, הכל אינטראקטיבי עם מעבדות קוד ומבחנונים.</div>
+  </div>
+
+  <div class="overall-progress">
+    <div class="label"><span>התקדמות כוללת</span><span id="overallCount">0 / 29</span></div>
+    <div class="overall-bar-wrap"><div class="overall-bar" id="overallBar"></div></div>
+  </div>
+
+  <div class="modules" id="modulesGrid"></div>
+
+  <div class="footer-note">💡 ההתקדמות נשמרת אוטומטית בדפדפן הזה (localStorage). כל מודול הוא קובץ HTML עצמאי - אפשר לפתוח כל אחד גם ישירות.</div>
+</div>
+
+<script>
+const PROGRESS_KEY = 'academy_progress_v1';
+function loadProgress(){
+  try{ return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]')); }
+  catch(e){ return new Set(); }
+}
+function safeGetTheme(){ try{ return localStorage.getItem('ai-theme'); }catch(e){ return null; } }
+function safeSetTheme(v){ try{ localStorage.setItem('ai-theme', v); }catch(e){} }
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+  safeSetTheme(isDark?'dark':'light');
+}
+if(safeGetTheme()==='dark'){
+  document.body.classList.add('dark');
+  document.getElementById('themeToggle').textContent='☀️';
+}
+
+const modules = [
+  {
+    num: 1, emoji:'🌍', title:'יסודות מודלי השפה', file:'module1-ai-fundamentals.html',
+    desc:'איך LLM עובד באמת: טרנספורמר, Self-Attention, Tokenization, Temperature, Context Window, API, RAG, Embeddings והלולאה האג׳נטית.',
+    time:'~2.5 שעות', units:['llms','tokens','temperature','context','api','rag','embeddings','agent']
+  },
+  {
+    num: 2, emoji:'🛠️', title:'עולם קלוד קוד', file:'module2-claude-code.html',
+    desc:'איך בונים סוכנים אמיתיים: Skills, Tools, MCP, Subagents, Slash Commands, Hooks, Plugins, וסוכנים אוטונומיים שרצים לבד.',
+    time:'~2.5 שעות', units:['skills','tools','mcp','subagents','slash','hooks','plugins','alwayson']
+  },
+  {
+    num: 3, emoji:'🏗️', title:'הנדסת מערכות AI', file:'module3-ai-engineering.html',
+    desc:'Frameworks (LangChain/LlamaIndex/Agent SDK) מול API גולמי, ארכיטקטורת Fullstack ל-AI, ופרויקט מסכם: תכננו פלאגין שלם.',
+    time:'~1.5 שעות', units:['frameworks','fullstack','capstone']
+  },
+  {
+    num: 4, emoji:'💻', title:'תכנות Fullstack מקצועי', file:'module4-fullstack-dev.html', isNew:true,
+    desc:'Python מהיסוד, OOP, Git, SQL ומסדי נתונים, Django (models/views/ORM/REST API), Frontend, Docker, טסטים ו-deployment - ופרויקט מסכם: בניית CRM מינימלי.',
+    time:'~3 שעות', units:['py-basics','py-oop','git','sql','django-models','django-views','django-rest','frontend','docker','crm-capstone']
+  }
+];
+
+function render(){
+  const progress = loadProgress();
+  const grid = document.getElementById('modulesGrid');
+  grid.innerHTML = '';
+  let totalUnits = 0, totalDone = 0;
+  modules.forEach(m=>{
+    const doneCount = m.units.filter(u=>progress.has(m.file+'::'+u)).length;
+    const allDone = doneCount === m.units.length;
+    totalUnits += m.units.length;
+    totalDone += doneCount;
+    const pct = Math.round((doneCount/m.units.length)*100);
+    const card = document.createElement('div');
+    card.className = 'module-card' + (allDone ? ' done' : '');
+    card.innerHTML = `
+      <div class="module-num">מודול ${m.num}</div>
+      ${m.isNew ? '<div class="module-badge-new">חדש! 🆕</div>' : ''}
+      <div class="module-em">${m.emoji}</div>
+      <div class="module-title">${m.title}</div>
+      <div class="module-desc">${m.desc}</div>
+      <div class="module-meta"><span>⏱️ ${m.time}</span><span>📚 ${m.units.length} יחידות</span></div>
+      <div class="module-bar-wrap"><div class="module-bar" style="width:${pct}%"></div></div>
+      <div style="font-size:.8rem;color:var(--text-soft);font-weight:700;">${doneCount} / ${m.units.length} הושלמו</div>
+      <a class="module-link ${allDone?'done-link':''}" href="${m.file}">${allDone ? '✅ סיימת - חזרה למודול' : (doneCount>0 ? '▶️ המשך' : '▶️ התחל')}</a>
+    `;
+    grid.appendChild(card);
+  });
+  document.getElementById('overallCount').textContent = totalDone+' / '+totalUnits;
+  document.getElementById('overallBar').style.width = Math.round((totalDone/totalUnits)*100)+'%';
+}
+render();
+window.addEventListener('focus', render);
+</script>
 </body>
 </html>
