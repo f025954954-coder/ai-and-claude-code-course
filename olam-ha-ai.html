@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤖 עולם ה-AI - קורס מתקדם</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#4A90E2; --purple:#7B68EE; --green:#2ECC71;
+  --bg:#eef2fb; --bg2:#e4ecfb; --card:#ffffff; --text:#2d3142; --text-soft:#5a5f7a;
+  --radius:26px; --radius-sm:16px;
+  --shadow:0 12px 30px rgba(74,144,226,0.18);
+  --shadow-soft:0 6px 16px rgba(74,144,226,0.12);
+  --code-bg:#1e2233; --code-text:#d7dcff;
+}
+body.dark{
+  --bg:#141827; --bg2:#1b2032; --card:#222842; --text:#f2f3fb; --text-soft:#b7bcda;
+  --shadow:0 12px 30px rgba(0,0,0,0.45); --shadow-soft:0 6px 16px rgba(0,0,0,0.35);
+  --code-bg:#0d0f1a; --code-text:#c7d0ff;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Heebo',sans-serif; background:linear-gradient(160deg,var(--bg),var(--bg2)); color:var(--text);
+  min-height:100vh; transition:background .4s ease,color .4s ease; padding-top:126px;
+}
+h1,h2,h3{margin:0 0 8px 0;}
+button{font-family:'Heebo',sans-serif;cursor:pointer;border:none;outline:none;}
+code, pre, .mono{font-family:'JetBrains Mono',monospace;}
+
+/* ===== TOP NAV ===== */
+.topnav{position:fixed;top:0;right:0;left:0;z-index:100;background:var(--card);box-shadow:var(--shadow-soft);padding:10px 16px 0 16px;transition:background .4s ease;}
+.topnav-row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1200px;margin:0 auto;}
+.logo{font-weight:900;font-size:1.2rem;white-space:nowrap;background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;cursor:pointer;user-select:none;flex-shrink:0;}
+.nav-scroll{display:flex;gap:8px;overflow-x:auto;flex:1;padding:4px 2px;scrollbar-width:thin;align-items:center;}
+.nav-scroll::-webkit-scrollbar{height:6px;}
+.nav-scroll::-webkit-scrollbar-thumb{background:var(--purple);border-radius:10px;}
+.navbtn{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 13px;font-size:0.82rem;font-weight:500;white-space:nowrap;transition:all .25s ease;border:2px solid transparent;position:relative;}
+.navbtn:hover{transform:translateY(-2px) scale(1.04);}
+.navbtn.active{background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;box-shadow:var(--shadow-soft);}
+.navbtn.passed::after{content:'✓';position:absolute;top:-4px;left:-4px;background:var(--green);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
+.nav-divider{flex-shrink:0;color:var(--text-soft);opacity:.5;padding:0 2px;font-size:.9rem;}
+.theme-toggle{flex-shrink:0;background:var(--bg2);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;transition:transform .3s ease;}
+.theme-toggle:hover{transform:rotate(20deg) scale(1.1);}
+.progress-wrap{max-width:1200px;margin:8px auto 0 auto;height:10px;background:var(--bg2);border-radius:999px;overflow:hidden;}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));border-radius:999px;transition:width .5s ease;}
+.progress-label{max-width:1200px;margin:4px auto 0 auto;font-size:.72rem;color:var(--text-soft);text-align:left;padding:0 4px;}
+
+/* ===== PAGES ===== */
+.page{display:none;animation:fadeIn .5s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.page-inner{max-width:860px;margin:0 auto;padding:18px 16px 60px 16px;}
+.hero-title{font-size:clamp(1.5rem,4vw,2.3rem);font-weight:900;text-align:center;margin-bottom:6px;}
+.hero-sub{text-align:center;color:var(--text-soft);font-size:1.02rem;margin-bottom:22px;}
+.world-tag{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 12px;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--green));color:#fff;margin-bottom:10px;}
+.level-tag{display:inline-block;font-size:.7rem;font-weight:800;padding:3px 12px;border-radius:999px;background:var(--bg2);color:var(--text-soft);margin-bottom:10px;margin-right:6px;}
+
+.card{background:var(--card);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);margin-bottom:20px;}
+.explain{font-size:1.05rem;line-height:1.95;color:var(--text);}
+.explain p{margin:0 0 14px 0;}
+.explain p:last-child{margin-bottom:0;}
+.explain b, .highlight{background:linear-gradient(90deg,rgba(123,104,238,.18),rgba(46,204,113,.18));padding:2px 8px;border-radius:8px;font-weight:700;color:var(--purple);}
+body.dark .explain b, body.dark .highlight{color:#c9c2ff;}
+.callout{background:rgba(241,196,15,.12);border-right:4px solid #f1c40f;padding:12px 16px;border-radius:10px;margin-top:14px;font-size:.95rem;}
+.callout.info{background:rgba(74,144,226,.1);border-color:var(--blue);}
+
+.section-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.05rem;margin:0 0 14px 0;}
+.section-title .num{background:var(--purple);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;}
+
+.demo-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.demo-label{font-weight:700;margin-bottom:12px;font-size:1rem;color:var(--text-soft);}
+
+/* Lab / code blocks */
+.lab-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.code-block{position:relative;background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px 18px;overflow-x:auto;font-size:.82rem;line-height:1.7;direction:ltr;text-align:left;margin-top:10px;}
+.code-block pre{margin:0;white-space:pre;}
+.code-label{position:absolute;top:8px;left:14px;font-size:.65rem;color:#8891b8;letter-spacing:.05em;text-transform:uppercase;}
+.lab-note{font-size:.92rem;color:var(--text-soft);margin-top:10px;line-height:1.7;}
+
+textarea, input[type=text]{width:100%;font-family:'Heebo',sans-serif;font-size:1rem;padding:14px 16px;border-radius:var(--radius-sm);border:2px solid var(--bg2);background:var(--bg);color:var(--text);resize:none;transition:border .2s ease;}
+textarea:focus, input[type=text]:focus{border-color:var(--purple);}
+
+.btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;font-weight:700;font-size:0.92rem;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-soft);transition:transform .2s ease, box-shadow .2s ease;}
+.btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 26px rgba(74,144,226,.3);}
+.btn:active{transform:translateY(0) scale(.98);}
+.btn.secondary{background:var(--bg2);color:var(--text);}
+.btn.green{background:linear-gradient(90deg,var(--green),#27ae60);}
+.btn.red{background:linear-gradient(90deg,#e74c3c,#c0392b);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:10px;}
+
+/* Quiz */
+.quiz-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.quiz-q{font-weight:700;margin:18px 0 10px 0;}
+.quiz-q:first-of-type{margin-top:6px;}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{background:var(--bg);border-radius:12px;padding:11px 16px;text-align:right;font-size:.95rem;border:2px solid transparent;transition:all .2s ease;}
+.quiz-opt:hover{border-color:var(--purple);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(46,204,113,.15);font-weight:700;}
+.quiz-opt.wrong{border-color:#e74c3c;background:rgba(231,76,60,.12);}
+.quiz-opt.disabled{pointer-events:none;}
+.quiz-feedback{font-size:.85rem;margin-top:6px;color:var(--text-soft);}
+.quiz-summary{margin-top:18px;padding:14px 18px;border-radius:14px;background:var(--bg);font-weight:700;text-align:center;}
+.quiz-summary.pass{background:rgba(46,204,113,.15);color:var(--green);}
+.quiz-summary.fail{background:rgba(231,76,60,.12);color:#e74c3c;}
+
+/* Tokens */
+.cube-box{display:flex;flex-wrap:wrap;gap:8px;min-height:60px;margin-top:16px;align-items:center;}
+.cube{padding:8px 12px;border-radius:12px;color:#fff;font-weight:700;font-size:.92rem;transform:scale(0);animation:cubeIn .35s ease forwards;box-shadow:0 6px 14px rgba(0,0,0,.15);}
+@keyframes cubeIn{to{transform:scale(1);}}
+.token-count{margin-top:14px;font-weight:700;font-size:1.1rem;color:var(--purple);}
+
+/* Temperature */
+.temp-slider{width:100%;-webkit-appearance:none;height:10px;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--purple),#e74c3c);outline:none;margin:16px 0;}
+.temp-slider::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid var(--purple);cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.25);}
+.temp-value{text-align:center;font-weight:900;font-size:1.4rem;margin-bottom:6px;}
+.temp-output{text-align:center;font-size:1.2rem;font-weight:600;padding:22px;border-radius:var(--radius-sm);background:var(--bg);min-height:70px;display:flex;align-items:center;justify-content:center;transition:color .3s ease;}
+.wobble{animation:wobble linear infinite;}
+@keyframes wobble{0%{transform:rotate(-1deg) translateY(0);}25%{transform:rotate(1.5deg) translateY(-2px);}50%{transform:rotate(-1deg) translateY(1px);}75%{transform:rotate(2deg) translateY(-1px);}100%{transform:rotate(-1deg) translateY(0);}}
+
+/* Context window */
+.ctx-bar-wrap{height:34px;border-radius:999px;background:var(--bg);overflow:hidden;margin-top:14px;box-shadow:inset 0 2px 6px rgba(0,0,0,.08);}
+.ctx-bar{height:100%;width:0%;border-radius:999px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;transition:width .4s ease, background .4s ease;}
+.ctx-msg{text-align:center;margin-top:12px;font-weight:700;min-height:24px;}
+
+/* API */
+.api-stage{position:relative;height:260px;background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:16px 0;}
+.api-node{font-size:2.4rem;text-align:center;}
+.api-node-label{font-size:.8rem;color:var(--text-soft);text-align:center;font-weight:700;}
+.api-bubble{position:absolute;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;padding:8px 16px;border-radius:999px;font-size:.85rem;font-weight:700;max-width:78%;text-align:center;white-space:normal;opacity:0;box-shadow:var(--shadow-soft);}
+.api-bubble.response{background:linear-gradient(90deg,var(--green),#27ae60);}
+.api-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+
+/* RAG */
+.rag-stage{background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;padding:20px;min-height:220px;position:relative;}
+.rag-dots{position:relative;height:150px;margin-top:12px;}
+.rag-dot{position:absolute;width:16px;height:16px;border-radius:50%;transform:scale(0);animation:cubeIn .4s ease forwards;box-shadow:0 4px 10px rgba(0,0,0,.2);}
+.rag-dot.found{outline:3px solid var(--green);outline-offset:3px;}
+.rag-result{margin-top:14px;font-weight:700;text-align:center;min-height:24px;color:var(--green);}
+
+/* Embeddings */
+.embed-scene{height:280px;margin-top:14px;background:var(--bg);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;perspective:900px;overflow:hidden;}
+.embed-space{position:relative;width:220px;height:220px;transform-style:preserve-3d;animation:spin3d 14s linear infinite;}
+@keyframes spin3d{from{transform:rotateY(0deg) rotateX(10deg);}to{transform:rotateY(360deg) rotateX(10deg);}}
+.embed-point{position:absolute;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;box-shadow:0 8px 18px rgba(0,0,0,.25);transform-style:preserve-3d;}
+.embed-legend{margin-top:12px;text-align:center;color:var(--text-soft);font-size:.9rem;}
+
+/* Agent loop */
+.agent-stage{height:300px;position:relative;margin-top:14px;background:var(--bg);border-radius:var(--radius-sm);}
+.agent-node{position:absolute;width:110px;padding:12px 8px;border-radius:var(--radius-sm);background:var(--card);box-shadow:var(--shadow-soft);text-align:center;font-weight:700;font-size:.85rem;transition:all .3s ease;border:3px solid transparent;}
+.agent-node.active{border-color:var(--green);transform:scale(1.1);box-shadow:0 0 0 6px rgba(46,204,113,.2);}
+.agent-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2.2rem;}
+
+/* Skills demo */
+.skill-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:16px;}
+.skill-card{background:var(--bg);border-radius:var(--radius-sm);padding:14px 8px;text-align:center;font-weight:700;font-size:.85rem;transition:all .3s ease;border:3px solid transparent;}
+.skill-card .sk-em{font-size:1.8rem;display:block;margin-bottom:6px;}
+.skill-card.match{border-color:var(--green);background:rgba(46,204,113,.15);transform:scale(1.08) translateY(-4px);box-shadow:var(--shadow-soft);}
+
+/* Tools demo */
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;margin-top:14px;}
+.tool-btn{background:var(--bg);border-radius:var(--radius-sm);padding:16px 8px;text-align:center;font-weight:700;font-size:.85rem;transition:all .2s ease;}
+.tool-btn:hover{transform:translateY(-3px);}
+.tool-btn .t-em{font-size:1.8rem;display:block;margin-bottom:6px;}
+.action-log{margin-top:16px;background:var(--bg);border-radius:var(--radius-sm);padding:16px;min-height:50px;font-size:.95rem;font-weight:600;text-align:center;}
+
+/* MCP demo */
+.mcp-stage{position:relative;height:230px;background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;}
+.mcp-node{font-size:2.2rem;text-align:center;}
+.mcp-label{font-size:.75rem;color:var(--text-soft);font-weight:700;text-align:center;margin-top:4px;}
+.app-picker{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.app-btn{background:var(--bg);border-radius:999px;padding:8px 16px;font-weight:700;font-size:.85rem;border:3px solid transparent;transition:all .2s ease;}
+.app-btn.selected{border-color:var(--purple);background:rgba(123,104,238,.15);}
+.mcp-bubble{position:absolute;top:50%;transform:translateY(-50%);background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;padding:6px 14px;border-radius:999px;font-size:.8rem;font-weight:700;opacity:0;box-shadow:var(--shadow-soft);}
+
+/* Subagent demo */
+.sub-stage{position:relative;height:220px;background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;overflow:hidden;}
+.sub-main{position:absolute;top:50%;right:16px;transform:translateY(-50%);font-size:2.2rem;text-align:center;}
+.sub-cloud{position:absolute;top:16px;left:16px;width:140px;height:190px;border-radius:24px;background:rgba(123,104,238,.12);border:2px dashed var(--purple);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.8rem;color:var(--text-soft);font-weight:700;text-align:center;padding:8px;}
+.sub-helper{position:absolute;top:50%;right:100px;transform:translateY(-50%);font-size:1.8rem;transition:all 1s ease;}
+.sub-result{margin-top:14px;text-align:center;font-weight:700;min-height:26px;color:var(--green);}
+.sub-thought{font-size:.72rem;opacity:.7;animation:fadeOut 1.2s ease forwards;}
+@keyframes fadeOut{from{opacity:.9;}to{opacity:0;}}
+
+/* Slash commands demo */
+.slash-list{margin-top:8px;background:var(--bg);border-radius:var(--radius-sm);overflow:hidden;}
+.slash-item{padding:12px 16px;font-weight:700;cursor:pointer;transition:background .2s ease;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.slash-item:hover{background:rgba(123,104,238,.12);}
+.slash-item .sd{font-weight:400;color:var(--text-soft);font-size:.85rem;}
+.slash-effect{margin-top:14px;background:var(--bg);border-radius:var(--radius-sm);padding:20px;text-align:center;font-weight:700;min-height:60px;display:flex;align-items:center;justify-content:center;}
+
+/* Hooks demo */
+.hook-gate{position:relative;height:230px;background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:16px;}
+.hook-guard{font-size:2.4rem;}
+.hook-question{font-weight:700;font-size:1.05rem;}
+.hook-outcome{font-weight:700;min-height:24px;}
+
+/* Plugins demo */
+.plugin-stage{background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;padding:24px;min-height:200px;position:relative;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;}
+.plugin-item{background:var(--card);border-radius:14px;padding:14px 10px;text-align:center;font-weight:700;font-size:.8rem;box-shadow:var(--shadow-soft);transition:all .8s ease;width:80px;}
+.plugin-item .p-em{font-size:1.6rem;display:block;}
+.plugin-box{background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;border-radius:20px;padding:20px;text-align:center;font-weight:800;box-shadow:var(--shadow);display:none;}
+
+/* Always-on agents demo */
+.clock-stage{background:var(--bg);border-radius:var(--radius-sm);margin-top:14px;padding:24px;text-align:center;}
+.clock-face{font-size:3rem;transition:transform .5s ease;}
+.clock-log{margin-top:14px;text-align:right;background:var(--card);border-radius:var(--radius-sm);padding:12px 16px;min-height:100px;box-shadow:var(--shadow-soft);font-size:.9rem;}
+.clock-log div{padding:4px 0;border-bottom:1px solid var(--bg2);}
+.clock-log div:last-child{border-bottom:none;}
+.time-picker{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px;}
+.time-btn{background:var(--bg);border-radius:999px;padding:8px 16px;font-weight:700;border:3px solid transparent;transition:all .2s ease;}
+.time-btn.selected{border-color:var(--green);background:rgba(46,204,113,.15);}
+
+/* Capstone */
+.capstone-step{background:var(--bg);border-radius:var(--radius-sm);padding:18px;margin-bottom:14px;}
+.capstone-step h4{margin:0 0 8px 0;font-size:.95rem;display:flex;align-items:center;gap:8px;}
+.capstone-step select, .capstone-step textarea{width:100%;padding:10px 12px;border-radius:10px;border:2px solid var(--card);background:var(--card);color:var(--text);font-family:'Heebo',sans-serif;}
+.capstone-preview{background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px;font-size:.8rem;white-space:pre-wrap;direction:ltr;text-align:left;margin-top:14px;display:none;}
+
+/* footer / finish */
+.finish-emoji{font-size:4rem;text-align:center;margin-bottom:10px;}
+.confetti{position:fixed;top:0;font-size:1.6rem;pointer-events:none;animation:fall linear forwards;z-index:200;}
+@keyframes fall{to{transform:translateY(100vh) rotate(360deg);opacity:0;}}
+
+/* home map */
+.section-header{display:flex;align-items:center;gap:10px;margin:30px 0 14px 0;}
+.section-header h2{font-size:1.25rem;font-weight:900;}
+.section-header .line{flex:1;height:2px;background:var(--bg2);}
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:10px;}
+.lesson-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:transform .25s ease, box-shadow .25s ease;text-align:center;border:3px solid transparent;position:relative;}
+.lesson-card:hover{transform:translateY(-6px) rotate(-1deg);box-shadow:0 16px 32px rgba(74,144,226,.25);}
+.lesson-card .em{font-size:2.2rem;display:block;margin-bottom:8px;}
+.lesson-card .tt{font-weight:800;font-size:1rem;margin-bottom:4px;}
+.lesson-card .dd{font-size:.85rem;color:var(--text-soft);}
+.lesson-card.done{border-color:var(--green);}
+.lesson-card .est{font-size:.7rem;color:var(--text-soft);opacity:.7;margin-top:6px;}
+
+@media (max-width:600px){
+  body{padding-top:112px;}
+  .logo{font-size:1rem;}
+  .navbtn{font-size:.76rem;padding:6px 10px;}
+  .card,.demo-card,.lab-card,.quiz-card{padding:18px;}
+  .agent-node{width:88px;font-size:.72rem;padding:8px 4px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="topnav-row">
+    <div class="logo" onclick="showPage('home')">🤖 עולם ה-AI</div>
+    <div class="nav-scroll" id="navScroll"></div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 16 הושלמו</div>
+</div>
+
+<!-- HOME -->
+<section class="page active" id="page-home">
+  <div class="page-inner">
+    <div class="hero-title">🤖 עולם ה-AI - קורס מתקדם</div>
+    <div class="hero-sub">קורס מקיף לבעלי ידע: איך AI עובד באמת מתחת למכסה המנוע, איך בונים סוכנים ואוטומציות עם קלוד קוד, ואיך זה נכנס לאפליקציה fullstack אמיתית. 18 שיעורים + פרויקט מסכם, כמה שעות של תוכן. כל שיעור כולל הסבר מעמיק, מעבדת קוד אמיתי, הדגמה אינטראקטיבית ומבחנון.</div>
+    <div class="section-header"><h2>🌍 חלק 1: איך מודלי שפה עובדים בפועל</h2><div class="line"></div></div>
+    <div class="lesson-grid" id="lessonGridA"></div>
+    <div class="section-header"><h2>🛠️ חלק 2: איך קלוד קוד בונה סוכנים</h2><div class="line"></div></div>
+    <div class="lesson-grid" id="lessonGridB"></div>
+    <div class="section-header"><h2>🏗️ חלק 3: הנדסת מערכות AI מקצועית</h2><div class="line"></div></div>
+    <div class="lesson-grid" id="lessonGridD"></div>
+    <div class="section-header"><h2>🏁 פרויקט מסכם</h2><div class="line"></div></div>
+    <div class="lesson-grid" id="lessonGridC"></div>
+  </div>
+</section>
+
+<!-- LLMS -->
+<section class="page" id="page-llms">
+  <div class="page-inner">
+    <div class="world-tag">🌍 חלק 1</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🧠 LLMs - מה זה בכלל "מודל שפה גדול"</div>
+    <div class="card">
+      <div class="explain">
+        <p>LLM (Large Language Model) הוא רשת נוירונים מסוג <span class="highlight">Transformer</span> - לרוב בארכיטקטורת decoder-only - עם מיליארדי פרמטרים (משקלים נלמדים), שאומנה למשימה מתמטית פשוטה להפליא: <b>חיזוי הטוקן הבא</b> בהינתן כל הטוקנים שלפניו. כל היכולות ה"חכמות" שאנחנו רואים - כתיבה, קוד, נימוק - מתפתחות כתופעת-לוואי של אימון בקנה מידה עצום על המשימה הזו.</p>
+        <p>המנגנון המרכזי שמאפשר את זה הוא <span class="highlight">Self-Attention</span>: בכל שכבה, כל טוקן "מביט" בכל הטוקנים האחרים בהקשר ומחשב כמה כל אחד מהם רלוונטי אליו כרגע (באמצעות מטריצות Query/Key/Value), ומצרף מידע בהתאם. כמה "ראשי קשב" (attention heads) פועלים במקביל ולוכדים סוגי קשרים שונים (תחביריים, סמנטיים, ארוכי-טווח), והכל נערם על פני עשרות שכבות.</p>
+        <p>האימון עצמו מתבצע במספר שלבים נפרדים: <b>Pretraining</b> - חיזוי הטוקן הבא על קורפוס טקסט אדיר (טריליוני טוקנים) - זה המקור העיקרי לידע וליכולת שפה. <b>Fine-tuning/Instruction tuning</b> - מלמד את המודל לעקוב אחר הוראות בפורמט שיחה. <b>RLHF / Constitutional AI</b> וטכניקות דומות - מיישרות את הפלט להעדפות אנושיות ולעקרונות בטיחות. ההבדל בין <span class="highlight">base model</span> (שרק ממשיך טקסט בצורה גולמית) ל-<span class="highlight">instruct/chat model</span> (כמו קלוד, שמתנהג כעוזר שיחתי) הוא בדיוק תוצאה של השלבים הנוספים האלה.</p>
+        <div class="callout">🤔 הערה אפיסטמית: השאלה האם מודל "מבין" באמת את מה שהוא כותב היא שאלה פילוסופית שנויה במחלוקת. הניסוח המדויק והזהיר: המודל לומד מבנה סטטיסטי עמוק של שפה, שמתברר כמקודד בתוכו כמות עצומה של ידע עולם ויכולות דמויות-נימוק - בלי לקבוע באופן חד-משמעי אם זו "הבנה" במובן האנושי.</div>
+        <p>מגמת <b>Scaling Laws</b>: במשך שנים, יכולות המודל השתפרו בצורה צפויה יחסית עם יותר פרמטרים, יותר נתונים, ויותר חישוב אימון. בשנים האחרונות נוספו מקורות שיפור נוספים שלא תלויים רק ב"גודל" - איכות הנתונים, שיטות post-training מתקדמות, וחישוב בזמן ההסקה עצמה (inference-time compute / "חשיבה" מורחבת לפני מתן תשובה).</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: הנוסחה מאחורי Self-Attention</div>
+      <div class="code-block"><span class="code-label">Scaled Dot-Product Attention</span><pre>Attention(Q, K, V) = softmax( (Q · K^T) / sqrt(d_k) ) · V
+
+// Q (Query), K (Key), V (Value) - הטלות לינאריות של embedding הטוקן
+// d_k - מימד וקטור ה-Key (הגורם sqrt(d_k) מייצב את הגרדיאנטים)
+// softmax הופך את הציונים להתפלגות משקלים שמסכמת ל-1
+// התוצאה: כל טוקן מקבל "ממוצע משוקלל" של כל הטוקנים הרלוונטיים לו</pre></div>
+      <div class="lab-note">💡 בלוק טרנספורמר בודד נראה בערך כך: <code>קלט → Self-Attention → Add&Norm → Feed-Forward → Add&Norm</code> - וזה נערם N פעמים (עשרות שכבות במודלים גדולים) לפני הטלה סופית להתפלגות הסתברות על פני אוצר המילים כולו, בדיוק כמו שראינו בשיעור Temperature.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🔍 המחשה: לפני שהמודל "בוחר" מילה, כל טוקן קודם מביט בשאר הטוקנים (Attention). לחצו כדי להדגים סבב קשב פשוט:</div>
+      <div class="api-row"><button class="btn" onclick="runAttentionDemo()">▶️ הרץ סבב Attention</button></div>
+      <div class="action-log" id="attnLog">לחצו כדי לראות דוגמת קשב על המשפט: "הכלב רדף אחרי החתול כי הוא רעב"</div>
+    </div>
+    <div class="quiz-card" id="quiz-llms"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goHome()">🏠 חזרה למפה</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- TOKENS -->
+<section class="page" id="page-tokens">
+  <div class="page-inner">
+    <div class="world-tag">🌍 חלק 1</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">🧱 Tokenization - איך טקסט הופך למספרים</div>
+    <div class="card">
+      <div class="explain">
+        <p>מודל שפה לא "רואה" אותיות או מילים שלמות. לפני שהטקסט מגיע למודל, רכיב בשם <b>Tokenizer</b> מפרק אותו ליחידות קטנות בשם <b>tokens</b> - לרוב באמצעות אלגוריתם כמו <span class="highlight">Byte-Pair Encoding (BPE)</span>, שבונה אוצר מילים של עשרות אלפי עד מאות אלפי "חתיכות" נפוצות מתוך קורפוס טקסט ענק.</p>
+        <p>מילים נפוצות (כמו "the" או "שלום") הופכות לרוב לטוקן בודד. מילים נדירות, שמות פרטיים, קוד תכנות או מספרים מתפצלים למספר טוקנים. שפות שאינן אנגלית - כולל עברית - נוטות "לצרוך" יותר טוקנים לאותה כמות תווים, כי אוצר המילים של רוב המודלים אומן בעיקר על טקסט אנגלי. זו לא רק סוגיה טכנית: היא משפיעה ישירות על <span class="highlight">מחיר</span> (חיוב הוא לפי מספר טוקנים), על <span class="highlight">מהירות</span>, ועל כמה טקסט נכנס ב-Context Window (השיעור הבא).</p>
+        <p>חוק אצבע גס: בטקסט אנגלי, טוקן אחד ≈ 4 תווים בממוצע. בעברית היחס פחות נוח ולעיתים קרוב יותר לטוקן על כל מילה או חצי מילה. חשוב גם לזכור: <b>אין תקן אחיד</b> - לכל משפחת מודלים יש Tokenizer משלה, כך שאותו משפט יכול להיספר אחרת ב-Claude לעומת מודלים אחרים.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: איך זה נראה בתשובת API אמיתית</div>
+      <div class="lab-note">כל תשובה מ-Claude API מגיעה עם אובייקט <code>usage</code> שמדווח בדיוק כמה טוקנים נצרכו - זה הבסיס לחיוב:</div>
+      <div class="code-block"><span class="code-label">JSON response (מקוצר)</span><pre>{
+  "id": "msg_01XyZ...",
+  "role": "assistant",
+  "content": [{ "type": "text", "text": "..." }],
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 15,
+    "output_tokens": 42
+  }
+}</pre></div>
+      <div class="lab-note">💡 המחיר הסופי = (input_tokens × מחיר-לקלט) + (output_tokens × מחיר-לפלט). זה גם ההסבר לפרקטיקה של "לקצר פרומפטים" בסביבות production - כל טוקן מיותר חוזר על עצמו בכל קריאה ומצטבר לעלות.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">✍️ נסו בעצמכם - כתבו משפט ותראו הערכת חלוקה לטוקנים (הערכה גסה, לא ה-Tokenizer האמיתי של Claude):</div>
+      <textarea id="tokenInput" rows="3" placeholder="כתבו כאן משהו... לדוגמה: שלום, מה שלומך היום?"></textarea>
+      <div class="cube-box" id="cubeBox"></div>
+      <div class="token-count" id="tokenCount">0 tokens 🧱</div>
+    </div>
+    <div class="quiz-card" id="quiz-tokens"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- TEMPERATURE -->
+<section class="page" id="page-temperature">
+  <div class="page-inner">
+    <div class="world-tag">🌍 חלק 1</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">🌡️ Temperature - שליטה בהתפלגות ההסתברות</div>
+    <div class="card">
+      <div class="explain">
+        <p>בכל צעד, המודל לא "בוחר" את הטוקן הבא - הוא מחשב <span class="highlight">התפלגות הסתברויות</span> על פני כל אוצר המילים (למשל, "80% סיכוי שהמילה הבאה היא 'שמח', 12% 'עצוב'..."). <b>Temperature</b> הוא פרמטר שמשנה את "חדות" ההתפלגות הזו לפני הדגימה (טכנית: הוא מחלק את ה-logits לפני הפעלת softmax).</p>
+        <p>ב-<span class="highlight">Temperature נמוך</span> ההתפלגות נהיית חדה מאוד - כמעט כל המשקל עובר לטוקן הכי סביר, והתוצאה קרובה לדטרמיניסטית (אך לא בהכרח זהה ב-100% מהמקרים, כי יש עוד גורמי דגימה). ב-<span class="highlight">Temperature גבוה</span> ההתפלגות משתטחת - גם טוקנים פחות סבירים מקבלים סיכוי הגון להיבחר, מה שמייצר יותר יצירתיות אך גם יותר סיכון לחוסר קוהרנטיות.</p>
+        <div class="callout info">📌 דיוק חשוב: ה-API של Anthropic מקבל Temperature בטווח <b>0 עד 1</b> (לא 0 עד 2 כמו בממשקים מסוימים של ספקים אחרים). בדמו למטה השתמשנו בטווח 0-2 להמחשה חינוכית מוגזמת - כדאי לזכור את ההבדל כשעובדים עם APIs אמיתיים.</div>
+        <p>פרמטרים קרובים שכדאי להכיר: <b>top_p</b> (Nucleus Sampling - שוקל רק את קבוצת הטוקנים המצטברת שמגיעה לאחוז הסתברות מסוים) ו-<b>top_k</b> (מגביל את הדגימה ל-K הטוקנים הכי סבירים בלבד). לרוב לא משנים את כולם יחד - Anthropic ממליצה לשנות temperature <b>או</b> top_p, לא את שניהם בו-זמנית.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: הפרמטר בבקשת API אמיתית</div>
+      <div class="code-block"><span class="code-label">Request body</span><pre>{
+  "model": "claude-sonnet-5",
+  "max_tokens": 1024,
+  "temperature": 0.7,
+  "messages": [
+    { "role": "user", "content": "תכתוב לי שיר קצר" }
+  ]
+}</pre></div>
+      <div class="lab-note">💡 שימו לב: אין פרמטר "seed" אמיתי שמבטיח תוצאה זהה ב-100% מהמקרים בין קריאות שונות, גם ב-temperature=0 - יש עדיין שונות זעירה שנובעת מאופן חישוב מקבילי (floating point non-determinism). "דטרמיניסטי" הוא קירוב, לא הבטחה מוחלטת.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🔥 הזיזו את הסליידר ותראו איך ההתפלגות "משתטחת":</div>
+      <div class="temp-value" id="tempValue">🥶 0.0</div>
+      <input type="range" min="0" max="2" step="0.1" value="0" class="temp-slider" id="tempSlider" oninput="updateTemperature(this.value)">
+      <div style="text-align:center;color:var(--text-soft);font-size:.85rem;margin-bottom:8px;">שאלה: "איך השמיים היום?"</div>
+      <div class="temp-output" id="tempOutput">השמיים היום בהירים. ☀️</div>
+    </div>
+    <div class="quiz-card" id="quiz-temperature"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- CONTEXT WINDOW -->
+<section class="page" id="page-context">
+  <div class="page-inner">
+    <div class="world-tag">🌍 חלק 1</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">🧠 Context Window - גבול הזיכרון בפועל</div>
+    <div class="card">
+      <div class="explain">
+        <p><b>Context Window</b> הוא מספר הטוקנים המקסימלי שמודל יכול "להביט" בו בבת אחת בקריאה בודדת - system prompt + היסטוריית שיחה + ההודעה הנוכחית + מקום שמור לתשובה, הכל ביחד. זה לא "זיכרון לטווח ארוך" - ברגע שהשיחה מסתיימת, שום דבר לא נשמר אלא אם אפליקציה חיצונית שומרת ומזינה אותו מחדש בפעם הבאה.</p>
+        <p>גודל החלון משתנה בין דורות מודלים ומשפחות שונות, וגדל באופן עקבי עם הזמן - חלק מהמודלים תומכים כיום בחלונות של מאות אלפי טוקנים ואף יותר. אבל חלון גדול יותר לא פותר הכל: מחקרים מראים תופעה שנקראת <span class="highlight">"lost in the middle"</span> - מידע שנמצא באמצע הקשר ארוך מאוד נוטה להיזכר פחות טוב מאשר מידע שבתחילת או בסוף ההקשר.</p>
+        <p>כשההקשר מתמלא, יש כמה אסטרטגיות מקובלות: <b>חיתוך</b> (זריקת ההודעות הישנות ביותר), <b>סיכום</b> (החלפת היסטוריה ארוכה בתקציר קצר), ו-<b>RAG</b> (השיעור הבא) - שבמקום להכניס את כל המידע לקונטקסט, שולף רק את הקטעים הרלוונטיים לשאלה הנוכחית.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: תקציב הטוקנים של קריאה בודדת</div>
+      <div class="code-block"><span class="code-label">budget (pseudo)</span><pre>system_prompt_tokens
++ conversation_history_tokens
++ current_user_message_tokens
++ reserved_for_output_tokens (max_tokens)
+─────────────────────────────
+≤ context_window_limit   // אחרת: שגיאת "context length exceeded"</pre></div>
+      <div class="lab-note">💡 שימו לב ל־<code>max_tokens</code> בבקשה: זה לא "כמה שהמודל צריך" אלא תקרה שאתם קובעים מראש. אם היא נמוכה מדי, התשובה תיחתך גם אם עדיין נשאר מקום בחלון ההקשר.</div>
+    </div>
+    <div class="card">
+      <div class="explain">
+        <p><b>ניהול הקשר ברמת האפליקציה</b>: כשהשיחה מתארכת, יש כמה תבניות נפוצות מעבר לחיתוך גס - <span class="highlight">Sliding Window</span> (שמירת ה-N ההודעות האחרונות בלבד), <span class="highlight">Summarization Chain</span> (סיכום אוטומטי של הודעות ישנות לפסקה קצרה במקום למחוק אותן לגמרי), ו-<span class="highlight">Hierarchical Memory</span> (שילוב של זיכרון קצר-טווח בהקשר עצמו + זיכרון ארוך-טווח חיצוני שנשלף לפי הצורך דרך RAG).</p>
+        <p><b>Prompt Caching</b> - טכניקה אמיתית וזמינה בפועל ב-API: כאשר חלק גדול מהפרומפט חוזר על עצמו בין קריאות (system prompt ארוך, מסמך רקע קבוע), אפשר לסמן אותו כ"נקודת cache" - השרת שומר את מצב החישוב הפנימי (Key/Value) של אותו קידומת, וקריאות עוקבות שמשתמשות באותה קידומת בדיוק נהנות מזמן עיבוד וממחיר נמוכים משמעותית, במקום לעבד את אותו טקסט מחדש בכל פעם.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: סימון cache breakpoint בבקשה</div>
+      <div class="code-block"><span class="code-label">Request with cache_control</span><pre>{
+  "model": "claude-sonnet-5",
+  "system": [
+    {
+      "type": "text",
+      "text": "...system prompt ארוך עם הרבה הוראות...",
+      "cache_control": { "type": "ephemeral" }
+    }
+  ],
+  "messages": [ { "role": "user", "content": "שאלה קצרה" } ]
+}</pre></div>
+      <div class="lab-note">💡 בקריאה הראשונה עם הקידומת הזו יש עלות "כתיבה ל-cache" מעט גבוהה יותר; בכל קריאה חוזרת עם אותה קידומת בדיוק, יש חיסכון משמעותי - יעיל במיוחד לשיחות ארוכות עם system prompt כבד או agent שקורא שוב ושוב לאותו הקשר.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">📝 כתבו טקסט ותראו את הזיכרון מתמלא:</div>
+      <textarea id="ctxInput" rows="4" placeholder="תמשיכו לכתוב... הבר יתמלא ככל שתוסיפו טקסט"></textarea>
+      <div class="ctx-bar-wrap"><div class="ctx-bar" id="ctxBar">0%</div></div>
+      <div class="ctx-msg" id="ctxMsg"></div>
+    </div>
+    <div class="quiz-card" id="quiz-context"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- API -->
+<section class="page" id="page-api">
+  <div class="page-inner">
+    <div class="world-tag">🌍 חלק 1</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🍽️ API - החוזה הפורמלי מול המודל</div>
+    <div class="card">
+      <div class="explain">
+        <p>API (Application Programming Interface) הוא חוזה מוגדר: כתובת (endpoint), פורמט בקשה, פורמט תשובה, ואימות הרשאות - שמאפשר לתוכנה שלכם "לדבר" עם שרתי הספק בלי שתריצו את המודל בעצמכם. אנלוגיית המלצר נכונה ברמת העיקרון, אבל ה-API האמיתי מוסיף שכבות: <b>מפתח API</b> (אישור זהות וחיוב), <b>גרסת API</b> (headers כמו <code>anthropic-version</code>), <b>הגבלות קצב</b> (rate limits), <b>קודי שגיאה</b> סטנדרטיים (400, 401, 429, 500...), ו-<b>ניסיונות חוזרים</b> (retries) בכשלים זמניים.</p>
+        <p>בקשה טיפוסית כוללת: שם מודל, מערך <code>messages</code> עם תפקידים (<code>user</code>/<code>assistant</code>), ופרמטרים כמו <code>temperature</code> ו-<code>max_tokens</code>. התשובה כוללת בלוקי תוכן, <code>stop_reason</code> (למה המודל הפסיק - סיים תשובה? הגיע למגבלת טוקנים? ביקש להשתמש בכלי?), ואת אובייקט ה-<code>usage</code> שראינו בשיעור על Tokens.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: קריאת API אמיתית</div>
+      <div class="code-block"><span class="code-label">bash / curl</span><pre>curl https://api.anthropic.com/v1/messages \
+  -H "x-api-key: $ANTHROPIC_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "content-type: application/json" \
+  -d '{
+    "model": "claude-sonnet-5",
+    "max_tokens": 1024,
+    "messages": [
+      { "role": "user", "content": "מה זה API בשתי שורות?" }
+    ]
+  }'</pre></div>
+      <div class="lab-note">💡 שימו לב שהמפתח (<code>x-api-key</code>) נשלח כ-header, לא בגוף הבקשה - כלל אצבע אבטחתי: סודות לא נכנסים ל-body או לכתובת ה-URL, כי אלו נוטים להישמר בלוגים.</div>
+    </div>
+    <div class="card">
+      <div class="explain">
+        <p><b>Streaming</b>: בממשקי צ'אט אמיתיים המודל לא "נעלם" לכמה שניות ואז מחזיר הכל בבת אחת - הבקשה נשלחת עם <code>"stream": true</code>, והשרת מחזיר את התשובה כזרם אירועים (Server-Sent Events) שמגיעים טוקן-טוקן (או בקבוצות קטנות), כדי שהמשתמש יראה טקסט מופיע בזמן אמת במקום לחכות לכל התשובה. זה משפר drastically את זמן התגובה הנתפס, גם אם זמן הסיום הכולל דומה.</p>
+        <p><b>התמודדות עם כשלים</b>: קריאות API אמיתיות נכשלות מדי פעם - עומס זמני (429 Too Many Requests), תקלת שרת (5xx), או timeout ברשת. התבנית הסטנדרטית היא <span class="highlight">exponential backoff with jitter</span>: בכל ניסיון חוזר מחכים זמן שגדל אקספוננציאלית (1s, 2s, 4s...) בתוספת רעש אקראי קטן, כדי למנוע "גל" של כל הלקוחות שמנסים שוב באותה שנייה בדיוק.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: זרם SSE אמיתי</div>
+      <div class="code-block"><span class="code-label">Server-Sent Events stream</span><pre>event: content_block_delta
+data: {"type":"text_delta","text":"שלום"}
+
+event: content_block_delta
+data: {"type":"text_delta","text":" עולם"}
+
+event: message_delta
+data: {"stop_reason":"end_turn"}
+
+event: message_stop
+data: {}</pre></div>
+      <div class="lab-note">💡 הצד הלקוח מצרף (concatenate) את כל ה-<code>text_delta</code> events בזמן אמת ומרנדר אותם לתוך ה-UI - זו בדיוק ההרגשה של "המודל כותב לפנייך" שרואים ב-Claude.ai או ב-Claude Code.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">💬 כתבו שאלה ולחצו "שלח" כדי לראות את מסלול הבקשה:</div>
+      <input type="text" id="apiInput" placeholder="לדוגמה: מה השעה?">
+      <div class="api-row"><button class="btn" onclick="sendApiRequest()">📨 שלח</button></div>
+      <div class="api-stage">
+        <div style="text-align:center;"><div class="api-node">🧑</div><div class="api-node-label">אתם (client)</div></div>
+        <div style="text-align:center;"><div class="api-node">🧑‍🍳</div><div class="api-node-label">API endpoint → מודל</div></div>
+        <div id="apiBubble" class="api-bubble"></div>
+      </div>
+    </div>
+    <div class="quiz-card" id="quiz-api"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- RAG -->
+<section class="page" id="page-rag">
+  <div class="page-inner">
+    <div class="world-tag">🌍 חלק 1</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🔍 RAG - שליפה מבוססת-עדות לפני יצירה</div>
+    <div class="card">
+      <div class="explain">
+        <p>Retrieval-Augmented Generation הוא Pipeline בן כמה שלבים: (1) <b>חיתוך</b> מסמכים לקטעים (chunks), (2) <b>הטמעה</b> (embedding) של כל קטע לוקטור מספרי, (3) שמירה במסד וקטורים (Vector DB / אינדקס ANN כמו HNSW), (4) בזמן שאלה - הטמעת השאלה עצמה, (5) <b>שליפה</b> של ה-K הקטעים הכי דומים (לרוב לפי Cosine Similarity), (6) הזרקת הקטעים שנשלפו כהקשר לתוך הפרומפט, (7) המודל מייצר תשובה המבוססת (מקווים) על הטקסט שנשלף.</p>
+        <p>למה זה חשוב: זו דרך לתת למודל גישה למידע עדכני או פרטי בלי לאמן אותו מחדש, ולהפחית הזיות (Hallucinations) על ידי "עיגון" התשובה בעדות ממשית. אבל יש כאן נקודת תורפה קריטית: <span class="highlight">איכות התשובה חסומה על ידי איכות השליפה</span> - "garbage in, garbage out". אם החיתוך גרוע או ההטמעה לא מדויקת, המודל יקבל הקשר לא רלוונטי ועדיין "יאמין" שהוא נכון.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: הנוסחה שמאחורי "החיפוש החכם"</div>
+      <div class="code-block"><span class="code-label">Cosine Similarity</span><pre>similarity(A, B) = (A · B) / (‖A‖ × ‖B‖)
+
+// דוגמה מספרית עם שני וקטורים דו-ממדיים:
+A = [0.9, 0.1]   // "כלב רץ בפארק"
+B = [0.8, 0.2]   // "כלבלב משחק בחוץ"
+A·B = 0.9*0.8 + 0.1*0.2 = 0.74
+‖A‖ = 0.906, ‖B‖ = 0.825
+similarity ≈ 0.74 / (0.906*0.825) ≈ 0.99  →  קרובים מאוד במשמעות</pre></div>
+      <div class="lab-note">💡 ערך קרוב ל-1 = כמעט זהים במשמעות. ערך קרוב ל-0 = לא קשורים. ערך שלילי (בטווח -1 עד 1) = מנוגדים סמנטית. זה בדיוק המנוע מאחורי "החיפוש" בדמו למטה.</div>
+    </div>
+    <div class="card">
+      <div class="explain">
+        <p><b>איפה שומרים את הוקטורים?</b> במסד וקטורים (Vector Database) - כלים ייעודיים כמו Pinecone, Weaviate, Qdrant או Chroma, לעומת הרחבות וקטוריות למסדי נתונים קיימים כמו pgvector עבור Postgres. הבחירה תלויה בקנה מידה (מיליוני עד מיליארדי וקטורים דורשים תשתית ייעודית), בדרישות latency, ובכמה חשוב לכם לא להוסיף עוד מערכת נפרדת לתחזק כשכבר יש לכם Postgres.</p>
+        <p><b>אסטרטגיית חיתוך (Chunking)</b> משפיעה ישירות על איכות השליפה: chunks קטנים מדי מאבדים הקשר; chunks גדולים מדי "מדללים" את האות הרלוונטי בתוך רעש. פרקטיקה נפוצה: chunks בגודל 200-500 טוקנים עם <span class="highlight">overlap</span> (חפיפה) של 10-20% ביניהם - כדי שמשפט שנחתך בדיוק על הגבול לא "ייעלם" משני הצדדים.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: פרמטרי chunking אמיתיים</div>
+      <div class="code-block"><span class="code-label">chunking config (pseudo)</span><pre>{
+  "chunk_size": 400,        // טוקנים בכל קטע
+  "chunk_overlap": 60,      // חפיפה בין קטעים סמוכים
+  "strategy": "semantic"    // לפי גבולות משמעות (למשל פסקאות)
+                             // לעומת "fixed" - חיתוך מכני קשיח
+}</pre></div>
+      <div class="lab-note">💡 חיתוך semantic (למשל לפי כותרות/פסקאות) נוטה לשמר יותר משמעות מחיתוך fixed מכני, אבל מסובך יותר ליישום ותלוי במבנה המסמך המקורי.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">📤 שלב 1: "העלו" קובץ (מדמה חיתוך + הטמעה לוקטורים)</div>
+      <button class="btn" onclick="uploadFile()">📄 העלה קובץ</button>
+      <div class="rag-stage"><div class="rag-dots" id="ragDots"></div></div>
+      <div class="demo-label" style="margin-top:16px;">❓ שלב 2: שאלו שאלה (מדמה שליפה לפי דמיון וקטורי)</div>
+      <input type="text" id="ragInput" placeholder="לדוגמה: מה כתוב בקובץ?">
+      <div class="api-row"><button class="btn green" onclick="ragSearch()">🔎 חפש</button></div>
+      <div class="rag-result" id="ragResult"></div>
+    </div>
+    <div class="quiz-card" id="quiz-rag"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- EMBEDDINGS -->
+<section class="page" id="page-embeddings">
+  <div class="page-inner">
+    <div class="world-tag">🌍 חלק 1</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">🗺️ Embeddings - משמעות כגיאומטריה</div>
+    <div class="card">
+      <div class="explain">
+        <p>Embedding הוא וקטור מספרי צפוף (בפועל - לרוב מאות עד אלפי ממדים, לא 3 כמו בדמו למטה) שמיוצר על ידי רשת נוירונים מאומנת, כך שקלטים בעלי משמעות דומה ממופים לנקודות קרובות במרחב הווקטורי. מרחק בין נקודות נמדד לרוב ב-Cosine Similarity או במרחק אוקלידי.</p>
+        <p>איך זה מתאמן, בקצרה: <span class="highlight">Contrastive Learning</span> - במהלך האימון, המודל נענש כשהוא ממקם זוגות "דומים" רחוק, ומתוגמל כשהוא ממקם אותם קרוב, ולהיפך עבור זוגות "שונים". מודלי Embedding הם בדרך כלל מודלים <b>נפרדים</b> ומתמחים - לא אותו מודל גנרטיבי שעונה לכם על שאלות.</p>
+        <p>שימושים מרכזיים: חיפוש סמנטי (מוצא תוצאות "לפי משמעות" ולא רק לפי מילים זהות), קלאסטרינג (איתור קבוצות דומות), המלצות, וכמובן - הרכיב המרכזי שמפעיל RAG.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: חישוב דמיון אמיתי בין שלוש מילים</div>
+      <div class="code-block"><span class="code-label">toy vectors (2D, להמחשה)</span><pre>חתול  = [0.90, 0.85]
+כלב   = [0.88, 0.80]
+אוטו  = [0.10, 0.95]
+
+similarity(חתול, כלב) ≈ 0.999   →  קרובים מאוד (שתיהן חיות מחמד)
+similarity(חתול, אוטו) ≈ 0.79   →  רחוקים משמעותית פחות</pre></div>
+      <div class="lab-note">💡 בעולם האמיתי הווקטורים ארוכים בהרבה, אבל העיקרון זהה לחלוטין - זו בדיוק הסיבה שהדמו למטה מציג רק 3 מימדים: קל יותר להמחיש חלל תלת-ממדי מאשר חלל של 1536 מימדים.</div>
+    </div>
+    <div class="card">
+      <div class="explain">
+        <p><b>טרייד-אוף מימדיות</b>: מודל embedding עם יותר מימדים (למשל 3072 לעומת 384) לרוב לוכד יותר ניואנס סמנטי, אבל עולה יותר באחסון, בזיכרון, ובזמן חיפוש - חשוב כפליים כשהאינדקס מכיל מיליוני וקטורים. השוואת איכות בין מודלי embedding שונים נעשית בדרך כלל מול benchmarks סטנדרטיים (כמו MTEB) שבודקים ביצועים על משימות שליפה, קלאסיפיקציה ודמיון - חשוב לבדוק benchmarks עדכניים בזמן הבחירה, כי הדירוג משתנה תדיר.</p>
+        <p><b>Matryoshka Embeddings</b> - טכניקה חדשה יחסית: מודלים מסוימים מאומנים כך שאפשר "לקצץ" (truncate) את הוקטור למימדים פחותים ועדיין לקבל דמיון סמנטי שמיש, עם ירידה הדרגתית באיכות ולא קריסה מוחלטת - כמו בובות מטריושקה מקוננות. זה מאפשר trade-off דינמי בין דיוק למהירות/עלות בלי לאמן כמה מודלים נפרדים.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: קיצוץ מימדים (Matryoshka) להמחשה</div>
+      <div class="code-block"><span class="code-label">truncation example</span><pre>full_vector (1536 dims)  → similarity(A,B) = 0.912
+truncated to 512 dims    → similarity(A,B) = 0.905   // כמעט זהה
+truncated to 128 dims    → similarity(A,B) = 0.861   // ירידה מתונה
+truncated to 32 dims     → similarity(A,B) = 0.640   // ירידה משמעותית</pre></div>
+      <div class="lab-note">💡 שימו לב לירידה ה"חלקה" - זה ההבדל בין matryoshka embeddings לחיתוך מקרי של מודל רגיל, שהיה קורס לתוצאות חסרות משמעות כבר בקיצוץ הראשון.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🔄 שימו לב: חתול וכלב קרובים (שניהם חיות), אבל אוטו רחוק יותר במרחב:</div>
+      <div class="embed-scene">
+        <div class="embed-space">
+          <div class="embed-point" style="background:var(--blue);transform:translate3d(-40px,-20px,30px);">🐱 חתול</div>
+          <div class="embed-point" style="background:var(--purple);transform:translate3d(10px,10px,40px);">🐶 כלב</div>
+          <div class="embed-point" style="background:var(--green);transform:translate3d(60px,30px,-60px);">🚗 אוטו</div>
+        </div>
+      </div>
+      <div class="embed-legend">המרחב מסתובב לבד - שימו לב שהמרחק בין המילים נשמר מכל זווית 👀</div>
+    </div>
+    <div class="quiz-card" id="quiz-embeddings"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- AGENT LOOP -->
+<section class="page" id="page-agent">
+  <div class="page-inner">
+    <div class="world-tag">🌍 חלק 1</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🔁 Agentic Loop - מלולאת חשיבה ליישות פועלת</div>
+    <div class="card">
+      <div class="explain">
+        <p>לולאה אג'נטית (מוכרת גם בשם דפוס <span class="highlight">ReAct</span> - Reasoning + Acting) עובדת כך: <b>Observe</b> (המודל רואה את מצב השיחה הנוכחי) → <b>Think</b> (מנמק מה השלב הבא, לעיתים באופן חשוף כ-"extended thinking") → <b>Act</b> (בוחר ומפעיל כלי - tool call) → <b>Observe</b> את תוצאת הכלי → וחוזר חלילה, עד לתנאי עצירה (המשימה הושלמה, הגיע למספר איטרציות מקסימלי, או שהמודל עצמו מחליט שאין צורך בעוד פעולה).</p>
+        <p>זו בדיוק הארכיטקטורה שמפעילה בפועל את Claude Code ואת Claude Agent SDK: כל איטרציה היא קריאת API בודדת שעשויה להחזיר בלוק מסוג <code>tool_use</code>; ה-harness (התוכנה שמריצה את הסוכן) מבצע את הפעולה בפועל, ומזין את תוצאת הכלי (<code>tool_result</code>) בחזרה כהודעה בהיסטוריה עבור האיטרציה הבאה.</p>
+        <p>מוקשים אמיתיים: לולאות אינסופיות (המודל "תקוע" מנסה שוב ושוב), שימוש שגוי בכלים, וההיסטוריה שגדלה בכל איטרציה - ומתמלאת את חלון ההקשר (קשור ישירות לשיעור Context Window). זו בדיוק הסיבה ש-<b>Subagents</b> (שיעור מאוחר יותר) קיימים: הם "מכילים" גידול הקשר בלתי נשלט עבור תת-משימות מסוימות.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: פסאודוקוד של הלולאה בפועל</div>
+      <div class="code-block"><span class="code-label">pseudo-python</span><pre>messages = [system_prompt, user_message]
+done = False
+while not done:
+    response = model.call(messages)
+    if response.stop_reason == "tool_use":
+        result = run_tool(response.tool_call)
+        messages.append(tool_result(result))
+    else:
+        done = True
+        final_answer = response.text</pre></div>
+      <div class="lab-note">💡 שימו לב: אין כאן "עצירה" מגיל 5 - העצירה קורית כי <code>stop_reason</code> כבר לא <code>tool_use</code>. אם המודל תמיד מחזיר tool_use, הלולאה לא תיעצר לבד - מכאן חשיבות ה-max_turns וה-timeout שרואים בהגדרות subagents.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">▶️ לחצו "התחל" ותראו את הלולאה בפעולה:</div>
+      <div class="api-row">
+        <button class="btn" id="agentStartBtn" onclick="startAgentLoop()">▶️ התחל</button>
+        <button class="btn secondary" onclick="stopAgentLoop()">⏸ עצור</button>
+      </div>
+      <div class="agent-stage">
+        <div class="agent-center">🤖</div>
+        <div class="agent-node" id="agentNode0" style="top:6px;right:calc(50% - 55px);">🤔<br>1. Think</div>
+        <div class="agent-node" id="agentNode1" style="top:calc(50% - 30px);right:8px;">🛠️<br>2. Act (tool)</div>
+        <div class="agent-node" id="agentNode2" style="bottom:6px;right:calc(50% - 55px);">⚡<br>3. Execute</div>
+        <div class="agent-node" id="agentNode3" style="top:calc(50% - 30px);left:8px;">✅<br>4. Observe</div>
+      </div>
+    </div>
+    <div class="quiz-card" id="quiz-agent"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅ (חלק 2!)</button>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="page" id="page-skills">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ חלק 2</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🧩 Skills - יחידות יכולת הניתנות לגילוי אוטומטי</div>
+    <div class="card">
+      <div class="explain">
+        <p>Skill הוא חבילת הוראות עצמאית - תיקייה שמכילה קובץ <code>SKILL.md</code> עם YAML frontmatter ותוכן Markdown, השוכנת ב-<code>.claude/skills/&lt;name&gt;/</code> (ברמת פרויקט) או <code>~/.claude/skills/&lt;name&gt;/</code> (ברמה אישית). השדה הקריטי הוא <b>description</b>: זה בדיוק מה שקלוד קורא כדי להחליט אם הבקשה שלכם "מתאימה" לסקיל הזה - בלי שתצטרכו לקרוא לו בשם במפורש.</p>
+        <p>בניגוד לפרומפט חד-פעמי, Skill הוא <span class="highlight">קבוע וניתן לשימוש חוזר</span>: הוא נטען לתוך ההקשר רק כאשר הבקשה תואמת לתיאור שלו (fuzzy matching על ה-description), מה שהופך אותו לפתרון סקיילבילי - אפשר להוסיף עשרות סקילים בלי "להציף" את קלוד בכל ההוראות בכל שיחה.</p>
+        <p>שדות מתקדמים שכדאי להכיר: <code>allowed-tools</code> (מגביל אילו כלים הסקיל מורשה להשתמש בהם - עיקרון "הרשאה מינימלית"), <code>disable-model-invocation</code> (אם true - רק המשתמש יכול להפעיל את הסקיל במפורש, שימושי לפעולות יקרות או הרסניות), ו-<code>context: fork</code> (מריץ את הסקיל כתת-סוכן מבודד עם חלון הקשר משלו - קשור ישירות לשיעור Subagents).</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: קובץ SKILL.md אמיתי</div>
+      <div class="code-block"><span class="code-label">.claude/skills/pdf-report/SKILL.md</span><pre>---
+name: pdf-report
+description: Generate formatted PDF reports from markdown
+  templates, including cover pages, tables of contents,
+  and styling. Use when the user asks to create, compile,
+  or export a report to PDF.
+allowed-tools:
+  - Read
+  - Write
+  - Glob
+disable-model-invocation: false
+---
+# PDF Report Generator
+
+You are a report generation specialist. When invoked:
+1. Read the user's markdown content or template
+2. Enhance formatting, structure, and visual hierarchy
+3. Generate a polished PDF with a cover page, TOC,
+   page numbers, and consistent styling</pre></div>
+      <div class="lab-note">💡 שימו לב: השם בשדה <code>name</code> חייב להתאים לשם התיקייה עצמה. ה-description כאן ארוך ומפורט בכוונה - description עמום כמו "עוזר עם מסמכים" יגרום לסקיל להיות מופעל (או לא מופעל) באופן לא עקבי.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">✍️ כתבו בקשה ותראו איזה סקיל "נדלק" לפי ה-description שלו:</div>
+      <input type="text" id="skillInput" oninput="matchSkills(this.value)" placeholder="לדוגמה: תעשה לי מצגת על חלל">
+      <div class="skill-grid" id="skillGrid"></div>
+    </div>
+    <div class="quiz-card" id="quiz-skills"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section class="page" id="page-tools">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ חלק 2</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">🖐️ Tools - הממשק הפורמלי בין המודל לעולם</div>
+    <div class="card">
+      <div class="explain">
+        <p>מבחינה טכנית, "כלי" הוא פונקציה בעלת שם, תיאור, וסכימת קלט (JSON Schema) שמוגדרת לפני הקריאה למודל. כשהמודל "מחליט" להשתמש בכלי, הוא לא מריץ שום דבר בעצמו - הוא פשוט מחזיר בלוק תוכן מסוג <code>tool_use</code> עם שם הכלי וארגומנטים. ה-harness (Claude Code, ה-Agent SDK, או כל אפליקציה שבנויה סביב ה-API) הוא זה שבפועל מריץ את הפעולה, ומחזיר את התוצאה כבלוק <code>tool_result</code> בהודעה הבאה.</p>
+        <p>קלוד קוד מגיע עם כלים מובנים כמו <b>Read</b> (קריאת קבצים), <b>Write</b>/<b>Edit</b> (יצירה ועריכה), <b>Bash</b> (הרצת פקודות מעטפת), ו-<b>WebSearch</b>/<b>WebFetch</b> (גישה לאינטרנט). כלים נוספים יכולים להגיע דרך שרתי MCP (השיעור הבא) - כך שההבחנה החשובה היא: <span class="highlight">כלים מובנים תמיד זמינים; כלי MCP הם תוספת אופציונלית</span> שדורשת חיבור מפורש.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: איך קריאת כלי נראית בפרוטוקול עצמו</div>
+      <div class="code-block"><span class="code-label">tool_use content block</span><pre>{
+  "type": "tool_use",
+  "id": "toolu_01A...",
+  "name": "Read",
+  "input": { "file_path": "/project/README.md" }
+}
+
+// ואז ה-harness מחזיר בהודעה הבאה:
+{
+  "type": "tool_result",
+  "tool_use_id": "toolu_01A...",
+  "content": "# Welcome to the project\n..."
+}</pre></div>
+      <div class="lab-note">💡 שרשרת tool_use → tool_result היא בדיוק מה שראינו כפסאודוקוד בשיעור Agentic Loop - זה לא מטאפורה, זה הפורמט המילולי שמופיע ב-messages array.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🖱️ לחצו על כלי ותראו מה קלוד "עושה" איתו בפועל:</div>
+      <div class="tool-grid" id="toolGrid"></div>
+      <div class="action-log" id="actionLog">בחרו כלי כדי לראות אותו בפעולה 👆</div>
+    </div>
+    <div class="quiz-card" id="quiz-tools"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- MCP -->
+<section class="page" id="page-mcp">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ חלק 2</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🌉 MCP - פרוטוקול תקני לחיבור כלים חיצוניים</div>
+    <div class="card">
+      <div class="explain">
+        <p>Model Context Protocol הוא תקן פתוח בארכיטקטורת <span class="highlight">client-server</span>: קלוד הוא ה-client, ו-<b>שרת MCP</b> הוא תהליך נפרד (מקומי או מרוחק) שיודע "לתרגם" בין הפרוטוקול הגנרי לבין ה-API הספציפי של שירות חיצוני (Slack, GitHub, מסד נתונים פנימי וכו'). קלוד לא צריך "לדעת" Slack API - הוא רק צריך לדעת לדבר MCP, והשרת עושה את שאר העבודה.</p>
+        <p>שרתי MCP מוגדרים בקובץ <code>.mcp.json</code>. שרת <b>מקומי (stdio)</b> מוגדר עם <code>command</code> ו-<code>args</code> - תהליך שרץ על המחשב שלכם. שרת <b>מרוחק (HTTP)</b> מוגדר עם <code>url</code> - נקודת קצה שרצה בענן. שני הסוגים יכולים לקבל משתני סביבה (<code>env</code>) עם תמיכה בהרחבה מהצורה <code>${VAR}</code>, כדי שסודות לא יישמרו ישירות בקובץ ה-JSON.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: קובץ .mcp.json אמיתי</div>
+      <div class="code-block"><span class="code-label">.mcp.json</span><pre>{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_TOKEN": "${GITHUB_TOKEN}" },
+      "type": "stdio"
+    },
+    "remote-analytics": {
+      "url": "https://api.example.com/mcp",
+      "headers": { "Authorization": "Bearer ${AUTH_TOKEN}" },
+      "type": "http"
+    }
+  }
+}</pre></div>
+      <div class="lab-note">💡 שימו לב לשני הדפוסים באותו קובץ: <code>command</code>/<code>args</code> לשרת מקומי מול <code>url</code>/<code>headers</code> לשרת מרוחק. הסודות עצמם (<code>GITHUB_TOKEN</code>, <code>AUTH_TOKEN</code>) חיים במשתני סביבה של המערכת, לא בקובץ עצמו.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">📱 בחרו אפליקציה ולחצו "שלח בקשה" כדי לראות את מסלול ה-MCP:</div>
+      <div class="app-picker" id="appPicker"></div>
+      <div class="api-row"><button class="btn" onclick="sendMcpRequest()">📨 שלח בקשה</button></div>
+      <div class="mcp-stage">
+        <div style="text-align:center;"><div class="mcp-node">🤖</div><div class="mcp-label">קלוד (client)</div></div>
+        <div style="text-align:center;"><div class="mcp-node">🌉</div><div class="mcp-label">שרת MCP</div></div>
+        <div style="text-align:center;" id="mcpAppNode"><div class="mcp-node">💬</div><div class="mcp-label">האפליקציה</div></div>
+        <div id="mcpBubble" class="mcp-bubble"></div>
+      </div>
+    </div>
+    <div class="quiz-card" id="quiz-mcp"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- SUBAGENTS -->
+<section class="page" id="page-subagents">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ חלק 2</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🕵️ Subagents - בידוד הקשר לצורך האצלה</div>
+    <div class="card">
+      <div class="explain">
+        <p>Subagent הוא מופע קלוד נפרד ומבודד - עם system prompt משלו, רשימת כלים מוגבלת (<code>tools</code> / <code>disallowedTools</code>), ולעיתים אפילו מודל אחר (<code>model</code>). כשהסוכן הראשי מאציל משימה עצמאית, ה-subagent מבצע את כל העבודה בהקשר <span class="highlight">משלו</span> - כולל כל קריאות הכלים והחיפושים - ומחזיר לסוכן הראשי רק את <b>התוצאה הסופית</b>. כל השלבים הביניים לא "מלכלכים" את ההקשר של השיחה הראשית.</p>
+        <p>זה פותר ישירות את בעיית גדילת ההקשר שראינו ב-Agentic Loop: אם משימת מחקר דורשת 20 חיפושי אינטרנט, כל 20 התוצאות האלה "נחיות" בתוך ה-subagent, ולא מציפות את חלון ההקשר הראשי. זה גם מאפשר <b>התמחות</b>: subagent ל-code review יכול לקבל הרשאות read-only בלבד, בעוד subagent למחקר מקבל גישה לחיפוש אינטרנט.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: הגדרת subagent אמיתית</div>
+      <div class="code-block"><span class="code-label">.claude/agents/code-reviewer.md</span><pre>---
+name: code-reviewer
+description: Expert code review specialist. Use when
+  reviewing pull requests or architectural changes.
+tools:
+  - Read
+  - Grep
+  - Glob
+model: sonnet
+disallowedTools:
+  - Write
+  - Edit
+  - Bash
+permissionMode: read-only
+---
+# Code Review Specialist
+You are a senior engineer performing code reviews.
+Check for bugs, performance issues, security gaps,
+and style violations. Provide actionable feedback.</pre></div>
+      <div class="lab-note">💡 שימו לב ל-<code>disallowedTools</code>: זו הגנה מפורשת - גם אם מישהו ינסה לשכנע את ה-subagent הזה לכתוב קובץ, הוא פיזית לא יכול, כי Write ו-Edit חסומים ברמת ההגדרה.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🚀 לחצו לשלוח subagent למשימת חקירה:</div>
+      <div class="api-row"><button class="btn" onclick="sendSubagent()">🕵️ שלח subagent לחקור</button></div>
+      <div class="sub-stage">
+        <div class="sub-cloud" id="subCloud">כאן קורית כל העבודה בהקשר מבודד 🔒</div>
+        <div class="sub-main">🤖<br><span style="font-size:.7rem;">קלוד הראשי</span></div>
+        <div class="sub-helper" id="subHelper">🕵️</div>
+      </div>
+      <div class="sub-result" id="subResult"></div>
+    </div>
+    <div class="quiz-card" id="quiz-subagents"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- SLASH COMMANDS -->
+<section class="page" id="page-slash">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ חלק 2</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">⚡ Slash Commands - הפעלה מפורשת מול הפעלה אוטומטית</div>
+    <div class="card">
+      <div class="explain">
+        <p>פקודת סלאש היא הפעלה יזומה של המשתמש (מתחילה ב-<code>/</code>). יש פקודות מובנות (<code>/clear</code>, <code>/help</code>, <code>/model</code>) ופקודות מותאמות אישית. ההבדל המהותי מ-Skill: <b>פקודה מוגדרת בקובץ שטוח</b> ב-<code>.claude/commands/&lt;name&gt;.md</code> (הפורמט הישן, עדיין נתמך) ומופעלת <span class="highlight">רק</span> על ידי הקלדה מפורשת. Skill, לעומת זאת, נמצא בתיקייה עשירה יותר (<code>.claude/skills/&lt;name&gt;/SKILL.md</code>) ויכול להיות מופעל <b>גם</b> על ידי /שם וגם באופן אוטומטי כשהתיאור שלו תואם לבקשה.</p>
+        <p>שתי תוספות מתקדמות שקיימות בקלוד קוד: <code>/goal</code> - מגדיר מצב-סיום ניתן לאימות שקלוד ממשיך לעבוד לקראתו לבד בין תורות, בלי שתצטרכו לבקש שוב; ו-<code>/loop</code> - מריץ קלוד במחזורים חוזרים, אופציונלית עד תנאי עצירה (<code>until</code>). שני אלה הופכים אינטראקציה "שאלה-תשובה" בודדת לתהליך עבודה מתמשך - הבסיס לשיעור הבא, סוכנים שרצים ברקע.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: פקודה מותאמת אישית + /goal ו-/loop</div>
+      <div class="code-block"><span class="code-label">.claude/commands/deploy.md (legacy format)</span><pre>---
+name: deploy
+description: Deploy the current branch to production
+---
+# Deploy
+Before deploying: run tests, check for uncommitted
+changes, confirm target environment, then execute
+the deployment script.</pre></div>
+      <div class="code-block" style="margin-top:12px;"><span class="code-label">שילוב /goal + /loop</span><pre>/goal פרוסים ל-staging וכל הבדיקות עוברות בהצלחה
+/loop until כל הבדיקות עוברות</pre></div>
+      <div class="lab-note">💡 שימו לב לניסוח ה-goal: "כל הבדיקות עוברות בהצלחה" הוא מצב הניתן לאימות. ניסוח מעורפל כמו "תשפר את זה" לא עובד טוב - המעריך הפנימי צריך תנאי ברור כדי לדעת מתי לעצור.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🪄 לחצו על פקודה ותראו מה היא עושה:</div>
+      <div class="slash-list" id="slashList"></div>
+      <div class="slash-effect" id="slashEffect">בחרו פקודה למעלה 👆</div>
+    </div>
+    <div class="quiz-card" id="quiz-slash"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- HOOKS -->
+<section class="page" id="page-hooks">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ חלק 2</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🛡️ Hooks - שכבת אכיפה דטרמיניסטית</div>
+    <div class="card">
+      <div class="explain">
+        <p>Hook הוא סקריפט (או קריאת HTTP) שרץ אוטומטית בנקודות חיים מוגדרות - <b>PreToolUse</b> (לפני הרצת כלי - יכול לחסום או לשנות את הקלט), <b>PostToolUse</b> (אחרי סיום הכלי - יכול "לנקות" או לסנן את הפלט), <b>UserPromptSubmit</b>, <b>Stop</b> ועוד. ה-hook מקבל JSON דרך stdin, ושולט בהתנהגות דרך <span class="highlight">קוד היציאה</span>: <code>0</code> מאשר את הפעולה להמשיך, <code>2</code> חוסם אותה לחלוטין, וקוד אחר מסמן שגיאה לא-חוסמת.</p>
+        <p>ההבדל המהותי מ-Skill או מ-System Prompt: hook הוא <b>דטרמיניסטי</b> - הוא לא "מבקש בנימוס" מהמודל להיזהר, הוא אוכף בקוד ברמת התשתית, ולכן לא ניתן לעקוף אותו באמצעות שכנוע (Prompt Injection). זו הסיבה ש-hooks הם הכלי הנכון להגנות אבטחה קריטיות - למשל, חסימת פקודות הרסניות ב-Bash.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: hook אמיתי שחוסם rm -rf</div>
+      <div class="code-block"><span class="code-label">.claude/settings.json</span><pre>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [{
+          "type": "command",
+          "command": "bash -c 'echo \"$CLAUDE_TOOL_INPUT\" | grep -qE \"rm -rf\" && exit 2 || exit 0'"
+        }]
+      }
+    ]
+  }
+}</pre></div>
+      <div class="lab-note">💡 ה-<code>matcher</code> קובע על אילו כלים ה-hook חל ("Bash", או "Write|Edit" עם OR, או "" לכולם). כאן: כל פקודת Bash נבדקת מול תבנית מסוכנת לפני שהיא בכלל מגיעה למעטפת - אם יש התאמה, exit 2 עוצר את הכל.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🚦 קלוד רוצה לבצע פעולה - מה יגיד ה-hook?</div>
+      <div class="hook-gate">
+        <div class="hook-guard" id="hookGuard">🛡️</div>
+        <div class="hook-question" id="hookQuestion">קלוד רוצה: "להריץ Bash: rm -rf ./old_files" 🗑️ - לאשר (exit 0) או לחסום (exit 2)?</div>
+        <div class="api-row">
+          <button class="btn green" onclick="hookDecide(true)">✅ exit 0 (אשר)</button>
+          <button class="btn red" onclick="hookDecide(false)">🚫 exit 2 (חסום)</button>
+        </div>
+        <div class="hook-outcome" id="hookOutcome"></div>
+      </div>
+    </div>
+    <div class="quiz-card" id="quiz-hooks"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- PLUGINS -->
+<section class="page" id="page-plugins">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ חלק 2</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">📦 Plugins - אריזה, גרסאות והפצה</div>
+    <div class="card">
+      <div class="explain">
+        <p>Plugin לא מוסיף יכולת חדשה מבחינה טכנית - כל מה שהוא מכיל (skills, hooks, MCP servers, subagents) ניתן להגדרה בנפרד תחת <code>.claude/</code>. מה ש-plugin כן מוסיף הוא <span class="highlight">גבול פורמלי</span>: שם, מספר גרסה, ומניפסט (<code>.claude-plugin/plugin.json</code>), שהופכים אוסף הגדרות אישי ל<b>יחידה ניתנת להפצה, גרסאות, והתקנה אחידה</b> בין חברי צוות.</p>
+        <p>מבנה תיקיות סטנדרטי: <code>skills/</code>, <code>agents/</code>, <code>commands/</code> (legacy), <code>.mcp.json</code>, ו-<code>hooks/</code> - כל אלה מתגלים אוטומטית על ידי קלוד קוד, גם בלי <code>plugin.json</code> מלא. השדה החובה היחיד למניפסט מינימלי הוא <code>name</code>; שדות כמו <code>version</code>, <code>author</code> ו-<code>repository</code> נדרשים בפועל רק כשרוצים לפרסם ב-marketplace.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: plugin.json ומבנה תיקיות אמיתי</div>
+      <div class="code-block"><span class="code-label">.claude-plugin/plugin.json</span><pre>{
+  "name": "document-tools",
+  "version": "2.1.0",
+  "description": "PDF, DOCX, and PPTX generation tools",
+  "author": { "name": "Sarah Chen", "email": "sarah@co.com" },
+  "license": "MIT"
+}</pre></div>
+      <div class="code-block" style="margin-top:12px;"><span class="code-label">מבנה תיקיות</span><pre>my-plugin/
+├── .claude-plugin/plugin.json
+├── skills/pdf-report/SKILL.md
+├── agents/code-reviewer.md
+├── .mcp.json
+└── hooks/hooks.json</pre></div>
+      <div class="lab-note">💡 שימו לב: זו בדיוק אותה קופסה שנראה בהדגמה למטה - סקיל + hook + חיבור MCP, ארוזים תחת שם וגרסה אחת.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">📦 לחצו כדי לארוז את כל הפריטים לפלאגין אחד, ואז להתקין:</div>
+      <div class="plugin-stage" id="pluginStage">
+        <div class="plugin-item" id="pItem0"><span class="p-em">🧩</span>סקיל</div>
+        <div class="plugin-item" id="pItem1"><span class="p-em">🛡️</span>Hook</div>
+        <div class="plugin-item" id="pItem2"><span class="p-em">🌉</span>MCP</div>
+        <div class="plugin-box" id="pluginBox">📦 document-tools v2.1.0</div>
+      </div>
+      <div class="api-row">
+        <button class="btn" onclick="packPlugin()">📦 ארוז לפלאגין</button>
+        <button class="btn green" id="installBtn" onclick="installPlugin()" disabled>⬇️ התקן</button>
+      </div>
+      <div class="slash-effect" id="pluginMsg" style="margin-top:14px;">עדיין לא ארזתם כלום</div>
+    </div>
+    <div class="quiz-card" id="quiz-plugins"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- ALWAYS ON AGENTS -->
+<section class="page" id="page-alwayson">
+  <div class="page-inner">
+    <div class="world-tag">🛠️ חלק 2</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">⏰ סוכנים אוטונומיים - עבודה ללא לולאת שאלה-תשובה</div>
+    <div class="card">
+      <div class="explain">
+        <p>עד כה כל השיעורים הניחו מישהו שמקליד ומחכה לתשובה. סוכנים אוטונומיים הופכים את זה: אתם מגדירים <b>תזמון</b> (cron / זמן קבוע) או <b>יעד</b> (<code>/goal</code>), וקלוד מתעורר, מבצע את המשימה בעצמו, ומדווח - בלי שתצטרכו לשאול בכל פעם מחדש. זו בדיוק אותה לולאה אג'נטית שלמדנו קודם, רק שהטריגר לאיטרציה הראשונה הוא <span class="highlight">שעון</span> ולא הודעת משתמש.</p>
+        <p>יש כמה מנגנונים מעשיים להשגת זה: משימות מתוזמנות (cron expression - "בכל בוקר בשמונה"), <code>/loop</code> שרץ במחזורים חוזרים עד תנאי עצירה, ו-<code>/goal</code> שממשיך אוטומטית בין תורות עד שהמצב הרצוי מתקיים. בכל המקרים, ההפרדה בין "פעם אחת" ל"רץ ברקע" היא הבדל מהותי בעיצוב מוצר - היא דורשת מנגנון בקרה (מתי לעצור, איך לדווח כשלים, איך למנוע ריצה כפולה).</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: תזמון בפועל</div>
+      <div class="code-block"><span class="code-label">cron expression לדוגמה</span><pre>0 8 * * *   → בכל יום בשעה 08:00
+0 9 * * 1-5 → בימי חול בלבד, בשעה 09:00</pre></div>
+      <div class="lab-note">💡 בדמו למטה כל "מחזור" מייצג ריצה מלאה של הלולאה האג'נטית: הסוכן מתעורר, בודק את המצב, מחליט מה לעשות, ומדווח - בדיוק כמו שהוא היה עושה אם הייתם שואלים אותו ידנית באותו רגע.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🕗 בחרו מתי הסוכן יעבוד, ולחצו הפעלה (הדגמה מהירה - במציאות זה קורה פעם ביום בזמן שקבעתם):</div>
+      <div class="time-picker" id="timePicker"></div>
+      <div class="api-row">
+        <button class="btn" id="startClockBtn" onclick="startClock()">▶️ הפעל סוכן</button>
+        <button class="btn secondary" onclick="stopClock()">⏸ עצור</button>
+      </div>
+      <div class="clock-stage">
+        <div class="clock-face" id="clockFace">🌙</div>
+        <div class="clock-log" id="clockLog"></div>
+      </div>
+    </div>
+    <div class="quiz-card" id="quiz-alwayson"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅ (עולם 3!)</button>
+    </div>
+  </div>
+</section>
+
+<!-- FRAMEWORKS -->
+<section class="page" id="page-frameworks">
+  <div class="page-inner">
+    <div class="world-tag">🏗️ חלק 3</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🧰 Frameworks - מתי לבנות ומתי להשתמש בכלי מוכן</div>
+    <div class="card">
+      <div class="explain">
+        <p>פריימוורק ל-AI לא מוסיף יכולת AI חדשה - הוא מוסיף <span class="highlight">שכבת הפשטה</span> מעל קריאות API גולמיות: אורקסטרציה של שרשראות קריאות, ניהול זיכרון שיחה, אינטגרציה מובנית עם retrieval/RAG, והפשטות ל-tool calling. שלושה שמות שכדאי להכיר ברמת העיקרון (בלי להיכנס לפרטי גרסה - אלו משתנים תדיר): <b>LangChain</b> - פריימוורק אורקסטרציה כללי עם דגש על "שרשראות" (chains) ואינטגרציות רבות; <b>LlamaIndex</b> - מתמקד בעיקר באינדוקס וניהול נתונים עבור RAG; <b>Claude Agent SDK</b> - ה-SDK הרשמי של Anthropic, שנותן גישה ישירה לאותם פרימיטיבים שממש בונים את Claude Code עצמו (הלולאה האג'נטית, כלים, subagents, hooks).</p>
+        <p>ה<b>יתרון</b> המרכזי: פרוטוטייפ מהיר, פחות boilerplate, אינטגרציות מוכנות לעשרות מקורות נתונים וכלים. ה<b>חיסרון</b> המרכזי: שכבת ההפשטה יכולה "להסתיר" בדיוק מה שנשלח בפועל למודל - מה שמקשה על דיבוג כשמשהו לא עובד כמצופה, ומוסיפה תלות (dependency) בקוד צד-שלישי שמתעדכן בקצב מהיר ולפעמים שובר תאימות לאחור.</p>
+        <p>היוריסטיקת החלטה מעשית: עבור סוכן אחד עם מטרה מוגדרת היטב, עבודה ישירה מול ה-API או Claude Agent SDK נותנת שליטה וברירות מלאה, וקל יותר לדבג. עבור פרויקט עם הרבה מקורות נתונים, שרשראות מורכבות, וצורך אמיתי בפרוטוטייפ מהיר - פריימוורק כללי יכול לחסוך זמן משמעותי, בתנאי שמקבלים את מחיר ה"קסם" הנסתר.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: אותה משימה, שתי גישות</div>
+      <div class="code-block"><span class="code-label">גישה א׳: API גולמי (שליטה מלאה)</span><pre>messages = [{"role": "user", "content": question}]
+response = client.messages.create(
+    model="claude-sonnet-5", messages=messages,
+    tools=[search_tool], max_tokens=1024
+)
+while response.stop_reason == "tool_use":
+    result = run_tool(response)
+    messages.append(tool_result(result))
+    response = client.messages.create(model="claude-sonnet-5",
+        messages=messages, tools=[search_tool])</pre></div>
+      <div class="code-block" style="margin-top:12px;"><span class="code-label">גישה ב׳: סגנון פריימוורק (הפשטה)</span><pre>agent = Agent(model="claude-sonnet-5", tools=[search_tool])
+response = agent.run(question)
+// כל הלולאה, ניהול ה-messages, וה-tool_result
+// קורים "מתחת למכסה המנוע" בתוך agent.run()</pre></div>
+      <div class="lab-note">💡 שתי הגישות עושות בדיוק את אותה עבודה - ההבדל הוא כמה מהמנגנון גלוי לכם וכמה מנוהל אוטומטית מאחורי הקלעים.</div>
+    </div>
+    <div class="quiz-card" id="quiz-frameworks"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- FULLSTACK -->
+<section class="page" id="page-fullstack">
+  <div class="page-inner">
+    <div class="world-tag">🏗️ חלק 3</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🏛️ Fullstack - איך כל זה נכנס לאפליקציה אמיתית</div>
+    <div class="card">
+      <div class="explain">
+        <p>תכונת AI בפרודקשן היא לא רק "קריאה למודל" - היא ערימת שכבות: <b>Frontend</b> (ממשק צ'אט, רינדור streaming בזמן אמת, מצבי UI אופטימיים בזמן טעינה), <b>Backend/API layer</b> (השרת שלכם, שמחזיק את מפתח ה-API בצד השרת ולעולם לא חושף אותו לדפדפן, ומטפל באימות משתמשים, הגבלת קצב, ולוגים), <b>שכבת אורקסטרציה</b> (הלולאה האג'נטית, הרצת כלים, שילוב RAG לפני/אחרי קריאת המודל), <b>שכבת נתונים</b> (מסד נתונים רגיל למידע האפליקציה + מסד וקטורים נפרד או משולב ל-embeddings), <b>Observability</b> (תיעוד פרומפטים/תשובות/עלויות, מעקב אחר קריאות כלים, זיהוי רגרסיות), ו-<b>Deployment</b> (טיפול ב-streaming מעל HTTP, timeouts, סקיילינג לבקשות מקבילות, מעקב עלות לכל משתמש/פיצ׳ר).</p>
+        <div class="callout">🔒 עיקרון אבטחה קריטי: <b>לעולם לא</b> קוראים ל-API של המודל ישירות מקוד frontend/דפדפן עם מפתח API מוטמע - כל מי שפותח את ה-DevTools יכול לגנוב את המפתח ולהשתמש בו על חשבונכם. הבקשה תמיד עוברת דרך ה-backend שלכם, שמוסיף את המפתח בצד השרת בלבד.</div>
+        <p>נקודה מעשית שקושרת הכל: מה שראינו כ"מלצר" בשיעור ה-API הוא בעצם ה-<b>backend שלכם</b> - הוא זה שמדבר עם ה-API החיצוני של הספק, לא ה-frontend. ה-frontend מדבר רק עם ה-backend שלכם, בפרוטוקול משלכם.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: endpoint שרת שמשמש כ-proxy מאובטח</div>
+      <div class="code-block"><span class="code-label">backend/routes/chat.js (pseudo)</span><pre>app.post('/api/chat', authenticate, rateLimit, async (req, res) => {
+  const { message } = req.body;               // מהלקוח - בלי מפתח!
+  const stream = await anthropic.messages.create({
+    model: "claude-sonnet-5",
+    messages: [{ role: "user", content: message }],
+    stream: true,
+    apiKey: process.env.ANTHROPIC_API_KEY      // מהשרת בלבד
+  });
+  res.setHeader('Content-Type', 'text/event-stream');
+  for await (const chunk of stream) res.write(chunk);
+  logUsage(req.user.id, stream.usage);          // observability
+  res.end();
+});</pre></div>
+      <div class="lab-note">💡 שימו לב לשלושה דברים בו-זמנית: <code>authenticate</code> ו-<code>rateLimit</code> כ-middleware לפני שמגיעים בכלל למודל, מפתח ה-API שמגיע רק ממשתנה סביבה בצד השרת, וקריאה ל-<code>logUsage</code> לצורך מעקב עלויות - שלושתם דברים שראינו בנפרד בשיעורים קודמים (Hooks, API, Tokens) ומתחברים כאן לכדי endpoint אחד אמיתי.</div>
+    </div>
+    <div class="quiz-card" id="quiz-fullstack"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn green" onclick="goRelative(1)">לפרויקט המסכם ⬅ 🏁</button>
+    </div>
+  </div>
+</section>
+
+<!-- CAPSTONE -->
+<section class="page" id="page-capstone">
+  <div class="page-inner">
+    <div class="world-tag">🏁 פרויקט מסכם</div><span class="level-tag">⏱️ כ-30 דק'</span>
+    <div class="hero-title">🏗️ תכננו פלאגין: "עוזר מחקר אישי"</div>
+    <div class="card">
+      <div class="explain">
+        <p>עכשיו כשעברתם על כל 15 השיעורים, הגיע הזמן לחבר הכל יחד. במשימה הזו תתכננו - על הנייר, ללא כתיבת קוד בפועל - פלאגין שלם למקרה שימוש אמיתי: <b>"עוזר מחקר אישי"</b> שסורק נושא, שומר תובנות בקובץ, ושולח לכם סיכום כל בוקר. בכל שלב תבחרו את הרכיב המתאים מבין מה שלמדתם, ובסוף תקבלו תקציר בסגנון plugin.json אמיתי שמשקף את הבחירות שלכם.</p>
+      </div>
+    </div>
+
+    <div class="capstone-step">
+      <h4>1️⃣ הגדירו את ה-Skill (מתי הוא "נדלק"?)</h4>
+      <div class="lab-note" style="margin-bottom:8px;">כתבו description כפי שהיה נכנס לקובץ SKILL.md - זכרו: זה מה שקלוד קורא כדי להחליט אם להפעיל את הסקיל.</div>
+      <textarea id="cap-skill-desc" rows="2" placeholder='לדוגמה: "Research a topic across the web, save key findings to a markdown file, and track sources. Use when the user asks to research, investigate, or compile information on a subject."'></textarea>
+    </div>
+
+    <div class="capstone-step">
+      <h4>2️⃣ אילו כלים (Tools) הסקיל צריך?</h4>
+      <div class="api-row" id="cap-tools-picker"></div>
+    </div>
+
+    <div class="capstone-step">
+      <h4>3️⃣ הגדירו חיבור MCP (אם צריך גישה לשירות חיצוני)</h4>
+      <select id="cap-mcp-select">
+        <option value="none">לא נדרש חיבור MCP</option>
+        <option value="slack">Slack - לשליחת סיכומים לערוץ</option>
+        <option value="gmail">Gmail - לשליחת דוח יומי במייל</option>
+        <option value="notion">Notion - לשמירת ממצאים בבסיס ידע</option>
+      </select>
+    </div>
+
+    <div class="capstone-step">
+      <h4>4️⃣ הגדירו כלל Hook להגנה</h4>
+      <div class="lab-note" style="margin-bottom:8px;">איזו פעולה מסוכנת כדאי לחסום אוטומטית אצל הסוכן הזה? (PreToolUse)</div>
+      <select id="cap-hook-select">
+        <option value="delete">לחסום מחיקת קבצים (Bash: rm)</option>
+        <option value="send">לדרוש אישור לפני שליחת הודעה/מייל החוצה</option>
+        <option value="write">לחסום כתיבה מחוץ לתיקיית הפרויקט</option>
+      </select>
+    </div>
+
+    <div class="capstone-step">
+      <h4>5️⃣ הגדירו Subagent ייעודי (אופציונלי)</h4>
+      <div class="lab-note" style="margin-bottom:8px;">האם כדאי להאציל את שלב החיפוש עצמו ל-subagent נפרד, כדי לא להציף את ההקשר הראשי?</div>
+      <select id="cap-subagent-select">
+        <option value="yes">כן - subagent "researcher" עם גישה ל-WebSearch בלבד</option>
+        <option value="no">לא - להריץ הכל בשיחה הראשית</option>
+      </select>
+    </div>
+
+    <div class="capstone-step">
+      <h4>6️⃣ תזמון - מתי הסוכן ירוץ לבד?</h4>
+      <select id="cap-schedule-select">
+        <option value="0 8 * * *">כל בוקר ב-08:00</option>
+        <option value="0 18 * * 0-4">כל ערב (א'-ה') ב-18:00</option>
+        <option value="0 9 * * 1">כל יום שני ב-09:00 (סיכום שבועי)</option>
+      </select>
+    </div>
+
+    <div style="text-align:center;margin-top:10px;">
+      <button class="btn green" onclick="generateCapstone()">✨ צור תקציר פלאגין</button>
+    </div>
+    <div class="capstone-preview" id="capstonePreview"></div>
+
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="finishCourse()">סיימתי את הקורס! 🎓</button>
+    </div>
+  </div>
+</section>
+
+<!-- FINISH -->
+<section class="page" id="page-finish">
+  <div class="page-inner">
+    <div class="finish-emoji">🎓🏆✨</div>
+    <div class="hero-title">כל הכבוד - סיימתם את הקורס המלא!</div>
+    <div class="hero-sub">עברתם על 18 שיעורים מעמיקים - מארכיטקטורת טרנספורמר ועד ארכיטקטורת fullstack מלאה - עשרות מעבדות קוד אמיתיות, מבחנונים, ותכננתם פלאגין שלם משלכם. עכשיו יש לכם הבנה אמיתית - לא רק "תחושה" - של איך מודלי שפה עובדים, איך קלוד קוד בונה סוכנים אוטונומיים, ואיך משלבים הכל באפליקציה אמיתית. 🤖💙</div>
+    <div class="nav-buttons" style="justify-content:center;">
+      <button class="btn" onclick="goHome()">🏠 חזרה למפה</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const worldA = [
+  {key:'llms', emoji:'🧠', title:'LLMs', desc:'מה זה מודל שפה גדול'},
+  {key:'tokens', emoji:'🧱', title:'Tokenization', desc:'איך טקסט הופך למספרים'},
+  {key:'temperature', emoji:'🌡️', title:'Temperature', desc:'שליטה בהתפלגות'},
+  {key:'context', emoji:'🧠', title:'Context Window', desc:'גבול הזיכרון'},
+  {key:'api', emoji:'🍽️', title:'API', desc:'החוזה הפורמלי'},
+  {key:'rag', emoji:'🔍', title:'RAG', desc:'שליפה מבוססת-עדות'},
+  {key:'embeddings', emoji:'🗺️', title:'Embeddings', desc:'משמעות כגיאומטריה'},
+  {key:'agent', emoji:'🔁', title:'Agentic Loop', desc:'לולאת חשיבה-פעולה'}
+];
+const worldB = [
+  {key:'skills', emoji:'🧩', title:'Skills', desc:'יכולות ניתנות לגילוי'},
+  {key:'tools', emoji:'🖐️', title:'Tools', desc:'הממשק לעולם'},
+  {key:'mcp', emoji:'🌉', title:'MCP', desc:'פרוטוקול תקני'},
+  {key:'subagents', emoji:'🕵️', title:'Subagents', desc:'בידוד הקשר'},
+  {key:'slash', emoji:'⚡', title:'Slash Commands', desc:'הפעלה מפורשת'},
+  {key:'hooks', emoji:'🛡️', title:'Hooks', desc:'אכיפה דטרמיניסטית'},
+  {key:'plugins', emoji:'📦', title:'Plugins', desc:'אריזה והפצה'},
+  {key:'alwayson', emoji:'⏰', title:'סוכנים אוטונומיים', desc:'עבודה ללא שאלה-תשובה'}
+];
+const worldD = [
+  {key:'frameworks', emoji:'🧰', title:'Frameworks', desc:'מתי לבנות ומתי להשתמש בכלי'},
+  {key:'fullstack', emoji:'🏛️', title:'Fullstack', desc:'איך זה נכנס לאפליקציה אמיתית'}
+];
+const worldC = [
+  {key:'capstone', emoji:'🏗️', title:'פרויקט מסכם', desc:'תכננו פלאגין שלם'}
+];
+const topics = worldA.concat(worldB).concat(worldD).concat(worldC);
+const palette = ['#4A90E2','#7B68EE','#2ECC71'];
+let visited = new Set();
+let quizPassed = new Set();
+let capstoneDone = false;
+let currentPage = 'home';
+
+function safeGet(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
+function safeSet(key,val){ try{ localStorage.setItem(key,val); }catch(e){} }
+
+/* ---------- QUIZ ENGINE ---------- */
+const quizData = {
+  llms: [
+    {q:'מהו המנגנון המרכזי שמאפשר לטרנספורמר "לשקלל" רלוונטיות בין טוקנים בהקשר?', opts:['Self-Attention','Tokenization','Temperature','Context Window'], correct:0},
+    {q:'מה ההבדל בין base model ל-instruct/chat model?', opts:['אין הבדל טכני','base model רק ממשיך טקסט; instruct model עבר אימון נוסף (fine-tuning/RLHF) לעקוב אחר הוראות','instruct model קטן יותר תמיד','base model מהיר יותר תמיד'], correct:1},
+    {q:'מה תפקיד ה-pretraining בשלבי אימון LLM?', opts:['רק ליישר את המודל לבטיחות','לימוד חיזוי הטוקן הבא על קורפוס עצום - מקור עיקרי לידע ויכולת שפה','רק לכייל את ה-temperature','הוא שלב אופציונלי שרוב המודלים מדלגים עליו'], correct:1}
+  ],
+  tokens: [
+    {q:'מה קובע כמה tokens יעלה לכם משפט מסוים?', opts:['מספר האותיות בלבד','אלגוריתם ה-Tokenizer של המודל הספציפי','מספר המילים בלבד','הזמן שלוקח לקרוא את המשפט'], correct:1},
+    {q:'מה נכון לגבי טקסט בעברית לעומת אנגלית?', opts:['עברית תמיד צורכת פחות טוקנים','בד״כ עברית צורכת יותר טוקנים לאותה כמות תווים','אין שום הבדל','זה תלוי רק בגופן'], correct:1},
+    {q:'מה כולל אובייקט ה-usage בתשובת API?', opts:['רק input_tokens','רק output_tokens','גם input_tokens וגם output_tokens','זמן התגובה בשניות'], correct:2}
+  ],
+  temperature: [
+    {q:'מה temperature משנה טכנית?', opts:['את גודל אוצר המילים','את חדות התפלגות ההסתברות לפני הדגימה (softmax)','את מספר הטוקנים המקסימלי','את מהירות השרת'], correct:1},
+    {q:'מה טווח ה-temperature הרשמי ב-API של Anthropic?', opts:['0 עד 2','0 עד 1','-1 עד 1','1 עד 10'], correct:1},
+    {q:'האם temperature=0 מבטיח תוצאה זהה ב-100% מהמקרים?', opts:['כן, תמיד','לא, יש עדיין שונות זעירה אפשרית','רק במודלים ישנים','רק אם max_tokens=1'], correct:1}
+  ],
+  context: [
+    {q:'context window כולל...', opts:['רק את ההודעה האחרונה','system prompt + היסטוריה + הודעה נוכחית + מקום לתשובה','רק תשובות קודמות','רק את ה-system prompt'], correct:1},
+    {q:'מהי תופעת lost in the middle?', opts:['המודל שוכח הכל אחרי 5 דקות','מידע באמצע הקשר ארוך נזכר פחות טוב ממידע בקצוות','המודל מאבד חיבור לאינטרנט','טוקנים באמצע המשפט נחתכים'], correct:1},
+    {q:'איזו טכניקה עוזרת להתמודד עם הקשר מוגבל?', opts:['הגדלת temperature','RAG - שליפת קטעים רלוונטיים בלבד במקום הכל','הפחתת max_tokens ל-0','שינוי שם המודל'], correct:1}
+  ],
+  api: [
+    {q:'איפה אמור להישלח מפתח ה-API?', opts:['בתוך גוף הבקשה (body)','כ-header נפרד (למשל x-api-key)','בכתובת ה-URL','הוא לא נדרש'], correct:1},
+    {q:'מה זה stop_reason?', opts:['קוד שגיאה של השרת','הסיבה שהמודל הפסיק לייצר טקסט (סיים/tool_use/הגיע למגבלה)','הזמן שחלף מתחילת הבקשה','מזהה ייחודי של הבקשה'], correct:1},
+    {q:'מה תפקיד ה-header anthropic-version?', opts:['קובע את השפה','מציין גרסת API כדי לשמור על תאימות','מציין את גרסת הדפדפן','קובע את המחיר'], correct:1}
+  ],
+  rag: [
+    {q:'מה הסדר הנכון בפייפליין RAG?', opts:['שליפה → חיתוך → הטמעה','חיתוך → הטמעה → שמירה → שליפה בזמן שאילתה','יצירה → חיתוך → מחיקה','הטמעה → חיתוך → יצירה'], correct:1},
+    {q:'מדד נפוץ למדידת דמיון בין וקטורים ב-RAG?', opts:['Cosine Similarity','מספר התווים','זמן טעינה','צבע הטקסט'], correct:0},
+    {q:'למה RAG לא "פותר את הכל" אוטומטית?', opts:['הוא תמיד איטי מדי','איכות התשובה חסומה על ידי איכות השליפה - garbage in garbage out','הוא לא תואם לעברית','הוא דורש GPU בלבד'], correct:1}
+  ],
+  embeddings: [
+    {q:'embedding הוא...', opts:['קובץ טקסט רגיל','וקטור מספרי שמייצג משמעות במרחב רב-ממדי','סוג של temperature','שם אחר ל-API key'], correct:1},
+    {q:'איך מודל embedding "לומד" קרבה סמנטית?', opts:['Contrastive Learning - קירוב זוגות דומים והרחקת זוגות שונים','על ידי ספירת אותיות','באמצעות טבלת מילים נרדפות ידנית','הוא לא לומד, הוא מקודד קשיח'], correct:0},
+    {q:'מודל embedding ומודל השיחה הגנרטיבי - זה...', opts:['תמיד אותו מודל בדיוק','בדרך כלל שני מודלים נפרדים ומתמחים','זה אותו דבר במובן טכני','embedding לא צריך מודל בכלל'], correct:1}
+  ],
+  agent: [
+    {q:'מה הסדר בלולאה האג\'נטית (ReAct)?', opts:['Act→Think→Observe בלבד פעם אחת','Observe→Think→Act→Observe וחוזר חלילה עד תנאי עצירה','Think פעם אחת ואז עצירה תמיד','אין סדר קבוע'], correct:1},
+    {q:'מתי הלולאה האג\'נטית עוצרת (טכנית)?', opts:['כשה-stop_reason כבר לא tool_use, או תנאי עצירה אחר','אחרי בדיוק 3 שניות','היא לעולם לא עוצרת','כשה-temperature=0'], correct:0},
+    {q:'למה subagents רלוונטיים ללולאה אג\'נטית ארוכה?', opts:['הם מהירים יותר תמיד','הם מכילים גידול הקשר בלתי-נשלט עבור תת-משימות','הם מוזילים את המחיר ל-0','אין קשר ביניהם'], correct:1}
+  ],
+  skills: [
+    {q:'מה השדה הקריטי ביותר ב-SKILL.md שקובע מתי הסקיל "נדלק"?', opts:['name','description','license','context'], correct:1},
+    {q:'מה עושה disable-model-invocation: true?', opts:['מוחק את הסקיל','רק המשתמש יכול להפעיל את הסקיל במפורש, לא קלוד לבד','הופך את הסקיל למהיר יותר','משבית את כל הסקילים'], correct:1},
+    {q:'איפה חי קובץ SKILL.md ברמת פרויקט?', opts:['.claude/agents/name.md','.claude/skills/name/SKILL.md','.mcp.json','plugin.json'], correct:1}
+  ],
+  tools: [
+    {q:'כשקלוד "משתמש בכלי", מה בפועל קורה?', opts:['קלוד מריץ קוד בעצמו ישירות','קלוד מחזיר בלוק tool_use וה-harness מבצע את הפעולה בפועל','שום דבר, זו רק מטאפורה','זה קורה רק בגרסת הדפדפן'], correct:1},
+    {q:'מה מבדיל כלי מובנה (כמו Read) מכלי MCP?', opts:['אין הבדל בכלל','כלים מובנים תמיד זמינים; כלי MCP דורש חיבור מפורש','כלי MCP תמיד מהיר יותר','כלים מובנים דורשים תשלום נוסף'], correct:1},
+    {q:'מה חוזר בהודעה אחרי tool_use?', opts:['tool_result עם תוצאת הכלי','הודעת שגיאה תמיד','בקשת אישור מהמשתמש','כלום, זה חד-כיווני'], correct:0}
+  ],
+  mcp: [
+    {q:'מה תפקיד שרת MCP?', opts:['להריץ את המודל בעצמו','לתרגם בין קלוד לשירות חיצוני ספציפי (Slack, GitHub וכו\')','להחליף את ה-API key','לשמור היסטוריית שיחות'], correct:1},
+    {q:'מה ההבדל בין שרת stdio לשרת http ב-.mcp.json?', opts:['אין הבדל','stdio מוגדר עם command/args (מקומי), http מוגדר עם url (מרוחק)','http תמיד מהיר יותר','stdio לא נתמך יותר'], correct:1},
+    {q:'איך שומרים סודות בהגדרת MCP בלי לחשוף אותם בקובץ?', opts:['כותבים אותם ישירות בקובץ','באמצעות הרחבת משתני סביבה כמו ${VAR}','אין דרך, זה תמיד גלוי','שומרים אותם ב-plugin.json'], correct:1}
+  ],
+  subagents: [
+    {q:'מה חוזר לסוכן הראשי מ-subagent?', opts:['כל שלבי הביניים','רק התוצאה הסופית','כלום','כל קריאות ה-API הגולמיות'], correct:1},
+    {q:'מה יכול להגביל subagent שסוכן ראשי לא יכול?', opts:['שום דבר, הם זהים תמיד','רשימת כלים מוגבלת (disallowedTools) ואפילו מודל שונה','subagent תמיד יותר יקר','subagent לא יכול להשתמש בכלים בכלל'], correct:1},
+    {q:'למה subagent טוב למניעת "הצפת הקשר"?', opts:['הוא לא משתמש ב-tokens בכלל','כל העבודה הביניים נשארת בהקשר המבודד שלו, לא בהקשר הראשי','הוא מוחק את ההיסטוריה של הסוכן הראשי','אין לו קשר לזה'], correct:1}
+  ],
+  slash: [
+    {q:'מה ההבדל העיקרי בין slash command ל-Skill?', opts:['אין הבדל','command מופעל רק ידנית; Skill יכול גם להיות מופעל אוטומטית לפי description','Skill תמיד איטי יותר','command לא יכול לקבל ארגומנטים'], correct:1},
+    {q:'מה עושה /goal?', opts:['מוחק את השיחה','מגדיר מצב-סיום שקלוד ממשיך לקראתו לבד בין תורות','משנה את המודל','מציג עזרה'], correct:1},
+    {q:'מה עושה /loop until <תנאי>?', opts:['עוצר מיד','מריץ במחזורים חוזרים עד שהתנאי מתקיים','מוחק קבצים','משנה temperature'], correct:1}
+  ],
+  hooks: [
+    {q:'מה קורה כש-hook מחזיר exit code 2?', opts:['הפעולה מאושרת ונמשכת','הפעולה נחסמת לחלוטין','זה מתעלם מהתוצאה','זה מפעיל hook נוסף'], correct:1},
+    {q:'למה hook "חזק" יותר מהוראה ב-system prompt?', opts:['הוא לא באמת חזק יותר','הוא אכיפה דטרמיניסטית בקוד - לא ניתן לעקוף אותו בשכנוע','הוא רץ מהר יותר','הוא זול יותר'], correct:1},
+    {q:'מה עושה שדה matcher בהגדרת hook?', opts:['קובע את שם הפרויקט','קובע על אילו כלים ה-hook חל (למשל Bash, או Write|Edit)','קובע את המודל','קובע את ה-temperature'], correct:1}
+  ],
+  plugins: [
+    {q:'מה plugin מוסיף שלא קיים כבר ב-skills/hooks/mcp נפרדים?', opts:['יכולות טכניות חדשות לגמרי','גבול פורמלי - שם, גרסה ומניפסט שמאפשרים הפצה והתקנה אחידה','מודל AI חדש','זיכרון נוסף'], correct:1},
+    {q:'מה השדה החובה היחיד במניפסט מינימלי?', opts:['version','author','name','license'], correct:2},
+    {q:'היכן חי מניפסט הפלאגין?', opts:['.claude-plugin/plugin.json','SKILL.md','.env','README בלבד'], correct:0}
+  ],
+  alwayson: [
+    {q:'מה משותף לסוכן מתוזמן ולשיחה רגילה?', opts:['שום דבר, הם שונים לגמרי','שניהם מפעילים את אותה הלולאה האג\'נטית - רק הטריגר שונה','סוכן מתוזמן לא משתמש בכלים','סוכן מתוזמן לא יכול לכשול'], correct:1},
+    {q:'מה מייצג ביטוי כמו "0 8 * * *"?', opts:['מחיר ריצה','cron expression - כל יום בשעה 08:00','מספר גרסה','קוד שגיאה'], correct:1},
+    {q:'מה נדרש בעיצוב מוצר של סוכן שרץ ברקע?', opts:['שום דבר נוסף','מנגנון בקרה - מתי לעצור, איך לדווח כשלים, מניעת ריצה כפולה','מודל AI קטן יותר','זה תמיד ללא הבדל'], correct:1}
+  ],
+  frameworks: [
+    {q:'מה frameworks כמו LangChain מוסיפים מעל קריאות API גולמיות?', opts:['יכולות AI חדשות לגמרי שלא קיימות ב-API','הפשטות לאורקסטרציה - שרשור קריאות, ניהול זיכרון, אינטגרציית retrieval, tool abstractions','הם מחליפים את המודל עצמו','הם מוזילים תמיד את מחיר ה-API'], correct:1},
+    {q:'מה החיסרון האפשרי המרכזי בשימוש בפריימוורק כבד?', opts:['אין שום חיסרון','שכבת ההפשטה יכולה להסתיר בדיוק מה שנשלח למודל, מה שמקשה על דיבוג','הוא תמיד איטי יותר מ-API גולמי','הוא לא תומך ב-Python'], correct:1},
+    {q:'מה ה-Claude Agent SDK נותן שממנו בנוי גם Claude Code עצמו?', opts:['רק ממשק גרפי','גישה ישירה לפרימיטיבים של הלולאה האג\'נטית - כלים, subagents, hooks - באותה ארכיטקטורה שמפעילה את קלוד קוד','הוא כלי לעיצוב תמונות','הוא מחליף את ה-API לגמרי'], correct:1}
+  ],
+  fullstack: [
+    {q:'למה אסור לחשוף את מפתח ה-API בקוד frontend (בדפדפן)?', opts:['זה בסדר גמור לעשות זאת','כל אחד שרואה את קוד ה-JS בדפדפן יכול לגנוב את המפתח ולהשתמש בו על חשבונכם','זה מאט את הביצועים','זה לא קשור לאבטחה בכלל'], correct:1},
+    {q:'מה תפקיד השכבה "orchestration" בארכיטקטורת fullstack ל-AI?', opts:['רק לעצב את העמוד','להריץ את הלולאה האג\'נטית, לקרוא לכלים, ולשלב retrieval לפני/אחרי קריאת המודל','להחליף את מסד הנתונים','אין שכבה כזו בפועל'], correct:1},
+    {q:'למה כדאי להפריד מסד נתונים רגיל (למשל Postgres) ממסד וקטורים?', opts:['אסור לעולם להשתמש בשניהם יחד','לכל אחד תפקיד שונה - נתוני אפליקציה מובנים מול חיפוש דמיון סמנטי; חלק מהמסדים המודרניים כן תומכים בשניהם (כמו pgvector)','מסד וקטורים תמיד מיותר','זה תמיד אותו דבר בדיוק'], correct:1}
+  ]
+};
+
+function renderQuiz(key){
+  const container = document.getElementById('quiz-'+key);
+  if(!container || container.dataset.built) return;
+  container.dataset.built = '1';
+  const questions = quizData[key];
+  if(!questions) return;
+  let html = '<div class="section-title"><span class="num">📝</span> מבחנון קצר (ענו נכון על הכל כדי לסמן שיעור זה כהושלם)</div>';
+  questions.forEach((item,qi)=>{
+    html += '<div class="quiz-q">'+(qi+1)+'. '+item.q+'</div><div class="quiz-opts" id="qopts-'+key+'-'+qi+'">';
+    item.opts.forEach((opt,oi)=>{
+      html += '<div class="quiz-opt" onclick="answerQuiz(\''+key+'\','+qi+','+oi+')" id="qopt-'+key+'-'+qi+'-'+oi+'">'+opt+'</div>';
+    });
+    html += '</div>';
+  });
+  html += '<div class="quiz-summary" id="qsummary-'+key+'" style="display:none;"></div>';
+  container.innerHTML = html;
+  container._answers = new Array(questions.length).fill(null);
+}
+
+function answerQuiz(key, qi, oi){
+  const questions = quizData[key];
+  const item = questions[qi];
+  const container = document.getElementById('quiz-'+key);
+  const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+  for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+  if(oi===item.correct){
+    document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('correct');
+  } else {
+    document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('wrong');
+    document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+  }
+  container._answers[qi] = (oi===item.correct);
+  checkQuizComplete(key);
+}
+
+function checkQuizComplete(key){
+  const container = document.getElementById('quiz-'+key);
+  const answers = container._answers;
+  if(answers.every(a=>a!==null)){
+    const allCorrect = answers.every(a=>a===true);
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display = 'block';
+    const scoreCount = answers.filter(a=>a).length;
+    if(allCorrect){
+      summary.className = 'quiz-summary pass';
+      summary.textContent = '🎉 מעולה! '+scoreCount+'/'+answers.length+' נכון - השיעור סומן כהושלם.';
+      quizPassed.add(key);
+    } else {
+      summary.className = 'quiz-summary fail';
+      summary.textContent = '📚 '+scoreCount+'/'+answers.length+' נכון. כדאי לחזור על החומר - רעננו את הדף כדי לנסות שוב.';
+    }
+    updateProgress();
+    buildHome();
+  }
+}
+
+/* ---------- NAV / PAGES / PROGRESS ---------- */
+function buildNav(){
+  const nav = document.getElementById('navScroll');
+  nav.innerHTML = '';
+  const appendGroup = (list)=>{
+    list.forEach(t=>{
+      const b = document.createElement('button');
+      b.className='navbtn';
+      b.id = 'nav-'+t.key;
+      b.innerHTML = t.emoji+' '+t.title;
+      b.onclick = ()=>showPage(t.key);
+      nav.appendChild(b);
+    });
+  };
+  appendGroup(worldA);
+  const div1 = document.createElement('span'); div1.className='nav-divider'; div1.textContent='◆'; nav.appendChild(div1);
+  appendGroup(worldB);
+  const div2 = document.createElement('span'); div2.className='nav-divider'; div2.textContent='◆'; nav.appendChild(div2);
+  appendGroup(worldD);
+  const div3 = document.createElement('span'); div3.className='nav-divider'; div3.textContent='◆'; nav.appendChild(div3);
+  appendGroup(worldC);
+}
+
+function buildLessonGrid(containerId, list){
+  const grid = document.getElementById(containerId);
+  grid.innerHTML = '';
+  list.forEach(t=>{
+    const done = t.key==='capstone' ? capstoneDone : (visited.has(t.key) && quizPassed.has(t.key));
+    const c = document.createElement('div');
+    c.className = 'lesson-card' + (done ? ' done' : '');
+    c.id = 'card-'+t.key;
+    c.innerHTML = '<span class="em">'+t.emoji+'</span><div class="tt">'+t.title+'</div><div class="dd">'+t.desc+'</div>'+(done?'<div style="margin-top:6px;">✅</div>':'');
+    c.onclick = ()=>showPage(t.key);
+    grid.appendChild(c);
+  });
+}
+function buildHome(){
+  buildLessonGrid('lessonGridA', worldA);
+  buildLessonGrid('lessonGridB', worldB);
+  buildLessonGrid('lessonGridD', worldD);
+  buildLessonGrid('lessonGridC', worldC);
+  document.querySelectorAll('.navbtn').forEach(b=>{
+    const key = b.id.replace('nav-','');
+    const done = key==='capstone' ? capstoneDone : quizPassed.has(key);
+    b.classList.toggle('passed', done);
+  });
+}
+
+function showPage(key){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+key).classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+  const nb = document.getElementById('nav-'+key);
+  if(nb) nb.classList.add('active');
+  currentPage = key;
+  if(topics.some(t=>t.key===key)){
+    visited.add(key);
+    renderQuiz(key);
+    updateProgress();
+  }
+  buildHome();
+  if(typeof window.scrollTo === 'function'){
+    try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+  }
+}
+
+function goHome(){ showPage('home'); }
+
+function goRelative(dir){
+  const idx = topics.findIndex(t=>t.key===currentPage);
+  if(idx===-1) return;
+  const newIdx = idx+dir;
+  if(newIdx<0){ goHome(); return; }
+  if(newIdx>=topics.length){ finishCourse(); return; }
+  showPage(topics[newIdx].key);
+}
+
+function finishCourse(){
+  showPage('finish');
+  launchConfetti();
+}
+
+function updateProgress(){
+  const totalUnits = 18 + 1; // 18 quizzes + capstone
+  let done = quizPassed.size + (capstoneDone?1:0);
+  const pct = Math.round((done/totalUnits)*100);
+  document.getElementById('progressBar').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = done+' / '+totalUnits+' הושלמו';
+}
+
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+  safeSet('ai-theme', isDark?'dark':'light');
+}
+
+function launchConfetti(){
+  const emojis=['🎉','✨','🎊','💫','⭐'];
+  for(let i=0;i<24;i++){
+    const s=document.createElement('div');
+    s.className='confetti';
+    s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    s.style.left=Math.random()*100+'vw';
+    s.style.animationDuration=(2+Math.random()*2)+'s';
+    s.style.top='-40px';
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),4200);
+  }
+}
+
+/* ---------- LLMS / ATTENTION DEMO ---------- */
+function runAttentionDemo(){
+  const log = document.getElementById('attnLog');
+  const sentence = ['הכלב','רדף','אחרי','החתול','כי','הוא','רעב'];
+  const focusIdx = 5; // "הוא" - המילה המעורפלת (על מי היא מצביעה?)
+  log.innerHTML = '⏳ מחשב ציוני קשב עבור המילה "הוא"...';
+  setTimeout(()=>{
+    const weights = {'הכלב':0.62,'רדף':0.05,'אחרי':0.02,'החתול':0.18,'כי':0.03,'הוא':0.02,'רעב':0.08};
+    let html = '<div style="text-align:right;">מודל הקשב עבור המילה <b>"הוא"</b> (מיקום '+(focusIdx+1)+'):<br><br>';
+    sentence.forEach(w=>{
+      const wt = weights[w]||0;
+      const opacity = 0.25 + wt*1.2;
+      html += '<span style="display:inline-block;margin:3px;padding:6px 10px;border-radius:8px;background:rgba(123,104,238,'+Math.min(opacity,1).toFixed(2)+');font-weight:'+(wt>0.3?'800':'500')+';">'+w+' <span style="font-size:.7rem;opacity:.7;">('+(wt*100).toFixed(0)+'%)</span></span>';
+    });
+    html += '<br><br>💡 שימו לב: המודל "מקצה" הכי הרבה משקל קשב ל-<b>"הכלב"</b> (62%) - כך הוא פותר את העמימות של "הוא" ומבין שהכלב הוא הרעב, לא החתול. זו בדיוק העבודה של Self-Attention בכל שכבה.</div>';
+    log.innerHTML = html;
+  }, 500);
+}
+
+/* ---------- TOKENS ---------- */
+function estimateTokens(text){
+  text = text.trim();
+  if(!text) return [];
+  const words = text.split(/\s+/);
+  let tokens = [];
+  words.forEach(w=>{
+    const matches = w.match(/[֐-׿a-zA-Z0-9']+|[^\sa-zA-Z0-9֐-׿']/g);
+    if(matches) tokens.push(...matches); else tokens.push(w);
+  });
+  return tokens;
+}
+document.getElementById('tokenInput').addEventListener('input', function(){
+  const tokens = estimateTokens(this.value);
+  const box = document.getElementById('cubeBox');
+  box.innerHTML='';
+  tokens.forEach((tok,i)=>{
+    const c=document.createElement('div');
+    c.className='cube';
+    c.textContent=tok;
+    c.style.background = palette[i%palette.length];
+    c.style.animationDelay = (i*0.04)+'s';
+    box.appendChild(c);
+  });
+  document.getElementById('tokenCount').textContent = tokens.length+' tokens 🧱 (הערכה גסה)';
+});
+
+/* ---------- TEMPERATURE ---------- */
+const tempLow = ['השמיים היום בהירים. ☀️'];
+const tempMid = ['השמיים היום בהירים ונעימים. 🌤️','השמיים היום מלאים בעננים לבנים. ⛅','השמיים היום כחולים עם ענן קטן. ☁️'];
+const tempHigh = ['השמיים היום מלאים בדינוזאורים מרוקדים! 🦖','השמיים היום עשויים מריבס ירוק! 🍬','השמיים היום שרים שיר בטורקית! 🎵','השמיים היום הפכו לים של שוקולד! 🍫','השמיים היום ברחו למאדים! 🚀'];
+let tempInterval=null;
+function updateTemperature(val){
+  val = parseFloat(val);
+  const iconMap = val<0.6?'🥶':val<1.3?'🙂':'🤪';
+  document.getElementById('tempValue').textContent = iconMap+' '+val.toFixed(1);
+  const out = document.getElementById('tempOutput');
+  out.classList.remove('wobble');
+  clearInterval(tempInterval);
+  let text;
+  if(val<0.5){ text = tempLow[0]; }
+  else if(val<1.2){ text = tempMid[Math.floor(Math.random()*tempMid.length)]; }
+  else { text = tempHigh[Math.floor(Math.random()*tempHigh.length)]; }
+  out.textContent = text;
+  const hue = Math.round(val*140);
+  out.style.color = 'hsl('+hue+',70%,45%)';
+  if(val>0.05){
+    out.classList.add('wobble');
+    out.style.animationDuration = Math.max(0.3, 1.6-val*0.7)+'s';
+  }
+  if(val>=1.2){
+    tempInterval = setInterval(()=>{
+      out.textContent = tempHigh[Math.floor(Math.random()*tempHigh.length)];
+    }, 1200);
+  }
+}
+
+/* ---------- CONTEXT WINDOW ---------- */
+const CTX_MAX = 60;
+document.getElementById('ctxInput').addEventListener('input', function(){
+  const tokens = estimateTokens(this.value);
+  const pct = Math.min(100, Math.round((tokens.length/CTX_MAX)*100));
+  const bar = document.getElementById('ctxBar');
+  bar.style.width = pct+'%';
+  bar.textContent = tokens.length+' / '+CTX_MAX;
+  let color = 'var(--green)';
+  if(pct>=85) color='#e74c3c';
+  else if(pct>=60) color='#f1c40f';
+  bar.style.background = color;
+  const msg = document.getElementById('ctxMsg');
+  if(pct>=100){ msg.textContent='🧠 הזיכרון מלא! אני מתחיל לשכוח את ההתחלה...'; msg.style.color='#e74c3c'; }
+  else if(pct>=85){ msg.textContent='⚠️ כמעט מלא!'; msg.style.color='#e67e22'; }
+  else { msg.textContent=''; }
+});
+
+/* ---------- API ---------- */
+function sendApiRequest(){
+  const input = document.getElementById('apiInput');
+  const q = input.value.trim() || 'שאלה כלשהי';
+  const bubble = document.getElementById('apiBubble');
+  const responses = ['הנה התשובה שלך, בתאבון! 🍽️','השף (המודל) הכין את זה בשבילך! ✅','הזמנה הוגשה חמה מהמטבח! 🔥'];
+  bubble.textContent = q;
+  bubble.className = 'api-bubble';
+  bubble.style.bottom='10px';
+  bubble.style.opacity='1';
+  bubble.style.transition='none';
+  requestAnimationFrame(()=>{
+    bubble.style.transition='all 1s ease';
+    bubble.style.bottom='calc(100% - 60px)';
+  });
+  setTimeout(()=>{
+    bubble.style.opacity='0';
+    setTimeout(()=>{
+      bubble.textContent = responses[Math.floor(Math.random()*responses.length)];
+      bubble.className='api-bubble response';
+      bubble.style.transition='none';
+      bubble.style.bottom='calc(100% - 60px)';
+      bubble.style.opacity='1';
+      requestAnimationFrame(()=>{
+        bubble.style.transition='all 1s ease';
+        bubble.style.bottom='10px';
+      });
+      setTimeout(()=>{ bubble.style.opacity='0'; }, 2400);
+    }, 350);
+  }, 1300);
+}
+
+/* ---------- RAG ---------- */
+let ragUploaded = false;
+function uploadFile(){
+  const dots = document.getElementById('ragDots');
+  dots.innerHTML='';
+  ragUploaded = true;
+  for(let i=0;i<14;i++){
+    const d=document.createElement('div');
+    d.className='rag-dot';
+    d.style.background = palette[i%palette.length];
+    d.style.left = (5+Math.random()*90)+'%';
+    d.style.top = (5+Math.random()*80)+'%';
+    d.style.animationDelay = (i*0.05)+'s';
+    d.dataset.idx = i;
+    dots.appendChild(d);
+  }
+  document.getElementById('ragResult').textContent = '📄 הקובץ פוצל וקודד ל-14 וקטורים!';
+  document.getElementById('ragResult').style.color = 'var(--purple)';
+}
+function ragSearch(){
+  if(!ragUploaded){
+    document.getElementById('ragResult').textContent = '⚠️ קודם תעלו קובץ!';
+    document.getElementById('ragResult').style.color = '#e67e22';
+    return;
+  }
+  document.querySelectorAll('.rag-dot').forEach(d=>d.classList.remove('found'));
+  const allDots = Array.from(document.querySelectorAll('.rag-dot'));
+  const picked = allDots.sort(()=>0.5-Math.random()).slice(0,3);
+  picked.forEach(d=>d.classList.add('found'));
+  document.getElementById('ragResult').textContent = '🔎 נמצאו 3 הקטעים הכי דומים וקטורית - התשובה מבוססת עליהם 🟢';
+  document.getElementById('ragResult').style.color = 'var(--green)';
+}
+
+/* ---------- AGENT LOOP ---------- */
+let agentIdx = 0;
+let agentInterval = null;
+function startAgentLoop(){
+  stopAgentLoop();
+  agentIdx = 0;
+  setAgentActive(agentIdx);
+  agentInterval = setInterval(()=>{
+    agentIdx = (agentIdx+1)%4;
+    setAgentActive(agentIdx);
+  }, 1000);
+}
+function stopAgentLoop(){
+  clearInterval(agentInterval);
+  agentInterval = null;
+  for(let i=0;i<4;i++) document.getElementById('agentNode'+i).classList.remove('active');
+}
+function setAgentActive(i){
+  for(let j=0;j<4;j++) document.getElementById('agentNode'+j).classList.remove('active');
+  document.getElementById('agentNode'+i).classList.add('active');
+}
+
+/* ---------- SKILLS ---------- */
+const skillDefs = [
+  {em:'📊', name:'מצגות', keys:['מצגת','שקופיות','פרזנטציה','pptx']},
+  {em:'📄', name:'מסמכים', keys:['מסמך','וורד','word','docx','מכתב']},
+  {em:'📈', name:'גליונות', keys:['גליון','אקסל','excel','xlsx','טבלה']},
+  {em:'🔒', name:'בדיקת אבטחה', keys:['אבטחה','באג','vulnerability','בדוק קוד','security']},
+  {em:'🔍', name:'מחקר מעמיק', keys:['מחקר','חקור','research','תמצא מידע']},
+  {em:'📅', name:'תזמון משימות', keys:['כל בוקר','תזכיר','לוח זמנים','תזמן']}
+];
+function buildSkillGrid(){
+  const grid = document.getElementById('skillGrid');
+  grid.innerHTML='';
+  skillDefs.forEach((s,i)=>{
+    const c=document.createElement('div');
+    c.className='skill-card';
+    c.id='skillCard'+i;
+    c.innerHTML='<span class="sk-em">'+s.em+'</span>'+s.name;
+    grid.appendChild(c);
+  });
+}
+function matchSkills(text){
+  text = text.toLowerCase();
+  skillDefs.forEach((s,i)=>{
+    const card = document.getElementById('skillCard'+i);
+    const match = text.trim().length>0 && s.keys.some(k=>text.includes(k.toLowerCase()));
+    card.classList.toggle('match', match);
+  });
+}
+
+/* ---------- TOOLS ---------- */
+const toolDefs = [
+  {em:'👀', name:'קריאה (Read)', log:'קלוד קורא את הקובץ README.md... ✅ מצא: "ברוכים הבאים לפרויקט"'},
+  {em:'✍️', name:'כתיבה (Write)', log:'קלוד כותב קובץ חדש בשם notes.txt... ✅ נשמר בהצלחה!'},
+  {em:'⚙️', name:'הרצה (Bash)', log:'קלוד מריץ פקודה בטרמינל: npm install... ✅ הותקן!'},
+  {em:'🔭', name:'חיפוש (Web)', log:'קלוד מחפש באינטרנט "מזג אוויר היום"... ✅ מצא תוצאות!'}
+];
+function buildToolGrid(){
+  const grid = document.getElementById('toolGrid');
+  grid.innerHTML='';
+  toolDefs.forEach((t,i)=>{
+    const b=document.createElement('div');
+    b.className='tool-btn';
+    b.innerHTML='<span class="t-em">'+t.em+'</span>'+t.name;
+    b.onclick=()=>useTool(i);
+    grid.appendChild(b);
+  });
+}
+function useTool(i){
+  const log = document.getElementById('actionLog');
+  log.textContent = '⏳ ...';
+  setTimeout(()=>{ log.textContent = toolDefs[i].log; }, 400);
+}
+
+/* ---------- MCP ---------- */
+const appDefs = [
+  {em:'💬', name:'Slack'},
+  {em:'📧', name:'Gmail'},
+  {em:'🐙', name:'GitHub'}
+];
+let mcpSelected = 0;
+function buildAppPicker(){
+  const wrap = document.getElementById('appPicker');
+  wrap.innerHTML='';
+  appDefs.forEach((a,i)=>{
+    const b=document.createElement('button');
+    b.className='app-btn'+(i===0?' selected':'');
+    b.id='appBtn'+i;
+    b.innerHTML=a.em+' '+a.name;
+    b.onclick=()=>selectApp(i);
+    wrap.appendChild(b);
+  });
+  updateMcpAppNode();
+}
+function selectApp(i){
+  mcpSelected = i;
+  appDefs.forEach((a,idx)=>document.getElementById('appBtn'+idx).classList.toggle('selected', idx===i));
+  updateMcpAppNode();
+}
+function updateMcpAppNode(){
+  const node = document.getElementById('mcpAppNode');
+  node.innerHTML = '<div class="mcp-node">'+appDefs[mcpSelected].em+'</div><div class="mcp-label">'+appDefs[mcpSelected].name+'</div>';
+}
+function sendMcpRequest(){
+  const bubble = document.getElementById('mcpBubble');
+  bubble.style.transition='none';
+  bubble.style.right='8%';
+  bubble.style.opacity='1';
+  bubble.textContent='📩 בקשה: תבדוק הודעות חדשות';
+  requestAnimationFrame(()=>{
+    bubble.style.transition='all 1s ease';
+    bubble.style.right='50%';
+  });
+  setTimeout(()=>{
+    bubble.style.transition='all 1s ease';
+    bubble.style.right='8%';
+    bubble.textContent = '✅ תשובה מ-'+appDefs[mcpSelected].name+'!';
+    bubble.className='mcp-bubble';
+    bubble.style.background='linear-gradient(90deg,var(--green),#27ae60)';
+  }, 1100);
+  setTimeout(()=>{ bubble.style.opacity='0'; }, 2600);
+}
+
+/* ---------- SUBAGENTS ---------- */
+function sendSubagent(){
+  const helper = document.getElementById('subHelper');
+  const cloud = document.getElementById('subCloud');
+  const result = document.getElementById('subResult');
+  result.textContent='';
+  helper.style.right = '100px';
+  helper.style.opacity='1';
+  requestAnimationFrame(()=>{
+    helper.style.right = 'calc(100% - 90px)';
+  });
+  const thoughts = ['🤔 חושב...','🔎 מחפש מידע...','📋 בודק תוצאות...'];
+  let i=0;
+  cloud.innerHTML='';
+  const thoughtInterval = setInterval(()=>{
+    if(i<thoughts.length){
+      const div = document.createElement('div');
+      div.className='sub-thought';
+      div.textContent = thoughts[i];
+      cloud.appendChild(div);
+      i++;
+    }
+  }, 500);
+  setTimeout(()=>{
+    clearInterval(thoughtInterval);
+    cloud.innerHTML = 'כל העבודה נשארה כאן, בהקשר מבודד 🔒';
+    helper.style.right='100px';
+    result.textContent = '✅ ה-subagent חזר: "מצאתי את התשובה - הכל תקין!"';
+  }, 2200);
+}
+
+/* ---------- SLASH COMMANDS ---------- */
+const slashDefs = [
+  {cmd:'/clear', desc:'מנקה את כל השיחה ומתחיל מחדש', effect:'🧹 השיחה נוקתה! לוח חלק וריק.'},
+  {cmd:'/help', desc:'מציג רשימת עזרה ופקודות', effect:'❓ הנה כל הפקודות שאפשר להשתמש בהן!'},
+  {cmd:'/model', desc:'מחליף את מודל ה-AI', effect:'🔄 עברנו למודל אחר!'},
+  {cmd:'/goal', desc:'מגדיר מצב-סיום שקלוד ממשיך לקראתו לבד', effect:'🎯 יעד נקבע - קלוד ימשיך לעבוד עד שהתנאי יתקיים!'},
+  {cmd:'/loop', desc:'מריץ במחזורים חוזרים עד תנאי עצירה', effect:'🔁 מתחילים לרוץ במחזורים...'}
+];
+function buildSlashList(){
+  const list = document.getElementById('slashList');
+  list.innerHTML='';
+  slashDefs.forEach((s,i)=>{
+    const item = document.createElement('div');
+    item.className='slash-item';
+    item.innerHTML = '<span>'+s.cmd+'</span><span class="sd">'+s.desc+'</span>';
+    item.onclick = ()=>{ document.getElementById('slashEffect').textContent = s.effect; };
+    list.appendChild(item);
+  });
+}
+
+/* ---------- HOOKS ---------- */
+function hookDecide(allow){
+  const outcome = document.getElementById('hookOutcome');
+  const guard = document.getElementById('hookGuard');
+  if(allow){
+    guard.textContent='🟢';
+    outcome.textContent = '✅ exit 0 - הפעולה אושרה, קלוד ימשיך וימחק את הקבצים.';
+    outcome.style.color = 'var(--green)';
+  } else {
+    guard.textContent='🔴';
+    outcome.textContent = '🚫 exit 2 - הפעולה נחסמה! הקבצים נשארו בטוחים.';
+    outcome.style.color = '#e74c3c';
+  }
+  setTimeout(()=>{ guard.textContent='🛡️'; }, 1800);
+}
+
+/* ---------- PLUGINS ---------- */
+let pluginPacked = false;
+function packPlugin(){
+  for(let i=0;i<3;i++){
+    const item = document.getElementById('pItem'+i);
+    item.style.transform = 'scale(0)';
+    item.style.opacity = '0';
+  }
+  setTimeout(()=>{
+    document.getElementById('pluginBox').style.display='block';
+    document.getElementById('pluginMsg').textContent = '📦 הכל ארוז בקופסה אחת - document-tools v2.1.0!';
+    document.getElementById('installBtn').disabled = false;
+    pluginPacked = true;
+  }, 500);
+}
+function installPlugin(){
+  if(!pluginPacked) return;
+  document.getElementById('pluginMsg').textContent = '✅ הפלאגין הותקן! עכשיו יש לכם סקיל + hook + חיבור MCP תחת שם וגרסה אחידה 🎉';
+}
+
+/* ---------- ALWAYS-ON AGENTS ---------- */
+const timeOptions = ['08:00','12:00','18:00'];
+let selectedTime = timeOptions[0];
+let clockInterval = null;
+function buildTimePicker(){
+  const wrap = document.getElementById('timePicker');
+  wrap.innerHTML='';
+  timeOptions.forEach((t,i)=>{
+    const b = document.createElement('button');
+    b.className = 'time-btn'+(i===0?' selected':'');
+    b.id = 'timeBtn'+i;
+    b.textContent = t;
+    b.onclick = ()=>{
+      selectedTime = t;
+      timeOptions.forEach((_,idx)=>document.getElementById('timeBtn'+idx).classList.toggle('selected', idx===i));
+    };
+    wrap.appendChild(b);
+  });
+}
+const clockMessages = ['📋 בודק את המשימות שלך...','📨 מכין סיכום יומי...','✅ הדוח מוכן ונשלח!'];
+function startClock(){
+  stopClock();
+  const face = document.getElementById('clockFace');
+  const log = document.getElementById('clockLog');
+  log.innerHTML = '<div>⏰ הסוכן הופעל - יעבוד כל יום ב-'+selectedTime+'</div>';
+  let cycle = 0;
+  clockInterval = setInterval(()=>{
+    face.textContent = cycle%2===0 ? '☀️' : '🌙';
+    const msg = clockMessages[cycle%clockMessages.length];
+    const div = document.createElement('div');
+    div.textContent = '🕐 '+selectedTime+' (יום '+(Math.floor(cycle/clockMessages.length)+1)+') - '+msg;
+    log.insertBefore(div, log.firstChild);
+    cycle++;
+  }, 1200);
+}
+function stopClock(){
+  clearInterval(clockInterval);
+  clockInterval = null;
+}
+
+/* ---------- CAPSTONE ---------- */
+const capToolLabels = ['Read','Write','WebSearch','Bash','Grep'];
+function buildCapToolsPicker(){
+  const wrap = document.getElementById('cap-tools-picker');
+  if(!wrap) return;
+  wrap.innerHTML='';
+  capToolLabels.forEach(t=>{
+    const b = document.createElement('button');
+    b.type='button';
+    b.className='btn secondary small';
+    b.textContent = t;
+    b.dataset.selected='0';
+    b.onclick = ()=>{
+      const sel = b.dataset.selected === '1';
+      b.dataset.selected = sel? '0':'1';
+      b.style.outline = sel? 'none' : '3px solid var(--green)';
+    };
+    wrap.appendChild(b);
+  });
+}
+function generateCapstone(){
+  const desc = (document.getElementById('cap-skill-desc').value || 'Research a topic and report findings').trim();
+  const toolBtns = document.querySelectorAll('#cap-tools-picker button');
+  const chosenTools = Array.from(toolBtns).filter(b=>b.dataset.selected==='1').map(b=>b.textContent);
+  const mcp = document.getElementById('cap-mcp-select').value;
+  const hook = document.getElementById('cap-hook-select').value;
+  const subagent = document.getElementById('cap-subagent-select').value;
+  const schedule = document.getElementById('cap-schedule-select').value;
+
+  const mcpLabel = {none:null, slack:'slack', gmail:'gmail', notion:'notion'}[mcp];
+  const hookLabel = {
+    delete:'Block Bash rm commands (PreToolUse, exit 2 on match)',
+    send:'Require confirmation before outbound send (PreToolUse)',
+    write:'Block writes outside project directory (PreToolUse)'
+  }[hook];
+
+  let preview = '{\n';
+  preview += '  "name": "research-assistant",\n';
+  preview += '  "version": "1.0.0",\n';
+  preview += '  "description": "'+desc.replace(/"/g,'\\"')+'"\n';
+  preview += '}\n\n';
+  preview += 'skills/research-assistant/SKILL.md\n';
+  preview += '  allowed-tools: ['+ (chosenTools.length? chosenTools.join(', ') : 'Read')+']\n\n';
+  if(mcpLabel){
+    preview += '.mcp.json\n';
+    preview += '  mcpServers.'+mcpLabel+': { ... }\n\n';
+  }
+  preview += 'hooks/hooks.json\n';
+  preview += '  PreToolUse rule: '+hookLabel+'\n\n';
+  if(subagent==='yes'){
+    preview += 'agents/researcher.md\n';
+    preview += '  tools: [WebSearch]   // isolated context for the search step\n\n';
+  }
+  preview += 'schedule (cron): '+schedule+'\n';
+
+  const el = document.getElementById('capstonePreview');
+  el.style.display='block';
+  el.textContent = preview;
+  capstoneDone = true;
+  visited.add('capstone');
+  updateProgress();
+  buildHome();
+}
+
+/* ---------- INIT ---------- */
+buildNav();
+buildHome();
+buildSkillGrid();
+buildToolGrid();
+buildAppPicker();
+buildSlashList();
+buildTimePicker();
+buildCapToolsPicker();
+if(safeGet('ai-theme')==='dark'){
+  document.body.classList.add('dark');
+  document.getElementById('themeToggle').textContent='☀️';
+}
+updateTemperature(0);
+updateProgress();
+</script>
+
+</body>
+</html>
