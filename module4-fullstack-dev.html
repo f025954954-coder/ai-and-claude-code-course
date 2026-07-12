@@ -137,12 +137,27 @@ textarea:focus, input[type=text]:focus, select:focus{border-color:var(--purple);
 .capstone-step{background:var(--bg);border-radius:var(--radius-sm);padding:18px;margin-bottom:14px;}
 .capstone-step h4{margin:0 0 8px 0;font-size:.95rem;display:flex;align-items:center;gap:8px;}
 
+/* Real screenshots */
+.screenshot-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:20px;}
+.screenshot-badge{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;font-weight:800;padding:4px 12px;border-radius:999px;background:linear-gradient(90deg,#f39c12,#e67e22);color:#fff;margin-bottom:12px;}
+.real-screenshot{width:100%;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.25);display:block;}
+.screenshot-caption{font-size:.85rem;color:var(--text-soft);margin-top:10px;line-height:1.6;}
+
 @media (max-width:600px){
   body{padding-top:112px;}
   .logo{font-size:.92rem;}
   .navbtn{font-size:.72rem;padding:6px 9px;}
   .card,.demo-card,.lab-card,.quiz-card{padding:18px;}
 }
+
+.slide-viewer-overlay{display:none;position:fixed;inset:0;background:rgba(10,12,20,.9);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.slide-viewer-overlay.active{display:flex;}
+.slide-viewer-box{max-width:920px;width:100%;background:var(--card);border-radius:20px;padding:18px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.slide-viewer-close{position:absolute;top:-14px;left:-14px;background:var(--card);border-radius:50%;width:38px;height:38px;font-size:1.1rem;box-shadow:var(--shadow);}
+.slide-viewer-imgwrap{background:#0d0f1a;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:200px;}
+#slideViewerImg{width:100%;display:block;}
+.slide-viewer-controls{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px;}
+.slide-viewer-controls span{font-weight:700;color:var(--text-soft);font-size:.9rem;}
 </style>
 </head>
 <body>
@@ -162,9 +177,25 @@ textarea:focus, input[type=text]:focus, select:focus{border-color:var(--purple);
   <div class="page-inner">
     <div class="hero-title">💻 מודול 4: תכנות Fullstack מקצועי</div>
     <div class="hero-sub">Python מהיסוד, OOP, Git, SQL, Django (models/views/REST API), Frontend, Docker - ופרויקט מסכם: בניית CRM מינימלי. המודול הכי מקיף באקדמיה - כ-3 שעות של תוכן.</div>
+    <div style="text-align:center;margin-bottom:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn" onclick="openSlideViewer()">🎞️ צפו במצגת המודול</button>
+      <a href="slides/module4-fullstack-dev.pptx" download class="btn secondary" style="text-decoration:none;">📥 הורידו PPTX</a>
+    </div>
     <div class="lesson-grid" id="lessonGrid"></div>
   </div>
 </section>
+
+<div class="slide-viewer-overlay" id="slideViewerOverlay" onclick="if(event.target===this) closeSlideViewer()">
+  <div class="slide-viewer-box">
+    <button class="slide-viewer-close" onclick="closeSlideViewer()">✕</button>
+    <div class="slide-viewer-imgwrap"><img id="slideViewerImg" src="" alt="slide"></div>
+    <div class="slide-viewer-controls">
+      <button class="btn secondary small" onclick="slideViewerNav(-1)">➡ הקודם</button>
+      <span id="slideViewerCounter">1 / 13</span>
+      <button class="btn small" onclick="slideViewerNav(1)">הבא ⬅</button>
+    </div>
+  </div>
+</div>
 
 <!-- PYTHON BASICS -->
 <section class="page" id="page-py-basics">
@@ -196,6 +227,11 @@ doubled = [x * 2 for x in range(5)]   # [0, 2, 4, 6, 8]
 for tag in tags:
     print(f"- {tag}")</pre></div>
       <div class="lab-note">💡 שימו לב ל-f-string (<code>f"..."</code>) - הדרך המודרנית והמומלצת לשלב משתנים בתוך מחרוזת, במקום קונקטנציה עם +.</div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי</div>
+      <img class="real-screenshot" src="screenshots/basics.png" alt="הרצה אמיתית של basics.py בטרמינל" loading="lazy">
+      <div class="screenshot-caption">💡 זו לא הדמיה - ממש הרצנו את <code>basics.py</code> שלמעלה ב-Python אמיתי וצילמנו את הפלט המדויק שהתקבל.</div>
     </div>
     <div class="demo-card">
       <div class="demo-label">🔍 כתבו ערך בסגנון Python (למשל <code>42</code>, <code>"שלום"</code>, <code>[1,2,3]</code>, <code>True</code>, <code>{'a':1}</code>) ותראו איזה טיפוס זה:</div>
@@ -246,6 +282,11 @@ dana.add_deal("Enterprise Plan")
 print(dana)   # Contact(Dana) - עדיין נגיש כי VipContact יורש מ-Contact</pre></div>
       <div class="lab-note">💡 <code>super().__init__(...)</code> קורא ל-constructor של מחלקת האב, כדי לא לשכפל קוד. זה דפוס סטנדרטי כמעט בכל שפת OOP.</div>
     </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי</div>
+      <img class="real-screenshot" src="screenshots/oop.png" alt="הרצה אמיתית של oop.py בטרמינל" loading="lazy">
+      <div class="screenshot-caption">💡 הרצנו בפועל את המחלקות Contact ו-VipContact מלמעלה, כולל super().__init__ וה-isinstance check - זה בדיוק מה שהתקבל.</div>
+    </div>
     <div class="demo-card">
       <div class="demo-label">🏗️ לחצו כדי "ליצור אובייקט" מהמחלקה ולראות את ה-attributes שלו:</div>
       <div class="row"><button class="btn" onclick="instantiateContact()">▶️ dana = VipContact("Dana", "dana@co.com", 0.15)</button></div>
@@ -282,6 +323,11 @@ git checkout main
 git merge feature/add-crm-search          # מיזוג חזרה</pre></div>
       <div class="lab-note">💡 <code>git diff</code> מראה שינויים שעדיין לא ב-staging; <code>git log</code> מראה את היסטוריית ה-commits; <code>git status</code> הוא הפקודה שתריצו הכי הרבה - היא תמיד אומרת לכם איפה אתם נמצאים.</div>
     </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי</div>
+      <img class="real-screenshot" src="screenshots/git.png" alt="הרצה אמיתית של git log --graph בטרמינל" loading="lazy">
+      <div class="screenshot-caption">💡 יצרנו repo אמיתי, פתחנו branch, ביצענו commits ומיזגנו - זה הפלט האמיתי של <code>git log --oneline --graph --all</code> על התוצאה.</div>
+    </div>
     <div class="demo-card">
       <div class="demo-label">🌳 לחצו על הפעולות ותראו את גרף ה-commits נבנה:</div>
       <div class="row">
@@ -310,6 +356,8 @@ git merge feature/add-crm-search          # מיזוג חזרה</pre></div>
         <p>מסד נתונים יחסי (כמו PostgreSQL או MySQL) מארגן מידע ב<span class="highlight">טבלאות</span> - שורות (records) ועמודות (fields) עם טיפוסים מוגדרים. כל טבלה מקבלת <b>Primary Key</b> (מזהה ייחודי, בד"כ <code>id</code>), וטבלאות מתקשרות ביניהן דרך <b>Foreign Key</b> - עמודה בטבלה אחת שמצביעה על ה-Primary Key של טבלה אחרת. זו בדיוק הדרך למדל מערכת CRM: טבלת <code>contacts</code>, טבלת <code>deals</code> עם <code>contact_id</code> שמצביע חזרה על איש הקשר.</p>
         <p>שאילתות SQL בנויות מפקודות כמו <code>SELECT</code> (שליפה), <code>WHERE</code> (סינון), <code>JOIN</code> (חיבור טבלאות לפי מפתח), <code>GROUP BY</code> (קיבוץ וצבירה), ו-<code>ORDER BY</code> (מיון). <b>Index</b> הוא מבנה נתונים נוסף שמאיץ חיפוש בעמודה מסוימת במחיר של מקום אחסון וזמן כתיבה מעט איטי יותר - שימושי מאוד על עמודות ש-<code>WHERE</code> או <code>JOIN</code> מסננים לפיהן הרבה.</p>
         <div class="callout">📌 קשר בין Django ל-SQL: כשתגדירו Model ב-Django (השיעור הבא), ה-ORM (Object-Relational Mapper) מייצר עבורכם את ה-SQL הזה אוטומטית - אבל ההבנה של מה שקורה "מתחת למכסה המנוע" קריטית לדיבוג ולביצועים.</div>
+        <p style="margin-top:14px;"><b>Transactions</b>: קבוצת שינויים שמתבצעת "הכל או כלום" - אם שלב באמצע נכשל, כל מה שקרה בטרנזקציה מתבטל (rollback). זה קריטי כשיוצרים איש קשר ועסקה קשורה יחד: לא רוצים ליצור את איש הקשר בלי העסקה אם משהו נכשל באמצע.</p>
+        <p><b>בעיית N+1</b>: מלכודת ביצועים נפוצה מאוד - אם שולפים 100 אנשי קשר ואז, בלולאה, שולפים בנפרד את העסקאות של כל אחד, מקבלים 101 שאילתות במקום שאילתה אחת (או שתיים) עם JOIN. זו בדיוק הסיבה ש-Django ORM מציע פקודות כמו <code>select_related</code> ו-<code>prefetch_related</code> - שיעלו בקורס בהמשך.</p>
       </div>
     </div>
     <div class="lab-card">
@@ -320,6 +368,11 @@ JOIN contacts ON deals.contact_id = contacts.id
 WHERE deals.status = 'open'
 ORDER BY deals.amount DESC;</pre></div>
       <div class="lab-note">💡 ה-JOIN "מחבר" כל שורת deal לאיש הקשר שלה לפי contact_id = id. בלי JOIN, הייתם צריכים שתי שאילתות נפרדות ולחבר את התוצאות בקוד.</div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי</div>
+      <img class="real-screenshot" src="screenshots/sql.png" alt="הרצה אמיתית של שאילתת JOIN ב-SQLite" loading="lazy">
+      <div class="screenshot-caption">💡 יצרנו מסד SQLite אמיתי עם שתי טבלאות, והרצנו את שאילתת ה-JOIN בדיוק כפי שהיא מופיעה למעלה - אלו התוצאות האמיתיות שחזרו.</div>
     </div>
     <div class="demo-card">
       <div class="demo-label">🔍 בנו שאילתה: בחרו טבלה, עמודה למיון, וכיוון - ותראו SQL וטבלת תוצאות לדוגמה:</div>
@@ -376,6 +429,11 @@ class Deal(models.Model):
       <div class="code-block" style="margin-top:12px;"><span class="code-label">bash</span><pre>python manage.py makemigrations crm
 python manage.py migrate</pre></div>
       <div class="lab-note">💡 <code>ForeignKey(Contact, on_delete=models.CASCADE)</code> בדיוק מיישם את קשר ה-JOIN שראינו בשיעור SQL - ומגדיר גם מה קורה אם ה-Contact נמחק (כאן: כל ה-Deals שלו נמחקים אוטומטית).</div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי</div>
+      <img class="real-screenshot" src="screenshots/django_migrate.png" alt="הרצה אמיתית של makemigrations ו-migrate" loading="lazy">
+      <div class="screenshot-caption">💡 יצרנו פרויקט Django אמיתי עם ה-Models בדיוק כמו למעלה, והרצנו <code>makemigrations</code> ו-<code>migrate</code> אמיתיים - כך נראית ההרצה האמיתית שלהם, כולל כל המיגרציות המובנות של Django עצמו.</div>
     </div>
     <div class="demo-card">
       <div class="demo-label">🏗️ בנו Model: הוסיפו שדות ותראו את קוד ה-models.py נבנה בזמן אמת:</div>
@@ -435,6 +493,11 @@ def contact_detail(request, pk):
     return render(request, "crm/contact_detail.html", {"contact": contact})</pre></div>
       <div class="lab-note">💡 <code>Contact.objects.all()</code> הוא ה-ORM בפעולה - זה מתורגם מאחורי הקלעים ל-<code>SELECT * FROM contact ORDER BY name</code>, בדיוק כמו בשיעור SQL.</div>
     </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי</div>
+      <img class="real-screenshot" src="screenshots/django_orm.png" alt="הרצה אמיתית של שאילתות ORM ב-Django shell" loading="lazy">
+      <div class="screenshot-caption">💡 פתחנו <code>python manage.py shell</code> אמיתי מול מסד הנתונים שיצרנו, והרצנו את <code>Contact.objects.all()</code> ו-<code>dana.deals.all()</code> - זו ה-ORM בפעולה, לא סימולציה.</div>
+    </div>
     <div class="demo-card">
       <div class="demo-label">▶️ לחצו כדי לדמות בקשת דפדפן ל-<code>/contacts/</code> ולראות את המסלול המלא:</div>
       <div class="row"><button class="btn" onclick="runDjangoRequest()">🌐 GET /contacts/</button></div>
@@ -457,6 +520,7 @@ def contact_detail(request, pk):
       <div class="explain">
         <p>אתר Django "קלאסי" מחזיר HTML מרונדר בשרת. אבל frontend מודרני (השיעור הבא) לרוב מעדיף לקבל <span class="highlight">JSON</span> ולבנות את ה-UI בעצמו. <b>Django REST Framework (DRF)</b> הוא התוסף הסטנדרטי שהופך Models ל-API: <b>Serializer</b> ממיר אובייקט Model ל-JSON (ובחזרה - ומאמת קלט נכנס), ו-<b>ViewSet</b> מספק אוטומטית endpoints סטנדרטיים ל-CRUD (Create/Read/Update/Delete).</p>
         <p>זה בדיוק אותו עיקרון של REST API שראינו במודול 1 (שיעור ה-API) - רק עכשיו אתם בונים אחד בעצמכם, לא רק צורכים אחד קיים כמו Claude API.</p>
+        <p><b>אימות והרשאות (Authentication & Permissions)</b>: DRF מפריד בין "מי אתה" (Authentication - למשל Token או Session) ל"מה מותר לך" (Permissions - למשל <code>IsAuthenticated</code> או הרשאות מותאמות אישית). בלי הגדרה מפורשת, ה-API שלכם עלול להיות פתוח לכולם - בדיוק כמו שראינו בשיעור ה-Hooks (מודול 2) על אכיפה דטרמיניסטית, כאן זו האכיפה הדטרמיניסטית של מי מורשה לגעת בנתונים.</p>
       </div>
     </div>
     <div class="lab-card">
@@ -477,6 +541,11 @@ class ContactViewSet(viewsets.ModelViewSet):
     serializer_class = ContactSerializer
 # מקבל אוטומטית: GET/POST /contacts/, GET/PUT/DELETE /contacts/{id}/</pre></div>
       <div class="lab-note">💡 שורה אחת - <code>viewsets.ModelViewSet</code> - נותנת חמישה endpoints שלמים (list, create, retrieve, update, delete). זו בדיוק ה"מגייה" שפריימוורקים נותנים שדיברנו עליה במודול 3.</div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי</div>
+      <img class="real-screenshot" src="screenshots/django_request.png" alt="הרצה אמיתית של בקשת GET דרך ViewSet אמיתי" loading="lazy">
+      <div class="screenshot-caption">💡 בנינו את ה-ViewSet וה-router האמיתיים מלמעלה, וביצענו בקשת GET אמיתית ל-<code>/api/contacts/</code> - קיבלנו 200 OK אמיתי עם ה-JSON שה-Serializer הפיק, בדיוק כמו שאפליקציית frontend אמיתית הייתה מקבלת.</div>
     </div>
     <div class="demo-card">
       <div class="demo-label">📤 לחצו לראות איך Model הופך ל-JSON דרך ה-Serializer:</div>
@@ -501,6 +570,8 @@ class ContactViewSet(viewsets.ModelViewSet):
         <p>שלוש השכבות הבסיסיות: <b>HTML</b> - מבנה ותוכן (מה יש בדף), <b>CSS</b> - עיצוב (איך זה נראה), <b>JavaScript</b> - התנהגות (מה קורה כשמשתמש מקליק). ה-<span class="highlight">DOM</span> (Document Object Model) הוא הייצוג החי של ה-HTML בזיכרון שג'אווהסקריפט יכול לקרוא ולשנות - זו הסיבה ש-<code>document.getElementById(...)</code> "עובד": הוא מוצא צומת בעץ ה-DOM.</p>
         <p>כדי ש-frontend "ידבר" עם backend (כמו ה-Django API שבנינו), משתמשים ב-<code>fetch()</code> - פונקציית JS מובנית שמבצעת בקשת HTTP ומחזירה Promise. זה בדיוק אותו עיקרון של בקשות API שראינו במודול 1, רק עכשיו מהצד הלקוח.</p>
         <p>פריימוורקים כמו React/Vue מוסיפים שכבת הפשטה (בדומה למה שראינו במודול 3 על LangChain): במקום לתפעל את ה-DOM ידנית, מתארים "איך התצוגה אמורה להיראות עבור מצב נתון", והפריימוורק דואג לעדכן את ה-DOM בעצמו.</p>
+        <p><b>CORS (Cross-Origin Resource Sharing)</b>: כשה-frontend וה-backend רצים על דומיינים/פורטים שונים (למשל frontend על localhost:3000 ו-Django על localhost:8000), הדפדפן חוסם בקשות בין-מקוריות כברירת מחדל, מסיבות אבטחה. השרת חייב להחזיר headers מפורשים (כמו <code>Access-Control-Allow-Origin</code>) שמאשרים לדומיין הספציפי לגשת אליו - ב-Django עושים זאת עם חבילת <code>django-cors-headers</code>.</p>
+        <p><b>ניהול מצב (State Management)</b>: ב-frontend מורכב, "מצב" הוא כל מידע שמשתנה עם הזמן ומשפיע על מה שמוצג - למשל רשימת אנשי הקשר שנטענה, או האם dialog פתוח. פריימוורקים נותנים כלים ייעודיים לניהול מצב (כמו useState/useReducer ב-React) כדי שעדכון נתון אחד יעדכן אוטומטית כל חלק ב-UI שתלוי בו.</p>
       </div>
     </div>
     <div class="lab-card">
@@ -542,6 +613,8 @@ loadContacts();</pre></div>
         <p>Docker אורז אפליקציה יחד עם <span class="highlight">כל</span> מה שהיא צריכה כדי לרוץ - גרסת Python, חבילות pip, משתני סביבה, קבצי מערכת - לתוך <b>image</b> אחד ניתן להרצה בכל מקום שיש בו Docker. <b>Container</b> הוא מופע רץ של image - בדיוק כמו ההבדל בין class ל-instance ששרשור ב-OOP.</p>
         <p><code>Dockerfile</code> הוא מתכון: רשימת הוראות איך לבנות את ה-image (איזה בסיס להתחיל ממנו, אילו חבילות להתקין, אילו קבצים להעתיק, איזו פקודה להריץ כשהcontainer עולה). <code>docker-compose.yml</code> מתאם כמה containers יחד - למשל, container לאפליקציית Django + container נפרד למסד הנתונים PostgreSQL, שמדברים ביניהם ברשת פנימית.</p>
         <p>למה זה חשוב לפרודקשן: זה פותר בדיוק את הבעיה "אצלי זה עבד" - אם זה רץ ב-container, זה ירוץ באותה צורה על השרת של הפיתוח, השרת של הבדיקות, ושרת הפרודקשן, כי כולם מריצים בדיוק את אותו image.</p>
+        <p><b>קשר ישיר ל-AI</b>: זוכרים את שיעור ה-LLMs (מודול 1)? מודלים ואפליקציות AI תלויים בגרסאות מדויקות של ספריות (למשל גרסת PyTorch או transformers ספציפית) - חוסר התאמה קטן יכול לשנות תוצאות או לגרום לקריסה. Docker הוא הכלי הסטנדרטי בתעשייה בדיוק בשביל זה: "נעילת" כל סביבת ה-AI כדי שתתנהג זהה בכל מקום.</p>
+        <p><b>Volumes</b>: כברירת מחדל, כל מידע שנכתב בתוך container נעלם כשהוא נהרס. <code>volumes</code> (כמו <code>pgdata</code> בדוגמה למעלה) הם דרך "לחבר" תיקייה חיצונית לקבועה לתוך ה-container, כדי שנתוני מסד הנתונים ישרדו גם אחרי restart.</p>
       </div>
     </div>
     <div class="lab-card">
@@ -1074,6 +1147,34 @@ function generateCrmCapstone(){
   updateProgress();
   buildHome();
 }
+
+/* ---------- SLIDE VIEWER ---------- */
+const SLIDE_TOTAL = 13;
+const SLIDE_FOLDER = 'slide-images/module4-fullstack-dev';
+let slideIdx = 1;
+function openSlideViewer(){
+  slideIdx = 1;
+  document.getElementById('slideViewerOverlay').classList.add('active');
+  updateSlideViewer();
+}
+function closeSlideViewer(){ document.getElementById('slideViewerOverlay').classList.remove('active'); }
+function slideViewerNav(dir){
+  slideIdx += dir;
+  if(slideIdx<1) slideIdx=SLIDE_TOTAL;
+  if(slideIdx>SLIDE_TOTAL) slideIdx=1;
+  updateSlideViewer();
+}
+function updateSlideViewer(){
+  const n = String(slideIdx).padStart(2,'0');
+  document.getElementById('slideViewerImg').src = SLIDE_FOLDER+'/s-'+n+'.jpg';
+  document.getElementById('slideViewerCounter').textContent = slideIdx+' / '+SLIDE_TOTAL;
+}
+document.addEventListener('keydown', function(e){
+  if(!document.getElementById('slideViewerOverlay').classList.contains('active')) return;
+  if(e.key==='Escape') closeSlideViewer();
+  if(e.key==='ArrowLeft') slideViewerNav(1);
+  if(e.key==='ArrowRight') slideViewerNav(-1);
+});
 
 /* ---------- INIT ---------- */
 buildNav();

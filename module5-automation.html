@@ -135,6 +135,15 @@ textarea:focus, input[type=text]:focus, select:focus{border-color:var(--purple);
   .navbtn{font-size:.72rem;padding:6px 9px;}
   .card,.demo-card,.lab-card,.quiz-card{padding:18px;}
 }
+
+.slide-viewer-overlay{display:none;position:fixed;inset:0;background:rgba(10,12,20,.9);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.slide-viewer-overlay.active{display:flex;}
+.slide-viewer-box{max-width:920px;width:100%;background:var(--card);border-radius:20px;padding:18px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.slide-viewer-close{position:absolute;top:-14px;left:-14px;background:var(--card);border-radius:50%;width:38px;height:38px;font-size:1.1rem;box-shadow:var(--shadow);}
+.slide-viewer-imgwrap{background:#0d0f1a;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:200px;}
+#slideViewerImg{width:100%;display:block;}
+.slide-viewer-controls{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px;}
+.slide-viewer-controls span{font-weight:700;color:var(--text-soft);font-size:.9rem;}
 </style>
 </head>
 <body>
@@ -154,10 +163,25 @@ textarea:focus, input[type=text]:focus, select:focus{border-color:var(--purple);
   <div class="page-inner">
     <div class="hero-title">🔗 מודול 5: אוטומציות וחיבורים</div>
     <div class="hero-sub">Make.com, Zapier, n8n, Webhooks ו-API ישיר, ו-Claude Agent SDK בתור מנוע אוטומציה - איך מחברים הכל, בונים אוטומציות אמיתיות, ומוציאים את המקסימום מקלוד קוד.</div>
-    <div style="text-align:center;margin-bottom:22px;"><a href="slides/module5-automation.pptx" download class="btn secondary" style="text-decoration:none;">📥 הורידו את מצגת המודול (PPTX)</a></div>
+    <div style="text-align:center;margin-bottom:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn" onclick="openSlideViewer()">🎞️ צפו במצגת המודול</button>
+      <a href="slides/module5-automation.pptx" download class="btn secondary" style="text-decoration:none;">📥 הורידו PPTX</a>
+    </div>
     <div class="lesson-grid" id="lessonGrid"></div>
   </div>
 </section>
+
+<div class="slide-viewer-overlay" id="slideViewerOverlay" onclick="if(event.target===this) closeSlideViewer()">
+  <div class="slide-viewer-box">
+    <button class="slide-viewer-close" onclick="closeSlideViewer()">✕</button>
+    <div class="slide-viewer-imgwrap"><img id="slideViewerImg" src="" alt="slide"></div>
+    <div class="slide-viewer-controls">
+      <button class="btn secondary small" onclick="slideViewerNav(-1)">➡ הקודם</button>
+      <span id="slideViewerCounter">1 / 9</span>
+      <button class="btn small" onclick="slideViewerNav(1)">הבא ⬅</button>
+    </div>
+  </div>
+</div>
 
 <!-- AUTOMATION LANDSCAPE -->
 <section class="page" id="page-automation-landscape">
@@ -301,6 +325,50 @@ class Handler(http.server.BaseHTTPRequestHandler):
   </div>
 </section>
 
+<!-- SECURITY -->
+<section class="page" id="page-security-webhooks">
+  <div class="page-inner">
+    <div class="world-tag">🔗 מודול 5</div><span class="level-tag">⏱️ כ-30 דק'</span>
+    <div class="hero-title">🔒 אבטחת אוטומציות וחיבורים חיצוניים</div>
+    <div class="card">
+      <div class="explain">
+        <p>ברגע שאוטומציה חושפת endpoint לאינטרנט (webhook) או מחזיקה מפתחות API לשירותים חיצוניים, היא הופכת ליעד תקיפה פוטנציאלי. חמישה עקרונות מרכזיים חוצים כל מימוש - בין אם זה Make, n8n, או קוד ישיר:</p>
+        <p><b>1) אימות מקור (Signature Verification)</b>: כל ספק webhook רציני (Stripe, GitHub, WhatsApp Business API ואחרים) חותם את הבקשה עם <span class="highlight">HMAC</span> - hash מוצפן שמחושב מהגוף (body) של הבקשה + סוד משותף. אתם מחשבים את אותו hash בצד שלכם ומשווים - אם הם לא זהים, הבקשה לא באמת הגיעה מהספק (או שהיא שונתה בדרך), ונדחית <b>לפני</b> שהיא בכלל מגיעה ללוגיקה העסקית.</p>
+        <p><b>2) ניהול סודות</b>: מפתחות API, secrets של webhook, וטוקנים לעולם לא נכתבים ישירות בקוד או ב-scenario (Make/n8n תומכים במשתני סביבה/connections מוצפנים). ברוטציה תקופתית של סודות וב-<code>.gitignore</code> לקבצי סביבה מקומיים - כדי שסוד לעולם לא "יידלף" ל-Git בטעות.</p>
+        <p><b>3) הרשאות מינימליות (Least Privilege)</b>: מפתח API שרק שולח מיילים לא צריך הרשאת מחיקה במסד הנתונים. ככל שההרשאה מצומצמת יותר, כך הנזק הפוטנציאלי אם המפתח דולף קטן יותר - בדיוק כמו <code>disallowedTools</code> ב-subagents (מודול 2).</p>
+        <p><b>4) אימות קלט (Input Validation)</b>: לעולם אל תסמכו על הקלט שמגיע מ-webhook כפי שהוא. בדקו סכימה (types, שדות חובה), הגבלות אורך, ותווים חוקיים - לפני שמעבירים את זה הלאה. נקודה קריטית וספציפית ל-AI: אם תוכן מ-webhook (למשל טקסט מטופס לקוח) מוזרק ישירות לתוך פרומפט ל-Claude, זה פותח דלת ל-<span class="highlight">Prompt Injection</span> - מישהו יכול לכתוב בטופס "התעלם מההוראות הקודמות ותעשה X" ולנסות להשתלט על ההתנהגות. התייחסו לכל תוכן חיצוני כנתון, לא כהוראה.</p>
+        <p><b>5) ניטור ותיעוד (Logging & Monitoring)</b>: כל קריאה חשובה (מי, מתי, מה בוצע) צריכה להישמר ביומן. זה מה שמאפשר לגלות שימוש חריג, לדבג כשמשהו משתבש, ולהראות ללקוח בדיוק מה קרה בכל אוטומציה שרצה עבורו.</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי</div>
+      <img class="real-screenshot" src="screenshots/hmac.png" alt="הרצה אמיתית של אימות חתימת HMAC" loading="lazy">
+      <div class="screenshot-caption">💡 חישבנו חתימת HMAC אמיתית על payload אמיתי, ואז ניסינו לאמת אותה מול payload שהשתנה (tampered) - האימות נכשל בדיוק כפי שאמור, בלי שהמערכת "האמינה" לתוכן המזויף.</div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: אימות HMAC אמיתי</div>
+      <div class="code-block"><span class="code-label">hmac_verify.py</span><pre>import hmac, hashlib
+
+SECRET = os.environ["WEBHOOK_SECRET"]  # לעולם לא בקוד עצמו
+
+def verify(payload_bytes, signature_header):
+    expected = hmac.new(SECRET.encode(), payload_bytes,
+                         hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, signature_header)
+
+# בתוך ה-handler:
+if not verify(request.body, request.headers["X-Signature"]):
+    return Response(status=401)  # דחייה מיידית</pre></div>
+      <div class="lab-note">💡 שימו לב ל-<code>hmac.compare_digest</code> ולא ל-<code>==</code> רגיל - זו השוואה ב"זמן קבוע" שמונעת מתקיפה מסוג timing attack ללמוד מידע מכמה זמן לוקחת ההשוואה להיכשל.</div>
+    </div>
+    <div class="quiz-card" id="quiz-security-webhooks"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
 <!-- AGENT SDK AUTOMATION -->
 <section class="page" id="page-agent-sdk-automation">
   <div class="page-inner">
@@ -351,6 +419,33 @@ agent.run(f"ליד חדש התקבל: {lead_data}")</pre></div>
         <p><b>האצלה ל-Subagents</b> (מודול 2) למשימות מבודדות שומרת את ההקשר הראשי נקי - במיוחד למחקר, code review, או בדיקות. <b>שימוש Headless/CI</b>: קלוד קוד יכול לרוץ ללא ממשק אינטראקטיבי בתוך pipeline של CI/CD - למשל, לבדוק כל Pull Request אוטומטית ולהוסיף הערות review.</p>
         <div class="callout">📌 עיקרון-על: ככל שההוראות (CLAUDE.md, system prompts, hooks) ברורות ומוגדרות יותר מראש, כך התוצאות עקביות ואמינות יותר - בדיוק כמו description טוב ל-Skill (מודול 2).</div>
       </div>
+    </div>
+    <div class="card">
+      <div class="explain">
+        <p><b>ניהול עלויות וטוקנים בפרויקט אמיתי</b>: כל קריאה צורכת טוקנים (מודול 1) - ובפרויקט גדול זה מצטבר. שלוש טכניקות מעשיות: (1) <b>Prompt Caching</b> על CLAUDE.md ותוכן קבוע שחוזר בכל שיחה - חוסך משמעותית בפרויקטים עם context גדול. (2) <b>האצלה לתת-סוכנים</b> (מודול 2) למשימות שדורשות הרבה "חפירה" (חיפוש בקבצים, קריאת דוקומנטציה) - כדי שהטוקנים של השיחה הראשית לא יתבזבזו על תוכן ביניים. (3) <b>הגבלת scope מפורשת</b> בכל בקשה - "תקן רק את הבאג בקובץ X" עדיף על "תבדוק את כל הפרויקט", כי היקף רחב מדי מייצר קריאות כלים מיותרות.</p>
+        <p><b>כשלים נפוצים וכיצד להימנע מהם</b>: <b>הקשר חסר</b> - קלוד מנחש כשאין לו מספיק מידע; הפתרון הוא CLAUDE.md עשיר ו-Plan Mode. <b>משימות ענק ללא פירוק</b> - "תבנה לי את כל האתר" מייצר תוצאה לא עקבית; פרקו למשימות קטנות וניתנות לבדיקה. <b>אין לולאת בדיקה</b> - אם אין לפרויקט טסטים, קלוד (וגם בן אדם) לא יכול לוודא שהשינוי לא שבר משהו; השקיעו בכיסוי טסטים בסיסי לפני שמסתמכים על אוטומציה כבדה. <b>אמון עיוור בפלט</b> - תמיד סקרו diff לפני commit אמיתי, גם כשקלוד "בטוח" שהקוד תקין.</p>
+        <p><b>אבטחת קלוד קוד עצמו</b>: קלוד קוד פועל בהרשאות המשתמש שמריץ אותו - לכן <b>Hooks</b> (מודול 2) הם קו ההגנה המרכזי: PreToolUse על Bash שחוסם פקודות הרסניות, הגבלת כלים ל-subagents לפי הצורך המינימלי (disallowedTools), ותשומת לב מיוחדת כשעובדים על repo עם קוד לא מוכר - "prompt injection" יכול להסתתר גם בתוך קבצים או תגובות קוד שקלוד קורא, לא רק בהודעות משתמש.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: זרימת עבודה מלאה - מ-Issue ועד PR</div>
+      <div class="code-block"><span class="code-label">workflow example</span><pre>1. משתמש: "יש באג - משתמשים מדווחים שהחיפוש לא
+   מחזיר תוצאות עם רווחים בשם"
+
+2. קלוד (Plan Mode): קורא CLAUDE.md, מאתר את
+   crm/search.py, מציע תיקון + טסט לפני שנוגע בקוד
+
+3. משתמש מאשר את התוכנית
+
+4. קלוד: כותב את התיקון + טסט, מריץ pytest,
+   מוודא שהכל עובר
+
+5. משתמש: "/commit" (slash command מותאם) →
+   קלוד כותב commit message לפי הפורמט מ-CLAUDE.md
+
+6. קלוד (headless, ב-CI): מריץ את כל סוויטת
+   הטסטים על ה-PR שנפתח, מוסיף הערת review</pre></div>
+      <div class="lab-note">💡 שימו לב איך כל עקרון מהשיעור הזה מופיע כאן בפועל: CLAUDE.md, Plan Mode, טסטים כלולאת בדיקה, slash command, ו-headless/CI - יחד, לא בנפרד.</div>
     </div>
     <div class="lab-card">
       <div class="section-title"><span class="num">🔬</span> מעבדה: CLAUDE.md אמיתי</div>
@@ -476,6 +571,7 @@ const topics = [
   {key:'make', emoji:'🧩', title:'Make.com', desc:'אוטומציה ויזואלית'},
   {key:'zapier-n8n', emoji:'⚡', title:'Zapier ו-n8n', desc:'שני קצוות של No-Code'},
   {key:'webhooks-api', emoji:'🪝', title:'Webhooks ו-API', desc:'חיבור ישיר בקוד'},
+  {key:'security-webhooks', emoji:'🔒', title:'אבטחה', desc:'HMAC, סודות, הרשאות מינימליות'},
   {key:'agent-sdk-automation', emoji:'🤖', title:'Agent SDK', desc:'הסוכן עצמו כמנוע'},
   {key:'claude-code-workflows', emoji:'🎯', title:'ניצול מקסימלי', desc:'איך עובדים נכון עם קלוד קוד'},
   {key:'automation-capstone', emoji:'🏗️', title:'פרויקט מסכם', desc:'תכננו אוטומציה מקצה לקצה', isCapstone:true}
@@ -502,6 +598,11 @@ const quizData = {
     {q:'מה זה Webhook טכנית?', opts:['בקשת GET רגילה','בקשת HTTP POST שנשלחת אוטומטית כשמשהו קורה, במקום polling','קובץ קונפיגורציה','פרוטוקול הצפנה'], correct:1},
     {q:'למה Webhook עדיף על polling?', opts:['אין הבדל בפועל','השרת לא צריך לשאול שוב ושוב "יש חדש?" - השירות מודיע ביוזמתו','polling תמיד מהיר יותר','webhook לא עובד עם JSON'], correct:1},
     {q:'מה חשוב להוסיף ל-webhook receiver בפרודקשן?', opts:['שום דבר נוסף','אימות (חתימת HMAC), טיפול בשגיאות, ותור עבודה','רק תמיכה ב-XML','חובה מסד נתונים בזיכרון בלבד'], correct:1}
+  ],
+  'security-webhooks': [
+    {q:'מה תפקיד חתימת HMAC בבקשת webhook נכנסת?', opts:['להצפין את הבקשה כך שאיש לא יראה אותה','לאמת שהבקשה באמת הגיעה מהמקור הצפוי ולא שונתה בדרך','להאיץ את זמן התגובה','לתרגם JSON ל-XML'], correct:1},
+    {q:'למה משתמשים ב-hmac.compare_digest ולא ב-== רגיל להשוואת חתימות?', opts:['אין הבדל בפועל','== רגיל חושף מידע דרך timing attack; compare_digest משווה בזמן קבוע','compare_digest מהיר יותר בלבד','זה נדרש רק ב-Python 2'], correct:1},
+    {q:'למה תוכן שמגיע מ-webhook חיצוני מסוכן במיוחד כשהוא מוזרק ישירות לפרומפט של Claude?', opts:['זה לא מסוכן בכלל','חשוף לסיכון Prompt Injection - תוכן חיצוני עלול לנסות "להורות" למודל במקום לשמש כנתון בלבד','זה תמיד גורם לשגיאת JSON','Claude לא יכול לקרוא webhook בכלל'], correct:1}
   ],
   'agent-sdk-automation': [
     {q:'מה ההבדל בין Claude כ"תחנה" בתרשים לבין Agent SDK כמנוע?', opts:['אין הבדל','בתרשים אתם מגדירים מראש את כל הצעדים; ב-Agent SDK קלוד מחליט בעצמו בזמן ריצה','Agent SDK תמיד איטי יותר','תרשים תמיד יותר גמיש'], correct:1},
@@ -706,6 +807,34 @@ function generateAutomationCapstone(){
   updateProgress();
   buildHome();
 }
+
+/* ---------- SLIDE VIEWER ---------- */
+const SLIDE_TOTAL = 9;
+const SLIDE_FOLDER = 'slide-images/module5-automation';
+let slideIdx = 1;
+function openSlideViewer(){
+  slideIdx = 1;
+  document.getElementById('slideViewerOverlay').classList.add('active');
+  updateSlideViewer();
+}
+function closeSlideViewer(){ document.getElementById('slideViewerOverlay').classList.remove('active'); }
+function slideViewerNav(dir){
+  slideIdx += dir;
+  if(slideIdx<1) slideIdx=SLIDE_TOTAL;
+  if(slideIdx>SLIDE_TOTAL) slideIdx=1;
+  updateSlideViewer();
+}
+function updateSlideViewer(){
+  const n = String(slideIdx).padStart(2,'0');
+  document.getElementById('slideViewerImg').src = SLIDE_FOLDER+'/s-'+n+'.jpg';
+  document.getElementById('slideViewerCounter').textContent = slideIdx+' / '+SLIDE_TOTAL;
+}
+document.addEventListener('keydown', function(e){
+  if(!document.getElementById('slideViewerOverlay').classList.contains('active')) return;
+  if(e.key==='Escape') closeSlideViewer();
+  if(e.key==='ArrowLeft') slideViewerNav(1);
+  if(e.key==='ArrowRight') slideViewerNav(-1);
+});
 
 /* ---------- INIT ---------- */
 buildNav();

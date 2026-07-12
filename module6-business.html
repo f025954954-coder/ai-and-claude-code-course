@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מודול 6: בניית עסק אוטומציות AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#2C5282; --purple:#4A5568; --green:#2F855A;
+  --bg:#f4f6f8; --bg2:#e8ecf0; --card:#ffffff; --text:#1a202c; --text-soft:#5a6472;
+  --radius:16px; --radius-sm:10px;
+  --shadow:0 8px 24px rgba(20,30,45,0.08);
+  --shadow-soft:0 4px 12px rgba(20,30,45,0.06);
+  --code-bg:#1e2233; --code-text:#d7dcff;
+}
+body.dark{
+  --bg:#12151c; --bg2:#1a1f29; --card:#1c212b; --text:#e8ecf1; --text-soft:#9aa5b3;
+  --shadow:0 8px 24px rgba(0,0,0,0.4); --shadow-soft:0 4px 12px rgba(0,0,0,0.3);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:'Heebo',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; transition:background .4s ease,color .4s ease; padding-top:120px;}
+h1,h2,h3{margin:0 0 8px 0;}
+button{font-family:'Heebo',sans-serif;cursor:pointer;border:none;outline:none;}
+code, pre, .mono{font-family:'JetBrains Mono',monospace;}
+
+.topnav{position:fixed;top:0;right:0;left:0;z-index:100;background:var(--card);box-shadow:var(--shadow-soft);padding:10px 16px 0 16px;border-bottom:1px solid var(--bg2);}
+.topnav-row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1200px;margin:0 auto;}
+.logo{font-weight:800;font-size:1.05rem;color:var(--text);flex-shrink:0;}
+.hub-link{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:6px;padding:7px 14px;font-size:.8rem;font-weight:700;text-decoration:none;white-space:nowrap;}
+.nav-scroll{display:flex;gap:6px;overflow-x:auto;flex:1;padding:4px 2px;scrollbar-width:thin;align-items:center;}
+.nav-scroll::-webkit-scrollbar{height:6px;}
+.nav-scroll::-webkit-scrollbar-thumb{background:var(--text-soft);border-radius:10px;}
+.navbtn{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:6px;padding:7px 13px;font-size:0.8rem;font-weight:600;white-space:nowrap;transition:all .2s ease;border:1px solid transparent;position:relative;}
+.navbtn:hover{border-color:var(--blue);}
+.navbtn.active{background:var(--blue);color:#fff;}
+.navbtn.passed::after{content:'✓';position:absolute;top:-4px;left:-4px;background:var(--green);color:#fff;border-radius:50%;width:15px;height:15px;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
+.theme-toggle{flex-shrink:0;background:var(--bg2);width:38px;height:38px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;}
+.progress-wrap{max-width:1200px;margin:8px auto 0 auto;height:6px;background:var(--bg2);border-radius:999px;overflow:hidden;}
+.progress-bar{height:100%;width:0%;background:var(--blue);transition:width .5s ease;}
+.progress-label{max-width:1200px;margin:4px auto 0 auto;font-size:.7rem;color:var(--text-soft);text-align:left;padding:0 4px;}
+
+.page{display:none;}
+.page.active{display:block;animation:fadeIn .4s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.page-inner{max-width:820px;margin:0 auto;padding:24px 16px 60px 16px;}
+.hero-title{font-size:clamp(1.4rem,4vw,2rem);font-weight:800;text-align:center;margin-bottom:8px;}
+.hero-sub{text-align:center;color:var(--text-soft);font-size:1rem;margin-bottom:26px;line-height:1.7;}
+.section-tag{display:inline-block;font-size:.72rem;font-weight:700;padding:4px 12px;border-radius:6px;background:var(--bg2);color:var(--text-soft);margin-bottom:12px;}
+
+.card{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:20px;border:1px solid var(--bg2);}
+.explain{font-size:1.02rem;line-height:1.9;color:var(--text);}
+.explain p{margin:0 0 15px 0;}
+.explain p:last-child{margin-bottom:0;}
+.explain b{font-weight:800;color:var(--text);}
+.explain .term{font-weight:700;border-bottom:2px solid var(--blue);}
+.callout{background:var(--bg);border-right:3px solid var(--blue);padding:14px 18px;border-radius:8px;margin-top:16px;font-size:.95rem;line-height:1.7;}
+
+.lab-card{background:var(--card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:20px;border:1px solid var(--bg2);}
+.lab-title{font-weight:800;font-size:1.02rem;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--blue);}
+.code-block{position:relative;background:var(--code-bg);color:var(--code-text);border-radius:10px;padding:16px 18px;overflow-x:auto;font-size:.82rem;line-height:1.7;direction:ltr;text-align:left;margin-top:10px;}
+.code-block pre{margin:0;white-space:pre;}
+.code-label{position:absolute;top:8px;left:14px;font-size:.65rem;color:#8891b8;letter-spacing:.05em;text-transform:uppercase;}
+.lab-note{font-size:.9rem;color:var(--text-soft);margin-top:12px;line-height:1.7;}
+.template-box{background:var(--bg);border-radius:8px;padding:16px 18px;margin-top:10px;font-size:.92rem;line-height:1.8;border:1px dashed var(--bg2);}
+
+.compare-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.85rem;}
+.compare-table th, .compare-table td{border:1px solid var(--bg2);padding:10px 12px;text-align:right;}
+.compare-table th{background:var(--bg);font-weight:800;}
+
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;font-weight:700;font-size:0.9rem;padding:11px 22px;border-radius:8px;transition:opacity .2s ease;}
+.btn:hover{opacity:.88;}
+.btn.secondary{background:var(--bg2);color:var(--text);}
+.btn.small{padding:8px 14px;font-size:.8rem;}
+.nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:10px;}
+
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:10px;}
+.lesson-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-soft);cursor:pointer;transition:box-shadow .2s ease;border:1px solid var(--bg2);}
+.lesson-card:hover{box-shadow:var(--shadow);border-color:var(--blue);}
+.lesson-card .num{font-size:.72rem;font-weight:800;color:var(--blue);margin-bottom:6px;}
+.lesson-card .tt{font-weight:800;font-size:1rem;margin-bottom:4px;}
+.lesson-card .dd{font-size:.85rem;color:var(--text-soft);}
+.lesson-card.done{border-color:var(--green);}
+.lesson-card .done-mark{color:var(--green);font-weight:700;font-size:.8rem;margin-top:6px;}
+
+.worksheet-field{margin-bottom:16px;}
+.worksheet-field label{display:block;font-weight:700;font-size:.9rem;margin-bottom:6px;}
+.worksheet-field input, .worksheet-field textarea, .worksheet-field select{width:100%;font-family:'Heebo',sans-serif;font-size:.95rem;padding:11px 14px;border-radius:8px;border:1px solid var(--bg2);background:var(--bg);color:var(--text);}
+.action-plan-output{background:var(--code-bg);color:var(--code-text);border-radius:10px;padding:18px;font-size:.85rem;white-space:pre-wrap;direction:ltr;text-align:left;margin-top:16px;display:none;}
+
+@media (max-width:600px){
+  body{padding-top:106px;}
+  .navbtn{font-size:.72rem;padding:6px 9px;}
+  .card,.lab-card{padding:18px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="topnav-row">
+    <a class="hub-link" href="index.html">האקדמיה</a>
+    <div class="logo">מודול 6: בניית עסק אוטומציות AI</div>
+    <div class="nav-scroll" id="navScroll"></div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 7 הושלמו</div>
+</div>
+
+<section class="page active" id="page-home">
+  <div class="page-inner">
+    <div class="hero-title">בניית עסק אוטומציות AI</div>
+    <div class="hero-sub">מודול עסקי - לא הדרכה טכנית. נישה, תמחור, לקוחות, מכירה, אספקה וסקיילינג: איך הופכים ידע טכני ב-AI ואוטומציות לעסק אמיתי, בין אם כפרילנסר ובין אם כסוכנות.</div>
+    <div style="text-align:center;margin-bottom:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn" onclick="openSlideViewer()">צפו במצגת המודול</button>
+      <a href="slides/module6-business.pptx" download class="btn secondary" style="text-decoration:none;">הורידו PPTX</a>
+    </div>
+    <div class="lesson-grid" id="lessonGrid"></div>
+  </div>
+</section>
+
+<div class="slide-viewer-overlay" id="slideViewerOverlay" onclick="if(event.target===this) closeSlideViewer()">
+  <div class="slide-viewer-box">
+    <button class="slide-viewer-close" onclick="closeSlideViewer()">✕</button>
+    <div class="slide-viewer-imgwrap"><img id="slideViewerImg" src="" alt="slide"></div>
+    <div class="slide-viewer-controls">
+      <button class="btn secondary small" onclick="slideViewerNav(-1)">➡ הקודם</button>
+      <span id="slideViewerCounter">1 / 9</span>
+      <button class="btn small" onclick="slideViewerNav(1)">הבא ⬅</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.slide-viewer-overlay{display:none;position:fixed;inset:0;background:rgba(10,12,20,.9);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.slide-viewer-overlay.active{display:flex;}
+.slide-viewer-box{max-width:920px;width:100%;background:var(--card);border-radius:var(--radius);padding:18px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.slide-viewer-close{position:absolute;top:-14px;left:-14px;background:var(--card);border-radius:50%;width:38px;height:38px;font-size:1.1rem;box-shadow:var(--shadow);}
+.slide-viewer-imgwrap{background:#0d0f1a;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:200px;}
+#slideViewerImg{width:100%;display:block;}
+.slide-viewer-controls{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px;}
+.slide-viewer-controls span{font-weight:700;color:var(--text-soft);font-size:.9rem;}
+</style>
+
+<!-- NICHE -->
+<section class="page" id="page-niche">
+  <div class="page-inner">
+    <div class="section-tag">שיעור 1</div>
+    <div class="hero-title">ניתוח שוק ובחירת נישה</div>
+    <div class="card">
+      <div class="explain">
+        <p>הטעות הנפוצה ביותר של מי שנכנס לתחום היא להציג את עצמו כ"אני עושה אוטומציות עם AI" - הצעה כללית מדי שקשה למכור כי אף אחד לא באמת מזהה בה פתרון לבעיה ספציפית שלו. <b class="term">נישה</b> פירושה לצמצם למרחב שבו אתם יכולים לדבר בדיוק בשפה של סוג לקוח מסוים, על בעיה מסוימת, עם תוצאה מדידה.</p>
+        <p>שלושה צירים לבחירת נישה: <b>תעשייה</b> (נדל"ן, קליניקות, עורכי דין, מסעדנות, אי-קומרס), <b>תפקיד/מחלקה בתוך הארגון</b> (מכירות, שירות לקוחות, כספים, HR), ו<b>תהליך ספציפי</b> (טיפול בלידים, גביית תשלומים, אונבורדינג עובדים, תמיכה טכנית). ככל שהצומת בין שלושת הצירים חדה יותר - "אני בונה מערכות טיפול-לידים אוטומטיות לקליניקות שיניים" - כך קל יותר למצוא לקוחות, לתמחר, ולבנות מוניטין מהיר יותר מאשר הצעה גנרית.</p>
+        <p>איך בוחרים בפועל: חפשו נישה שבה יש לכם <b>גישה</b> (מכירים אנשים בתעשייה, או עבדתם בה בעבר), <b>תדירות כאב</b> גבוהה (בעיה שחוזרת על עצמה כל שבוע, לא אחת לשנה), ו<b>יכולת תשלום</b> סבירה (עסקים עם תזרים, לא רק סטארטאפים ללא הכנסה). התחילו צר בכוונה - קל יותר להתרחב מנישה מצליחה מאשר לצאת מהצעה כללית שלא ממריאה.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="lab-title">תרגיל: מיפוי נישה</div>
+      <div class="template-box">שאלו את עצמכם:<br>
+      1. באילו 2-3 תעשיות יש לי כבר קשרים, ידע, או ניסיון קודם?<br>
+      2. איזה תהליך באותה תעשייה חוזר על עצמו וגוזל זמן יקר (טיפול בפניות, תיאום פגישות, מעקב אחר תשלומים)?<br>
+      3. האם בעלי עסקים בתחום הזה כבר משלמים היום על כלים/עובדים כדי לפתור את זה (סימן שיש תקציב)?<br>
+      4. מה המשפט שהייתי אומר בליפט פיץ' של 10 שניות? ("אני עוזר ל-X לפתור את Y כדי ש-Z")</div>
+      <div class="lab-note">💡 דוגמה למשפט טוב: "אני עוזר לקליניקות פרטיות להפסיק לאבד לידים שמגיעים אחרי שעות העבודה, על ידי סוכן AI שעונה, ממיין וקובע פגישה תוך דקות."</div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goHome()">חזרה למפת המודול</button>
+      <button class="btn" onclick="goRelative(1)">הבא</button>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="page" id="page-pricing">
+  <div class="page-inner">
+    <div class="section-tag">שיעור 2</div>
+    <div class="hero-title">מודלים עסקיים ותמחור</div>
+    <div class="card">
+      <div class="explain">
+        <p>שלושה מודלי תמחור מרכזיים, כל אחד עם טרייד-אוף אחר: <b class="term">תמחור פרויקטלי</b> (מחיר קבוע לפרויקט מוגדר) - הכי קל למכור בהתחלה כי הלקוח יודע בדיוק כמה ישלם, אבל הסיכון על הספק אם ההיקף גדל (scope creep). <b class="term">ריטיינר חודשי</b> - תשלום קבוע חודשי תמורת אחזקה, תמיכה, ושיפורים מתמשכים - נותן הכנסה צפויה וחוזרת (MRR), הבסיס לבניית עסק יציב מעבר לפרויקט בודד. <b class="term">תמחור מבוסס-תוצאה</b> (revenue share / per-outcome) - למשל אחוז מכל ליד שהאוטומציה סגרה - מיישר תמריצים אבל דורש מדידה אמינה ואמון גבוה מהלקוח.</p>
+        <p>טעות תמחור נפוצה: לתמחר לפי "שעות עבודה" בלבד. שווי הפתרון ללקוח (כמה כסף/זמן זה חוסך לו בחודש) הוא בסיס תמחור טוב יותר מאשר עלות הזמן שלכם - פתרון שחוסך ללקוח 20 שעות עבודה בחודש שווה הרבה יותר מ"שעתיים בנייה", גם אם זה מה שבאמת לקח לבנות אותו.</p>
+        <p>כלל אצבע למתחילים: התחילו בתמחור פרויקטלי לבניית תיק עבודות ומוניטין, ועברו בהדרגה לריטיינרים ברגע שיש לכם 2-3 לקוחות מרוצים - זו הדרך האמינה ביותר לבנות הכנסה חוזרת ולא להתחיל כל חודש "מאפס".</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="lab-title">דוגמה: חישוב תמחור פרויקט</div>
+      <div class="code-block"><span class="code-label">pricing worksheet</span><pre>פרויקט: אוטומציית טיפול-לידים לקליניקה
+
+זמן בנייה משוער: 15 שעות
+עלות תשתית חודשית (Make/n8n + Claude API): ~$80/חודש
+ערך ללקוח: חוסך 10 שעות/חודש של עבודת מזכירה
+           (~₪3,500/חודש בשווי שכר)
+
+תמחור פרויקטלי: ₪8,000-12,000 (חד פעמי)
++ ריטיינר תחזוקה: ₪800-1,500/חודש
+  (מכסה תשתית + עדכונים + תמיכה)</pre></div>
+      <div class="lab-note">💡 שימו לב: המחיר לא נגזר רק מ-15 השעות, אלא מהערך שנוצר ללקוח לאורך זמן. זה מה שמצדיק גם ריטיינר נפרד מהפרויקט החד-פעמי.</div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא</button>
+    </div>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<section class="page" id="page-clients">
+  <div class="page-inner">
+    <div class="section-tag">שיעור 3</div>
+    <div class="hero-title">השגת לקוחות ראשונים</div>
+    <div class="card">
+      <div class="explain">
+        <p>לפני שיש תיק עבודות, קשה מאוד "לחכות" ללקוחות שיגיעו - צריך ליזום. ארבעה ערוצים שעובדים במיוחד בשלב ההתחלתי: <b class="term">רשת קיימת</b> (חברים, מכרים, קבוצות פייסבוק/וואטסאפ מקצועיות בנישה שבחרתם) - הכי מהיר להמרה כי כבר יש אמון בסיסי. <b class="term">תוכן ונראות</b> (פוסטים ב-LinkedIn שמראים תהליך אמיתי - "ככה בניתי אוטומציה שחוסכת X שעות ל-Y" - בונה סמכות לאורך זמן). <b class="term">Outreach ישיר ומותאם אישית</b> (לא הודעות גנריות - מחקר קצר על העסק הספציפי ואיתור נקודת כאב קונקרטית לפני הפנייה). <b class="term">שיתופי פעולה</b> (סוכנויות שיווק/סוכני CRM שכבר עובדים עם הלקוחות שאתם מחפשים, ומחפשות שותף טכני להוסיף ערך).</p>
+        <p>הפרויקט הראשון או השניים הראשונים כדאי לתמחר נמוך יותר, ולפעמים אפילו בתמורה לעדות/case study מפורטת (בהסכמה מראש) - זה "מטבע" שקונה לכם אמינות מהירה יותר מכל שיווק. חשוב: תמיד לתעד תוצאה מדידה (כמה זמן/כסף נחסך) - זו נקודת המכירה החזקה ביותר ללקוח הבא.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="lab-title">תבנית: הודעת Outreach ראשונה</div>
+      <div class="template-box">"היי [שם], ראיתי ש[פרט ספציפי על העסק - למשל 'אתם מנהלים X סניפים' או 'ראיתי את הפוסט שלכם על גיוס']. עבדתי לאחרונה עם [סוג עסק דומה] על אוטומציה שפתרה בדיוק את [בעיה ספציפית] - זה חסך להם [תוצאה מדידה]. חשבתי שזה עשוי להיות רלוונטי גם אצלכם. יש לך 15 דקות השבוע לשיחה קצרה?"</div>
+      <div class="lab-note">💡 שלושה עקרונות בתבנית: התאמה אישית אמיתית (לא "Hi {{name}}" גנרי), עדות קונקרטית עם מספר, ובקשה קטנה וברורה (15 דקות, לא "בואו נדבר").</div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא</button>
+    </div>
+  </div>
+</section>
+
+<!-- SALES -->
+<section class="page" id="page-sales">
+  <div class="page-inner">
+    <div class="section-tag">שיעור 4</div>
+    <div class="hero-title">תהליך מכירה ו-Discovery</div>
+    <div class="card">
+      <div class="explain">
+        <p>שיחת <b class="term">Discovery</b> היא לא שיחת מכירה - היא שיחת אבחון. המטרה: להבין את התהליך הקיים של הלקוח לעומק לפני שמציעים פתרון. שלוש שאלות ליבה: "תארו לי איך זה עובד היום, צעד-צעד" (מפה את התהליך הידני הקיים), "כמה זמן/כסף זה עולה לכם היום" (כמת את הכאב), "מה קרה בפעם האחרונה שזה השתבש" (חושף את העלות הנסתרת של טעויות אנוש).</p>
+        <p>אחרי השיחה - <b class="term">הצעה (Proposal/SOW - Statement of Work)</b> צריכה לכלול: תיאור קצר של הבעיה (בשפת הלקוח, לא שפה טכנית), מה בדיוק ייבנה (scope מפורש - זה שם ההגנה שלכם מפני scope creep), מה לא כלול, ציר זמן, ותמחור. חוזה בסיסי (גם קצר) צריך לכלול לפחות: scope, תשלום ותנאיו, בעלות על הקוד/IP בסיום הפרויקט, ואחריות/תמיכה לאחר המסירה.</p>
+        <div class="callout">⚠️ הערה משפטית: אני לא עורך דין, וזה לא ייעוץ משפטי. לפני חתימה על חוזים אמיתיים עם לקוחות, מומלץ להיוועץ בעורך דין להתאמת הניסוח לחוק המקומי ולנסיבות הספציפיות שלכם.</div>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="lab-title">מבנה הצעת מחיר (SOW) בסיסית</div>
+      <div class="template-box">1. רקע ובעיה (2-3 משפטים בשפת הלקוח)<br>
+      2. הפתרון המוצע (מה ייבנה בפועל)<br>
+      3. תוצרים (Deliverables) - רשימה קונקרטית<br>
+      4. מה לא כלול בהיקף הזה<br>
+      5. ציר זמן ואבני דרך<br>
+      6. תמחור ותנאי תשלום (למשל: 50% מקדמה, 50% במסירה)<br>
+      7. תמיכה/אחריות לאחר המסירה</div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא</button>
+    </div>
+  </div>
+</section>
+
+<!-- DELIVERY -->
+<section class="page" id="page-delivery">
+  <div class="page-inner">
+    <div class="section-tag">שיעור 5</div>
+    <div class="hero-title">תהליך אספקה וניהול פרויקטים</div>
+    <div class="card">
+      <div class="explain">
+        <p>אספקה מקצועית היא ההבדל בין לקוח חד-פעמי ללקוח שממליץ עליכם. מבנה אספקה בסיסי: <b class="term">Kickoff</b> (וידוא הבנה משותפת של ה-scope וגישה למערכות הנדרשות), <b class="term">בנייה איטרטיבית</b> (עדכון ביניים אחרי כל שלב משמעותי, לא רק "תגיע ותופתע" בסוף), <b class="term">בדיקות עם הלקוח</b> (לפני מסירה סופית - הריצו תרחישי קצה אמיתיים יחד), ו<b class="term">מסירה מתועדת</b> (תיעוד כתוב של איך המערכת עובדת, מי הבעלים על כל חשבון/API key, ואיך לפתור תקלות נפוצות).</p>
+        <p>נקודה קריטית שרבים מפספסים: <b>בעלות על גישה</b>. תמיד להשתמש בחשבונות/מפתחות API בבעלות הלקוח (לא שלכם), כך שאם מערכת היחסים מסתיימת, הלקוח לא "תקוע" בלי גישה למערכת ששילם עליה - זה גם בונה אמון וגם עקרון אתי בסיסי.</p>
+        <p>לניהול כמה פרויקטים במקביל: כלי ניהול משימות פשוט (Trello/Notion/Linear), תבנית קבועה לכל פרויקט חדש (checklist של קליק-אוף → בנייה → בדיקות → מסירה), וזמן קבוע שבועי ל"תחזוקה" של לקוחות קיימים - כדי שריטיינרים לא ייפלו בין הכיסאות כשמגיע פרויקט חדש דחוף.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="lab-title">Checklist מסירת פרויקט</div>
+      <div class="template-box">☐ המערכת רצה על חשבונות/API keys בבעלות הלקוח<br>
+      ☐ תיעוד כתוב: איך המערכת עובדת + תרשים זרימה פשוט<br>
+      ☐ נבדקו לפחות 3 תרחישי קצה יחד עם הלקוח<br>
+      ☐ הוגדר מי אחראי לתמיכה שוטפת ומה זמן התגובה<br>
+      ☐ נקבעה פגישת מעקב אחרי שבועיים לוודא שהכל יציב</div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא</button>
+    </div>
+  </div>
+</section>
+
+<!-- SCALING -->
+<section class="page" id="page-scaling">
+  <div class="page-inner">
+    <div class="section-tag">שיעור 6</div>
+    <div class="hero-title">סקיילינג - מפרילנסר לסוכנות</div>
+    <div class="card">
+      <div class="explain">
+        <p>נקודת המעבר הטבעית: כשיש יותר עבודה פנויה ממה שאתם יכולים לספק לבד. שלוש דרכי סקיילינג עיקריות, לא בהכרח בלעדיות: <b class="term">Productization</b> - הפיכת פתרון שבניתם פעם אחת לתבנית ניתנת לשכפול מהיר ("חבילת אוטומציית לידים לקליניקות" עם התאמות מינימליות במקום בנייה מאפס לכל לקוח). <b class="term">קבלני משנה/עובדים</b> - גיוס מפתחים נוספים לפי פרויקט או קבוע, עם תיעוד תהליכים ברור כדי שהאיכות תישאר עקבית גם כשלא אתם בונים בעצמכם. <b class="term">שותפויות ערוץ</b> - סוכנויות שיווק/ייעוץ שמפנות אליכם לקוחות תמורת עמלה, במקום למכור ישירות בעצמכם לכל לקוח.</p>
+        <p>לפני שמגייסים, שווה לבנות <b>Playbook פנימי</b>: תיעוד של תהליך המכירה, תהליך הבנייה הטכני (כולל תבניות קוד/אוטומציה חוזרות ונשנות מהמודולים הקודמים באקדמיה הזו), ותהליך המסירה - כדי שקבלן משנה חדש יוכל להתחיל לעבוד לפי סטנדרט קבוע, לא "לפי מה שבראש שלכם".</p>
+        <p>סימן אזהרה נפוץ בסקיילינג מהיר מדי: לקיחת יותר מדי לקוחות לפני שיש תהליך אספקה יציב - זה פוגע באיכות ובמוניטין בו-זמנית. עדיף לגדול בקצב שבו כל לקוח חדש עדיין מקבל את אותה רמת שירות כמו הראשון.</p>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">הקודם</button>
+      <button class="btn" onclick="goRelative(1)">לתוכנית הפעולה</button>
+    </div>
+  </div>
+</section>
+
+<!-- ACTION PLAN -->
+<section class="page" id="page-action-plan">
+  <div class="page-inner">
+    <div class="section-tag">סיכום מעשי</div>
+    <div class="hero-title">תוכנית פעולה ל-90 יום</div>
+    <div class="card">
+      <div class="explain">
+        <p>לא מבחנון - כלי עבודה. מלאו את השדות בהתאם למה שלמדתם בשיעורים הקודמים, ותקבלו תקציר תוכנית פעולה שאפשר לשמור ולחזור אליו.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="worksheet-field">
+        <label>הנישה שבחרתי (תעשייה + תהליך ספציפי)</label>
+        <textarea id="plan-niche" rows="2" placeholder="לדוגמה: טיפול לידים אוטומטי לקליניקות פרטיות"></textarea>
+      </div>
+      <div class="worksheet-field">
+        <label>מודל תמחור עיקרי</label>
+        <select id="plan-pricing">
+          <option value="project">פרויקטלי (מחיר קבוע לפרויקט)</option>
+          <option value="retainer">ריטיינר חודשי</option>
+          <option value="outcome">מבוסס-תוצאה</option>
+          <option value="mixed">שילוב פרויקט + ריטיינר</option>
+        </select>
+      </div>
+      <div class="worksheet-field">
+        <label>ערוץ השגת הלקוחות הראשונים</label>
+        <select id="plan-channel">
+          <option value="network">רשת קיימת</option>
+          <option value="content">תוכן ונראות (LinkedIn וכו')</option>
+          <option value="outreach">Outreach ישיר</option>
+          <option value="partners">שיתופי פעולה</option>
+        </select>
+      </div>
+      <div class="worksheet-field">
+        <label>יעד: כמה שיחות Discovery בחודש הראשון</label>
+        <input type="text" id="plan-target" placeholder="לדוגמה: 10 שיחות">
+      </div>
+      <button class="btn" onclick="generateActionPlan()">צור תקציר תוכנית</button>
+      <div class="action-plan-output" id="actionPlanOutput"></div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">הקודם</button>
+      <a class="btn" href="index.html" style="text-decoration:none;">חזרה לאקדמיה</a>
+    </div>
+  </div>
+</section>
+
+<script>
+const THIS_FILE = 'module6-business.html';
+const PROGRESS_KEY = 'academy_progress_v1';
+
+function loadProgressSet(){
+  try{
+    const raw = localStorage.getItem(PROGRESS_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  }catch(e){ return new Set(); }
+}
+function saveProgressSet(set){
+  try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(Array.from(set))); }catch(e){}
+}
+function markDone(unitKey){
+  const set = loadProgressSet();
+  set.add(THIS_FILE+'::'+unitKey);
+  saveProgressSet(set);
+  updateProgress();
+  buildNav();
+}
+function isUnitDone(unitKey){
+  return loadProgressSet().has(THIS_FILE+'::'+unitKey);
+}
+function safeGetTheme(){ try{ return localStorage.getItem('academy_theme') || 'light'; }catch(e){ return 'light'; } }
+function safeSetTheme(t){ try{ localStorage.setItem('academy_theme', t); }catch(e){} }
+function toggleTheme(){
+  const isDark = document.body.classList.toggle('dark');
+  document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+  safeSetTheme(isDark ? 'dark' : 'light');
+}
+(function initTheme(){
+  if(safeGetTheme()==='dark'){
+    document.body.classList.add('dark');
+    document.addEventListener('DOMContentLoaded', ()=>{ document.getElementById('themeToggle').textContent='☀️'; });
+  }
+})();
+
+const lessons = [
+  {key:'niche', title:'ניתוח שוק ונישה', desc:'איך בוחרים נישה רווחית ובת-הגנה'},
+  {key:'pricing', title:'מודלים ותמחור', desc:'פרויקטלי, ריטיינר, מבוסס-תוצאה'},
+  {key:'clients', title:'לקוחות ראשונים', desc:'ערוצי השגת לקוחות ו-outreach'},
+  {key:'sales', title:'מכירה ו-Discovery', desc:'שיחת אבחון, הצעת מחיר וחוזה'},
+  {key:'delivery', title:'אספקה וניהול', desc:'תהליך מסירה מקצועי ותיעוד'},
+  {key:'scaling', title:'סקיילינג לסוכנות', desc:'Productization, גיוס, שותפויות'},
+  {key:'action-plan', title:'תוכנית פעולה ל-90 יום', desc:'כלי עבודה מסכם - לא מבחנון'}
+];
+
+function buildNav(){
+  const navScroll = document.getElementById('navScroll');
+  const homeBtn = document.createElement('button');
+  homeBtn.className = 'navbtn';
+  homeBtn.textContent = 'ראשי';
+  homeBtn.onclick = goHome;
+  navScroll.innerHTML = '';
+  navScroll.appendChild(homeBtn);
+  lessons.forEach(l=>{
+    const b = document.createElement('button');
+    b.className = 'navbtn' + (isUnitDone(l.key) ? ' passed' : '');
+    b.textContent = l.title;
+    b.onclick = ()=>showPage(l.key);
+    navScroll.appendChild(b);
+  });
+  updateActiveNav();
+}
+function updateActiveNav(){
+  const current = document.querySelector('.page.active');
+  if(!current) return;
+  const id = current.id.replace('page-','');
+  document.querySelectorAll('.navbtn').forEach((b,i)=>{
+    b.classList.toggle('active', (i===0 && id==='home') || (lessons[i-1] && lessons[i-1].key===id));
+  });
+}
+function buildHome(){
+  const grid = document.getElementById('lessonGrid');
+  grid.innerHTML = '';
+  lessons.forEach((l,i)=>{
+    const done = isUnitDone(l.key);
+    const card = document.createElement('div');
+    card.className = 'lesson-card' + (done ? ' done' : '');
+    card.onclick = ()=>showPage(l.key);
+    card.innerHTML = '<div class="num">שיעור '+(i+1)+'</div><div class="tt">'+l.title+'</div><div class="dd">'+l.desc+'</div>'+(done?'<div class="done-mark">✓ נצפה</div>':'');
+    grid.appendChild(card);
+  });
+}
+function showPage(key){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const target = document.getElementById('page-'+key);
+  if(target){ target.classList.add('active'); }
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(key !== 'home'){ markDone(key); }
+  buildHome();
+  updateActiveNav();
+}
+function goHome(){ showPage('home'); }
+function goRelative(dir){
+  const current = document.querySelector('.page.active');
+  const id = current.id.replace('page-','');
+  if(id === 'home'){ showPage(lessons[0].key); return; }
+  const idx = lessons.findIndex(l=>l.key===id);
+  const next = idx + dir;
+  if(next < 0){ showPage('home'); return; }
+  if(next >= lessons.length){ showPage('home'); return; }
+  showPage(lessons[next].key);
+}
+function updateProgress(){
+  const total = lessons.length;
+  const done = lessons.filter(l=>isUnitDone(l.key)).length;
+  const pct = total ? Math.round((done/total)*100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = done + ' / ' + total + ' הושלמו';
+}
+
+const SLIDE_TOTAL = 9;
+const SLIDE_FOLDER = 'slide-images/module6-business';
+let slideIdx = 1;
+function openSlideViewer(){ slideIdx = 1; document.getElementById('slideViewerOverlay').classList.add('active'); updateSlideViewer(); }
+function closeSlideViewer(){ document.getElementById('slideViewerOverlay').classList.remove('active'); }
+function slideViewerNav(dir){ slideIdx += dir; if(slideIdx<1) slideIdx=SLIDE_TOTAL; if(slideIdx>SLIDE_TOTAL) slideIdx=1; updateSlideViewer(); }
+function updateSlideViewer(){
+  const n = String(slideIdx).padStart(2,'0');
+  document.getElementById('slideViewerImg').src = SLIDE_FOLDER+'/s-'+n+'.jpg';
+  document.getElementById('slideViewerCounter').textContent = slideIdx+' / '+SLIDE_TOTAL;
+}
+document.addEventListener('keydown', (e)=>{
+  const overlay = document.getElementById('slideViewerOverlay');
+  if(!overlay.classList.contains('active')) return;
+  if(e.key==='Escape') closeSlideViewer();
+  if(e.key==='ArrowLeft') slideViewerNav(1);
+  if(e.key==='ArrowRight') slideViewerNav(-1);
+});
+
+function generateActionPlan(){
+  const niche = document.getElementById('plan-niche').value.trim() || '[לא הוגדר]';
+  const pricingMap = {project:'תמחור פרויקטלי (מחיר קבוע)', retainer:'ריטיינר חודשי', outcome:'מבוסס-תוצאה', mixed:'שילוב פרויקט + ריטיינר'};
+  const channelMap = {network:'רשת קיימת', content:'תוכן ונראות', outreach:'Outreach ישיר', partners:'שיתופי פעולה'};
+  const pricing = pricingMap[document.getElementById('plan-pricing').value];
+  const channel = channelMap[document.getElementById('plan-channel').value];
+  const target = document.getElementById('plan-target').value.trim() || '[לא הוגדר]';
+  const out = document.getElementById('actionPlanOutput');
+  out.style.display = 'block';
+  out.textContent =
+`תוכנית פעולה - 90 יום
+=======================
+נישה: ${niche}
+מודל תמחור: ${pricing}
+ערוץ השגת לקוחות: ${channel}
+יעד שיחות Discovery בחודש הראשון: ${target}
+
+ימים 1-30:  הגדרת הצעת ערך + הפעלת ערוץ הלקוחות שנבחר + 3-5 שיחות Discovery ראשונות
+ימים 31-60: סגירת 1-2 לקוחות ראשונים (תמחור נמוך יותר / תיאום תמורת עדות) + מסירה מתועדת
+ימים 61-90: איסוף עדות + עדכון החומר השיווקי + הפעלת ערוץ שני להשגת לקוחות`;
+  markDone('action-plan');
+}
+
+buildNav();
+buildHome();
+updateProgress();
+showPage('home');
+</script>
+
+</body>
+</html>

@@ -83,6 +83,7 @@ textarea:focus, input[type=text]:focus{border-color:var(--purple);}
 .btn.green{background:linear-gradient(90deg,var(--green),#27ae60);}
 .btn.red{background:linear-gradient(90deg,#e74c3c,#c0392b);}
 .btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn.small{padding:8px 14px;font-size:.82rem;}
 .nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:10px;}
 
 .quiz-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
@@ -166,6 +167,15 @@ textarea:focus, input[type=text]:focus{border-color:var(--purple);}
   .navbtn{font-size:.76rem;padding:6px 10px;}
   .card,.demo-card,.lab-card,.quiz-card{padding:18px;}
 }
+
+.slide-viewer-overlay{display:none;position:fixed;inset:0;background:rgba(10,12,20,.9);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.slide-viewer-overlay.active{display:flex;}
+.slide-viewer-box{max-width:920px;width:100%;background:var(--card);border-radius:20px;padding:18px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.slide-viewer-close{position:absolute;top:-14px;left:-14px;background:var(--card);border-radius:50%;width:38px;height:38px;font-size:1.1rem;box-shadow:var(--shadow);}
+.slide-viewer-imgwrap{background:#0d0f1a;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:200px;}
+#slideViewerImg{width:100%;display:block;}
+.slide-viewer-controls{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px;}
+.slide-viewer-controls span{font-weight:700;color:var(--text-soft);font-size:.9rem;}
 </style>
 </head>
 <body>
@@ -185,9 +195,25 @@ textarea:focus, input[type=text]:focus{border-color:var(--purple);}
   <div class="page-inner">
     <div class="hero-title">🛠️ מודול 2: עולם קלוד קוד</div>
     <div class="hero-sub">איך בונים סוכנים אמיתיים: Skills, Tools, MCP, Subagents, Slash Commands, Hooks, Plugins, וסוכנים אוטונומיים.</div>
+    <div style="text-align:center;margin-bottom:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn" onclick="openSlideViewer()">🎞️ צפו במצגת המודול</button>
+      <a href="slides/module2-claude-code.pptx" download class="btn secondary" style="text-decoration:none;">📥 הורידו PPTX</a>
+    </div>
     <div class="lesson-grid" id="lessonGrid"></div>
   </div>
 </section>
+
+<div class="slide-viewer-overlay" id="slideViewerOverlay" onclick="if(event.target===this) closeSlideViewer()">
+  <div class="slide-viewer-box">
+    <button class="slide-viewer-close" onclick="closeSlideViewer()">✕</button>
+    <div class="slide-viewer-imgwrap"><img id="slideViewerImg" src="" alt="slide"></div>
+    <div class="slide-viewer-controls">
+      <button class="btn secondary small" onclick="slideViewerNav(-1)">➡ הקודם</button>
+      <span id="slideViewerCounter">1 / 11</span>
+      <button class="btn small" onclick="slideViewerNav(1)">הבא ⬅</button>
+    </div>
+  </div>
+</div>
 
 <!-- SKILLS -->
 <section class="page" id="page-skills">
@@ -964,6 +990,34 @@ function startClock(){
   }, 1200);
 }
 function stopClock(){ clearInterval(clockInterval); clockInterval = null; }
+
+/* ---------- SLIDE VIEWER ---------- */
+const SLIDE_TOTAL = 11;
+const SLIDE_FOLDER = 'slide-images/module2-claude-code';
+let slideIdx = 1;
+function openSlideViewer(){
+  slideIdx = 1;
+  document.getElementById('slideViewerOverlay').classList.add('active');
+  updateSlideViewer();
+}
+function closeSlideViewer(){ document.getElementById('slideViewerOverlay').classList.remove('active'); }
+function slideViewerNav(dir){
+  slideIdx += dir;
+  if(slideIdx<1) slideIdx=SLIDE_TOTAL;
+  if(slideIdx>SLIDE_TOTAL) slideIdx=1;
+  updateSlideViewer();
+}
+function updateSlideViewer(){
+  const n = String(slideIdx).padStart(2,'0');
+  document.getElementById('slideViewerImg').src = SLIDE_FOLDER+'/s-'+n+'.jpg';
+  document.getElementById('slideViewerCounter').textContent = slideIdx+' / '+SLIDE_TOTAL;
+}
+document.addEventListener('keydown', function(e){
+  if(!document.getElementById('slideViewerOverlay').classList.contains('active')) return;
+  if(e.key==='Escape') closeSlideViewer();
+  if(e.key==='ArrowLeft') slideViewerNav(1);
+  if(e.key==='ArrowRight') slideViewerNav(-1);
+});
 
 /* ---------- INIT ---------- */
 buildNav();
