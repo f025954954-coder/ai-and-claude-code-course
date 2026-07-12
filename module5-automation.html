@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔗 מודול 5: אוטומציות וחיבורים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#4A90E2; --purple:#7B68EE; --green:#2ECC71;
+  --bg:#eef2fb; --bg2:#e4ecfb; --card:#ffffff; --text:#2d3142; --text-soft:#5a5f7a;
+  --radius:26px; --radius-sm:16px;
+  --shadow:0 12px 30px rgba(74,144,226,0.18);
+  --shadow-soft:0 6px 16px rgba(74,144,226,0.12);
+  --code-bg:#1e2233; --code-text:#d7dcff;
+}
+body.dark{
+  --bg:#141827; --bg2:#1b2032; --card:#222842; --text:#f2f3fb; --text-soft:#b7bcda;
+  --shadow:0 12px 30px rgba(0,0,0,0.45); --shadow-soft:0 6px 16px rgba(0,0,0,0.35);
+  --code-bg:#0d0f1a; --code-text:#c7d0ff;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:'Heebo',sans-serif; background:linear-gradient(160deg,var(--bg),var(--bg2)); color:var(--text); min-height:100vh; transition:background .4s ease,color .4s ease; padding-top:126px;}
+h1,h2,h3{margin:0 0 8px 0;}
+button{font-family:'Heebo',sans-serif;cursor:pointer;border:none;outline:none;}
+code, pre, .mono{font-family:'JetBrains Mono',monospace;}
+
+.topnav{position:fixed;top:0;right:0;left:0;z-index:100;background:var(--card);box-shadow:var(--shadow-soft);padding:10px 16px 0 16px;transition:background .4s ease;}
+.topnav-row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1200px;margin:0 auto;}
+.logo{font-weight:900;font-size:1.15rem;white-space:nowrap;background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;flex-shrink:0;}
+.hub-link{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 14px;font-size:.8rem;font-weight:700;text-decoration:none;white-space:nowrap;}
+.nav-scroll{display:flex;gap:8px;overflow-x:auto;flex:1;padding:4px 2px;scrollbar-width:thin;align-items:center;}
+.nav-scroll::-webkit-scrollbar{height:6px;}
+.nav-scroll::-webkit-scrollbar-thumb{background:var(--purple);border-radius:10px;}
+.navbtn{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 13px;font-size:0.8rem;font-weight:500;white-space:nowrap;transition:all .25s ease;border:2px solid transparent;position:relative;}
+.navbtn:hover{transform:translateY(-2px) scale(1.04);}
+.navbtn.active{background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;box-shadow:var(--shadow-soft);}
+.navbtn.passed::after{content:'✓';position:absolute;top:-4px;left:-4px;background:var(--green);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
+.theme-toggle{flex-shrink:0;background:var(--bg2);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;transition:transform .3s ease;}
+.theme-toggle:hover{transform:rotate(20deg) scale(1.1);}
+.progress-wrap{max-width:1200px;margin:8px auto 0 auto;height:10px;background:var(--bg2);border-radius:999px;overflow:hidden;}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));border-radius:999px;transition:width .5s ease;}
+.progress-label{max-width:1200px;margin:4px auto 0 auto;font-size:.72rem;color:var(--text-soft);text-align:left;padding:0 4px;}
+
+.page{display:none;animation:fadeIn .5s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.page-inner{max-width:860px;margin:0 auto;padding:18px 16px 60px 16px;}
+.hero-title{font-size:clamp(1.5rem,4vw,2.3rem);font-weight:900;text-align:center;margin-bottom:6px;}
+.hero-sub{text-align:center;color:var(--text-soft);font-size:1.02rem;margin-bottom:22px;}
+.world-tag{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 12px;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--green));color:#fff;margin-bottom:10px;}
+.level-tag{display:inline-block;font-size:.7rem;font-weight:800;padding:3px 12px;border-radius:999px;background:var(--bg2);color:var(--text-soft);margin-bottom:10px;margin-right:6px;}
+
+.card{background:var(--card);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);margin-bottom:20px;}
+.explain{font-size:1.05rem;line-height:1.95;color:var(--text);}
+.explain p{margin:0 0 14px 0;}
+.explain p:last-child{margin-bottom:0;}
+.explain b, .highlight{background:linear-gradient(90deg,rgba(123,104,238,.18),rgba(46,204,113,.18));padding:2px 8px;border-radius:8px;font-weight:700;color:var(--purple);}
+body.dark .explain b, body.dark .highlight{color:#c9c2ff;}
+.callout{background:rgba(241,196,15,.12);border-right:4px solid #f1c40f;padding:12px 16px;border-radius:10px;margin-top:14px;font-size:.95rem;}
+.callout.info{background:rgba(74,144,226,.1);border-color:var(--blue);}
+
+.section-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.05rem;margin:0 0 14px 0;}
+.section-title .num{background:var(--purple);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;}
+
+.demo-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.demo-label{font-weight:700;margin-bottom:12px;font-size:1rem;color:var(--text-soft);}
+
+.lab-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.code-block{position:relative;background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px 18px;overflow-x:auto;font-size:.82rem;line-height:1.7;direction:ltr;text-align:left;margin-top:10px;}
+.code-block pre{margin:0;white-space:pre;}
+.code-label{position:absolute;top:8px;left:14px;font-size:.65rem;color:#8891b8;letter-spacing:.05em;text-transform:uppercase;}
+.lab-note{font-size:.92rem;color:var(--text-soft);margin-top:10px;line-height:1.7;}
+
+textarea, input[type=text], select{width:100%;font-family:'Heebo',sans-serif;font-size:1rem;padding:14px 16px;border-radius:var(--radius-sm);border:2px solid var(--bg2);background:var(--bg);color:var(--text);resize:none;transition:border .2s ease;}
+textarea:focus, input[type=text]:focus, select:focus{border-color:var(--purple);}
+
+.btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;font-weight:700;font-size:0.92rem;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-soft);transition:transform .2s ease, box-shadow .2s ease;}
+.btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 26px rgba(74,144,226,.3);}
+.btn:active{transform:translateY(0) scale(.98);}
+.btn.secondary{background:var(--bg2);color:var(--text);}
+.btn.green{background:linear-gradient(90deg,var(--green),#27ae60);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn.small{padding:8px 14px;font-size:.8rem;}
+.row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:10px;}
+
+.quiz-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.quiz-q{font-weight:700;margin:18px 0 10px 0;}
+.quiz-q:first-of-type{margin-top:6px;}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{background:var(--bg);border-radius:12px;padding:11px 16px;text-align:right;font-size:.95rem;border:2px solid transparent;transition:all .2s ease;}
+.quiz-opt:hover{border-color:var(--purple);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(46,204,113,.15);font-weight:700;}
+.quiz-opt.wrong{border-color:#e74c3c;background:rgba(231,76,60,.12);}
+.quiz-opt.disabled{pointer-events:none;}
+.quiz-summary{margin-top:18px;padding:14px 18px;border-radius:14px;background:var(--bg);font-weight:700;text-align:center;}
+.quiz-summary.pass{background:rgba(46,204,113,.15);color:var(--green);}
+.quiz-summary.fail{background:rgba(231,76,60,.12);color:#e74c3c;}
+
+.finish-emoji{font-size:4rem;text-align:center;margin-bottom:10px;}
+.section-header{display:flex;align-items:center;gap:10px;margin:30px 0 14px 0;}
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:10px;}
+.lesson-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:transform .25s ease, box-shadow .25s ease;text-align:center;border:3px solid transparent;position:relative;}
+.lesson-card:hover{transform:translateY(-6px) rotate(-1deg);box-shadow:0 16px 32px rgba(74,144,226,.25);}
+.lesson-card .em{font-size:2.2rem;display:block;margin-bottom:8px;}
+.lesson-card .tt{font-weight:800;font-size:1rem;margin-bottom:4px;}
+.lesson-card .dd{font-size:.85rem;color:var(--text-soft);}
+.lesson-card.done{border-color:var(--green);}
+
+.compare-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.85rem;}
+.compare-table th, .compare-table td{border:1px solid var(--bg2);padding:10px 12px;text-align:right;}
+.compare-table th{background:var(--bg);font-weight:800;}
+
+.screenshot-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:20px;}
+.screenshot-badge{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;font-weight:800;padding:4px 12px;border-radius:999px;background:linear-gradient(90deg,#f39c12,#e67e22);color:#fff;margin-bottom:12px;}
+.real-screenshot{width:100%;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.25);display:block;}
+.screenshot-caption{font-size:.85rem;color:var(--text-soft);margin-top:10px;line-height:1.6;}
+
+.platform-picker{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+.platform-btn{background:var(--bg);border-radius:var(--radius-sm);padding:14px 18px;text-align:center;font-weight:700;font-size:.9rem;border:3px solid transparent;transition:all .2s ease;flex:1;min-width:120px;}
+.platform-btn.selected{border-color:var(--purple);background:rgba(123,104,238,.15);}
+.platform-result{margin-top:16px;background:var(--bg);border-radius:var(--radius-sm);padding:18px;font-size:.92rem;line-height:1.8;min-height:60px;}
+
+.capstone-step{background:var(--bg);border-radius:var(--radius-sm);padding:18px;margin-bottom:14px;}
+.capstone-step h4{margin:0 0 8px 0;font-size:.95rem;display:flex;align-items:center;gap:8px;}
+.capstone-preview{background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px;font-size:.8rem;white-space:pre-wrap;direction:ltr;text-align:left;margin-top:14px;display:none;}
+
+@media (max-width:600px){
+  body{padding-top:112px;}
+  .logo{font-size:.92rem;}
+  .navbtn{font-size:.72rem;padding:6px 9px;}
+  .card,.demo-card,.lab-card,.quiz-card{padding:18px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="topnav-row">
+    <a class="hub-link" href="index.html">🏠 האקדמיה</a>
+    <div class="logo">🔗 מודול 5: אוטומציות וחיבורים</div>
+    <div class="nav-scroll" id="navScroll"></div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 7 הושלמו</div>
+</div>
+
+<section class="page active" id="page-home">
+  <div class="page-inner">
+    <div class="hero-title">🔗 מודול 5: אוטומציות וחיבורים</div>
+    <div class="hero-sub">Make.com, Zapier, n8n, Webhooks ו-API ישיר, ו-Claude Agent SDK בתור מנוע אוטומציה - איך מחברים הכל, בונים אוטומציות אמיתיות, ומוציאים את המקסימום מקלוד קוד.</div>
+    <div style="text-align:center;margin-bottom:22px;"><a href="slides/module5-automation.pptx" download class="btn secondary" style="text-decoration:none;">📥 הורידו את מצגת המודול (PPTX)</a></div>
+    <div class="lesson-grid" id="lessonGrid"></div>
+  </div>
+</section>
+
+<!-- AUTOMATION LANDSCAPE -->
+<section class="page" id="page-automation-landscape">
+  <div class="page-inner">
+    <div class="world-tag">🔗 מודול 5</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🗺️ נוף האוטומציה - מ-No-Code ועד קוד מלא</div>
+    <div class="card">
+      <div class="explain">
+        <p>"אוטומציה" סביב AI פירושה חיבור טריגר (משהו שקורה - טופס נשלח, מייל מגיע, שעה עגולה) לפעולה (Claude מייצר תוכן, מסווג, מחליט) ולעוד פעולה (שליחת מייל, עדכון גיליון, יצירת רשומה). השאלה המרכזית היא <span class="highlight">איפה לבנות את החיבור הזה</span> - וזו בדיוק אותה שאלה שראינו בשיעור Frameworks (מודול 3), רק ברמת האפליקציה כולה ולא רק קוד.</p>
+        <p>הספקטרום נע בין שני קצוות: בקצה אחד - <b>פלטפורמות No-Code/Low-Code</b> (Make.com, Zapier, n8n) שנותנות ממשק ויזואלי לחיבור שירותים בלי לכתוב קוד. בקצה השני - <b>קוד מותאם אישית</b> (Webhooks + API ישיר, או Claude Agent SDK) שנותן שליטה מלאה אך דורש פיתוח ותחזוקה.</p>
+        <p>אין תשובה "נכונה" אחת - זו בדיוק אותה היוריסטיקה שלמדנו על frameworks: פרוטוטייפ מהיר וחיבור בין הרבה שירותים מוכנים → פלטפורמה. לוגיקה מורכבת, ביצועים קריטיים, או שליטה מלאה על כל פרט → קוד. הרבה מערכות אמיתיות משלבות את שניהם.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מפת הספקטרום</div>
+      <table class="compare-table">
+        <tr><th>גישה</th><th>מהירות בנייה</th><th>שליטה</th><th>מתאים ל-</th></tr>
+        <tr><td>Zapier / Make.com</td><td>מהירה מאוד</td><td>נמוכה-בינונית</td><td>אוטומציות עסקיות סטנדרטיות</td></tr>
+        <tr><td>n8n</td><td>בינונית</td><td>בינונית-גבוהה</td><td>אוטומציות מורכבות, self-hosted</td></tr>
+        <tr><td>Webhooks + API ישיר</td><td>איטית יותר</td><td>גבוהה</td><td>לוגיקה מותאמת אישית</td></tr>
+        <tr><td>Claude Agent SDK</td><td>איטית - דורש פיתוח</td><td>מלאה</td><td>סוכן/מוצר AI מלא</td></tr>
+      </table>
+      <div class="lab-note">💡 שימו לב לדפוס: ככל שעולה השליטה, יורדת מהירות הבנייה הראשונית - אותו טרייד-אוף בדיוק כמו ב-frameworks מול API גולמי.</div>
+    </div>
+    <div class="quiz-card" id="quiz-automation-landscape"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goHome()">🏠 חזרה למפת המודול</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- MAKE -->
+<section class="page" id="page-make">
+  <div class="page-inner">
+    <div class="world-tag">🔗 מודול 5</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🧩 Make.com - אוטומציה ויזואלית</div>
+    <div class="card">
+      <div class="explain">
+        <p>Make.com (לשעבר Integromat) בנוי סביב <b>Scenario</b> - תרשים ויזואלי של "מודולים" (modules) מחוברים בחיצים, שמייצג את זרימת המידע. כל scenario מתחיל ב<b>טריגר</b> (Trigger) - אירוע שמפעיל את התהליך: Webhook נכנס, שורה חדשה בגיליון, מייל חדש - וממשיך דרך מודולי עיבוד ופעולה.</p>
+        <p>לחיבור Claude ל-Make, יש שתי דרכים מרכזיות: מודול <b>HTTP</b> גנרי שקורא ישירות ל-Anthropic API (גמיש אך דורש הגדרת headers/body ידנית - בדיוק כמו ששיעור ה-API במודול 1 לימד), או אפליקציית Anthropic/Claude ייעודית ב-Make (אם קיימת בזמן השימוש - ממשק פשוט יותר עם שדות מוכנים).</p>
+        <p><b>Data Mapping</b> הוא הלב של Make: הפלט של מודול אחד (למשל שדה "email" מטופס שהתקבל) "נגרר" ומוזרק כקלט למודול הבא (למשל לפרומפט של Claude, או לשדה נמען במייל). זו בדיוק אותה זרימת נתונים שראינו ב-fetch/API - רק בממשק ויזואלי במקום קוד.</p>
+        <div class="callout info">📌 Make מתמחר לפי "operations" (כל הפעלת מודול נספרת) - חשוב לתכנן scenario יעיל, בלי לולאות מיותרות שמכפילות עלות.</div>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: תרשים Scenario טיפוסי</div>
+      <div class="code-block"><span class="code-label">Make.com scenario (טקסטואלי)</span><pre>[Webhook: טופס ליד חדש]
+        ↓
+[HTTP Module → Anthropic API]
+  Body: {
+    "model": "claude-sonnet-5",
+    "messages": [{"role":"user",
+      "content": "כתוב מייל תגובה אישי ל-{{1.name}}
+                   שהתעניין ב-{{1.interest}}"}]
+  }
+        ↓
+[Gmail Module: שלח את {{2.content}} ל-{{1.email}}]
+        ↓
+[Google Sheets: הוסף שורה - ליד טופל]</pre></div>
+      <div class="lab-note">💡 שימו לב לתחביר {{1.name}} - כך Make מפנה לפלט של מודול קודם. זו בדיוק אותה "העברת נתונים בין שלבים" שראינו בלולאה האג'נטית, רק בלי לכתוב קוד.</div>
+    </div>
+    <div class="quiz-card" id="quiz-make"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- ZAPIER / N8N -->
+<section class="page" id="page-zapier-n8n">
+  <div class="page-inner">
+    <div class="world-tag">🔗 מודול 5</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">⚡ Zapier ו-n8n - שני קצוות של No-Code</div>
+    <div class="card">
+      <div class="explain">
+        <p><b>Zapier</b> הוא ה-SaaS הוותיק והנפוץ ביותר בתחום: "Zap" הוא אוטומציה מ-Trigger אחד למספר "Actions", עם אלפי אינטגרציות מוכנות. פשוט ביותר להתחלה, אך פחות גמיש בלוגיקה מורכבת (תנאים, לולאות) בהשוואה ל-Make או n8n, ותמחור עולה מהר עם נפח.</p>
+        <p><b>n8n</b> הוא כלי <span class="highlight">קוד פתוח</span> (ניתן להרצה עצמאית - self-hosted - או בענן שלהם), עם עורך ויזואלי דומה ל-Make אך עם גישה עמוקה יותר לקוד: כל node יכול להכיל קטע JavaScript/Python מותאם אישית. זה הופך אותו לגשר טבעי בין "No-Code טהור" לבין "קוד מלא".</p>
+        <p>לחיבור Claude, ל-n8n יש node ל-HTTP Request גנרי (בדיוק כמו Make), ולעיתים node קהילתי ייעודי. מכיוון ש-n8n מארח בעצמכם (self-hosted), יש לכם שליטה מלאה על הסודות (API keys) ועל זמינות - אין תלות בזמינות ספק חיצוני.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: השוואה מעשית</div>
+      <table class="compare-table">
+        <tr><th>קריטריון</th><th>Zapier</th><th>n8n</th></tr>
+        <tr><td>מודל תמחור</td><td>SaaS, לפי Tasks</td><td>חינם (self-host) או SaaS</td></tr>
+        <tr><td>קוד מותאם</td><td>מוגבל</td><td>JS/Python מלא בכל node</td></tr>
+        <tr><td>איפה רץ</td><td>בענן של Zapier בלבד</td><td>אצלכם או בענן שלהם</td></tr>
+        <tr><td>עקומת למידה</td><td>הכי פשוטה</td><td>בינונית</td></tr>
+      </table>
+      <div class="lab-note">💡 כלל אצבע: מתחילים מהר עם Zapier, עוברים ל-n8n או Make כשצריך לוגיקה מורכבת יותר או שליטה על העלות בקנה מידה.</div>
+    </div>
+    <div class="quiz-card" id="quiz-zapier-n8n"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- WEBHOOKS / API -->
+<section class="page" id="page-webhooks-api">
+  <div class="page-inner">
+    <div class="world-tag">🔗 מודול 5</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🪝 Webhooks וחיבור API ישיר</div>
+    <div class="card">
+      <div class="explain">
+        <p><b>Webhook</b> הוא בפשטות בקשת HTTP POST שנשלחת אוטומטית כשמשהו קורה - "אל תשאל אותי, אני אודיע לך". במקום שהשרת שלכם ישאל שוב ושוב "יש חדש?" (polling), השירות החיצוני שולח POST לכתובת שאתם חושפים ברגע שיש עדכון. זה בדיוק ה-Trigger שראינו ב-Make/Zapier/n8n - רק שעכשיו אתם בונים את הצד המקבל בעצמכם.</p>
+        <p>לבנות אוטומציה בקוד ישיר משמעו: פותחים endpoint שמקבל webhook (כמו ה-Django view שבנינו במודול 4), מפענחים את הגוף (body) שהתקבל, קוראים ל-Claude API לעבד את המידע, ואז מבצעים את הפעולה הבאה (שליחת מייל, כתיבה למסד נתונים) - כל זה בקוד שאתם כותבים ומתחזקים.</p>
+        <p>מתי זה עדיף על פלטפורמה? כשהלוגיקה מורכבת מדי לייצוג ויזואלי, כשביצועים/latency קריטיים, כשצריך שליטה מלאה על טיפול בשגיאות ו-retries, או כשהעלות בקנה מידה גדול של פלטפורמה הופכת יקרה מדי.</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי</div>
+      <img class="real-screenshot" src="screenshots/webhook.png" alt="הרצה אמיתית של שרת webhook מקבל בקשה אמיתית" loading="lazy">
+      <div class="screenshot-caption">💡 הרצנו שרת webhook אמיתי ב-Python ושלחנו אליו בקשת POST אמיתית עם נתוני ליד - זה בדיוק הפלט שהתקבל, כולל ה-headers, הגוף, והתשובה שחזרה.</div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: מקבל webhook מינימלי</div>
+      <div class="code-block"><span class="code-label">webhook_server.py</span><pre>import http.server, json
+
+class Handler(http.server.BaseHTTPRequestHandler):
+    def do_POST(self):
+        length = int(self.headers.get('Content-Length', 0))
+        data = json.loads(self.rfile.read(length))
+        # כאן קוראים ל-Claude API לעבד את data
+        # ואז מבצעים את הפעולה הבאה (מייל, DB וכו')
+        response = {"status": "received"}
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(response).encode())</pre></div>
+      <div class="lab-note">💡 בפרודקשן: מוסיפים אימות (חתימת HMAC שהשולח מספק), טיפול בשגיאות, ותור עבודה (queue) כדי לא לתקוע את התשובה ל-webhook בזמן שקוראים ל-Claude.</div>
+    </div>
+    <div class="quiz-card" id="quiz-webhooks-api"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- AGENT SDK AUTOMATION -->
+<section class="page" id="page-agent-sdk-automation">
+  <div class="page-inner">
+    <div class="world-tag">🔗 מודול 5</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🤖 Claude Agent SDK כמנוע האוטומציה עצמו</div>
+    <div class="card">
+      <div class="explain">
+        <p>עד כה ראינו את Claude כ"תחנה" בתוך אוטומציה - מודול אחד בזרימה של Make, או קריאת API אחת מתוך webhook. אבל יש גישה שונה לגמרי: לתת ל-<b>Claude Agent SDK עצמו להיות מנוע האוטומציה</b> - כלומר, סוכן שמריץ את הלולאה האג'נטית המלאה (מודול 1) ומחליט בעצמו אילו כלים להפעיל, לא רק "ממלא שדה" בתוך תרשים קבוע מראש.</p>
+        <p>ההבדל המהותי: בפלטפורמת No-Code, <b>אתם</b> מגדירים מראש את כל הצעדים והתנאים. עם Agent SDK, <b>Claude עצמו</b> מחליט את רצף הצעדים בזמן ריצה, בהתבסס על המצב הנוכחי - גמיש הרבה יותר למקרים שלא חזיתם מראש, אך גם פחות צפוי.</p>
+        <p>מתי זה הבחירה הנכונה: כשהמשימה דורשת שיקול דעת אמיתי (לא רק "אם X אז Y"), כשיש הרבה כלים אפשריים והבחירה ביניהם תלוית-הקשר, או כשאתם בעצם בונים <b>מוצר</b> מבוסס-AI ולא רק אוטומציה פנימית חד-פעמית. שילוב עם תזמון (מודול 2, שיעור סוכנים אוטונומיים) הופך את זה לסוכן שרץ ברקע לגמרי לבד.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: אוטומציה כסוכן, לא כתרשים</div>
+      <div class="code-block"><span class="code-label">agent_automation.py (pseudo)</span><pre>from claude_agent_sdk import Agent
+
+agent = Agent(
+    model="claude-sonnet-5",
+    tools=[gmail_tool, crm_tool, calendar_tool],
+    system_prompt="""אתה עוזר מכירות. כשמגיע ליד חדש:
+    1. בדוק אם יש כבר רשומה ב-CRM
+    2. אם לא - צור רשומה חדשה
+    3. שלח מייל תגובה מותאם אישית
+    4. אם הליד מסומן כ'דחוף' - קבע פגישה בקלנדר"""
+)
+
+# הסוכן מחליט בעצמו את הסדר ואילו כלים להפעיל
+agent.run(f"ליד חדש התקבל: {lead_data}")</pre></div>
+      <div class="lab-note">💡 שימו לב: אין כאן "תרשים זרימה" מוגדר מראש - יש הוראות והכלים, וה-agentic loop (מודול 1) מחליט בזמן אמת. זה בדיוק ה-workflow שראינו בשיעור ה-Frameworks (מודול 3) ברמת יישום.</div>
+    </div>
+    <div class="quiz-card" id="quiz-agent-sdk-automation"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- CLAUDE CODE WORKFLOWS -->
+<section class="page" id="page-claude-code-workflows">
+  <div class="page-inner">
+    <div class="world-tag">🔗 מודול 5</div><span class="level-tag">⏱️ כ-30 דק'</span>
+    <div class="hero-title">🎯 איך מוציאים את המקסימום מקלוד קוד</div>
+    <div class="card">
+      <div class="explain">
+        <p>זה השיעור המעשי ביותר במודול: פרקטיקות עבודה אמיתיות שהופכות שימוש בקלוד קוד מ"נחמד" ל<span class="highlight">מקצועי ויעיל</span>. הבסיס: קובץ <b>CLAUDE.md</b> בשורש הפרויקט - זיכרון פרויקט קבוע שקלוד קורא בתחילת כל שיחה: מבנה הפרויקט, מוסכמות קוד, פקודות build/test, ודברים "שלא לעשות". זה חוסך להסביר את אותו הקשר בכל שיחה מחדש.</p>
+        <p><b>Plan Mode</b>: לפני שינויים גדולים, כדאי לבקש מקלוד לתכנן לפני שהוא נוגע בקוד - מפחית טעויות יקרות ונותן לכם הזדמנות לתקן כיוון לפני שהושקעה עבודה. <b>פקודות סלאש מותאמות אישית</b> (מודול 2) הופכות זרימות עבודה חוזרות (כמו "הרץ את כל הבדיקות ותקן כשלים") לקיצור דרך של מילה אחת.</p>
+        <p><b>האצלה ל-Subagents</b> (מודול 2) למשימות מבודדות שומרת את ההקשר הראשי נקי - במיוחד למחקר, code review, או בדיקות. <b>שימוש Headless/CI</b>: קלוד קוד יכול לרוץ ללא ממשק אינטראקטיבי בתוך pipeline של CI/CD - למשל, לבדוק כל Pull Request אוטומטית ולהוסיף הערות review.</p>
+        <div class="callout">📌 עיקרון-על: ככל שההוראות (CLAUDE.md, system prompts, hooks) ברורות ומוגדרות יותר מראש, כך התוצאות עקביות ואמינות יותר - בדיוק כמו description טוב ל-Skill (מודול 2).</div>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> מעבדה: CLAUDE.md אמיתי</div>
+      <div class="code-block"><span class="code-label">CLAUDE.md</span><pre># פרויקט: CRM Backend
+
+## מבנה
+- contacts/ - Django app לניהול אנשי קשר ועסקאות
+- api/ - endpoints של DRF
+- frontend/ - React SPA נפרד
+
+## פקודות
+- טסטים: `pytest`
+- שרת פיתוח: `python manage.py runserver`
+- מיגרציות: `python manage.py migrate`
+
+## מוסכמות
+- כל endpoint חדש דורש טסט תואם
+- לא לגעת ב-migrations קיימות שכבר deployed
+- commit messages בפורמט: type(scope): description</pre></div>
+      <div class="lab-note">💡 קובץ כזה הופך כל שיחה חדשה עם קלוד קוד לפרודוקטיבית מהרגע הראשון - בלי "לאמן" אותו מחדש כל פעם על אותו הקשר.</div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-label">🛠️ בחרו תרחיש עבודה ותראו את הפרקטיקה המומלצת:</div>
+      <div class="platform-picker" id="workflowPicker"></div>
+      <div class="platform-result" id="workflowResult">בחרו תרחיש למעלה 👆</div>
+    </div>
+    <div class="quiz-card" id="quiz-claude-code-workflows"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn green" onclick="goRelative(1)">לפרויקט המסכם ⬅ 🏁</button>
+    </div>
+  </div>
+</section>
+
+<!-- CAPSTONE -->
+<section class="page" id="page-automation-capstone">
+  <div class="page-inner">
+    <div class="world-tag">🏁 פרויקט מסכם</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🏗️ תכננו אוטומציה מקצה לקצה</div>
+    <div class="card">
+      <div class="explain">
+        <p>תרחיש: <b>"כשליד חדש ממלא טופס באתר, המערכת מנתחת את הצרכים שלו, שולחת מייל תגובה מותאם אישית, ומעדכנת את ה-CRM"</b>. תכננו את הפתרון המלא - מהטריגר ועד הפעולה האחרונה - ותקבלו סיכום תיעוד אמיתי.</p>
+      </div>
+    </div>
+    <div class="capstone-step">
+      <h4>1️⃣ מה הטריגר?</h4>
+      <select id="cap-trigger-select">
+        <option value="webhook">Webhook ישיר מטופס האתר</option>
+        <option value="form-platform">אינטגרציית טופס דרך Zapier/Make</option>
+        <option value="polling">בדיקה מתוזמנת (polling) כל כמה דקות</option>
+      </select>
+    </div>
+    <div class="capstone-step">
+      <h4>2️⃣ איזו גישת מימוש?</h4>
+      <select id="cap-approach-select">
+        <option value="make">Make.com scenario עם מודול HTTP ל-Claude</option>
+        <option value="n8n">n8n self-hosted עם node מותאם</option>
+        <option value="custom">Webhook + קוד מותאם אישית (Django/Python)</option>
+        <option value="agent-sdk">Claude Agent SDK כסוכן עצמאי</option>
+      </select>
+    </div>
+    <div class="capstone-step">
+      <h4>3️⃣ מה התפקיד המדויק של Claude בתהליך?</h4>
+      <div class="row" id="cap-role-picker"></div>
+    </div>
+    <div class="capstone-step">
+      <h4>4️⃣ טיפול בשגיאות</h4>
+      <select id="cap-error-select">
+        <option value="retry">Retry אוטומטי עם exponential backoff</option>
+        <option value="fallback">נפילה לתבנית קבועה אם Claude נכשל</option>
+        <option value="alert">התראה לצוות ועצירת התהליך</option>
+      </select>
+    </div>
+    <div class="capstone-step">
+      <h4>5️⃣ איפה נשמר תיעוד הפעולה?</h4>
+      <select id="cap-logging-select">
+        <option value="sheet">Google Sheets / CRM</option>
+        <option value="db">מסד נתונים ייעודי (כמו ה-CRM ממודול 4)</option>
+        <option value="none">אין תיעוד - רק פעולה חד-פעמית</option>
+      </select>
+    </div>
+    <div style="text-align:center;margin-top:10px;">
+      <button class="btn green" onclick="generateAutomationCapstone()">✨ צור תיעוד אוטומציה</button>
+    </div>
+    <div class="capstone-preview" id="automationPreview"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn green" onclick="goRelative(1)">סיימתי את כל האקדמיה! 🎓</button>
+    </div>
+  </div>
+</section>
+
+<!-- FINISH -->
+<section class="page" id="page-finish">
+  <div class="page-inner">
+    <div class="finish-emoji">🎓🏆🔗</div>
+    <div class="hero-title">כל הכבוד - סיימתם את מודול 5 ואת כל האקדמיה!</div>
+    <div class="hero-sub">מהבנת מודלי שפה, דרך בניית סוכנים והנדסת מערכות, תכנות Fullstack מלא, ועד חיבור הכל לעולם האמיתי דרך אוטומציות - עברתם דרך שלמה ומקצועית. 🚀</div>
+    <div class="nav-buttons" style="justify-content:center;">
+      <a class="btn" href="index.html" style="text-decoration:none;">🏠 חזרה לאקדמיה</a>
+    </div>
+  </div>
+</section>
+
+<script>
+const THIS_FILE = 'module5-automation.html';
+const PROGRESS_KEY = 'academy_progress_v1';
+function loadProgressSet(){
+  try{ return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]')); }
+  catch(e){ return new Set(); }
+}
+function markDone(unitKey){
+  const s = loadProgressSet();
+  s.add(THIS_FILE+'::'+unitKey);
+  try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(Array.from(s))); }catch(e){}
+}
+function isUnitDone(unitKey){ return loadProgressSet().has(THIS_FILE+'::'+unitKey); }
+function safeGetTheme(){ try{ return localStorage.getItem('ai-theme'); }catch(e){ return null; } }
+function safeSetTheme(v){ try{ localStorage.setItem('ai-theme', v); }catch(e){} }
+
+const topics = [
+  {key:'automation-landscape', emoji:'🗺️', title:'נוף האוטומציה', desc:'מ-No-Code ועד קוד מלא'},
+  {key:'make', emoji:'🧩', title:'Make.com', desc:'אוטומציה ויזואלית'},
+  {key:'zapier-n8n', emoji:'⚡', title:'Zapier ו-n8n', desc:'שני קצוות של No-Code'},
+  {key:'webhooks-api', emoji:'🪝', title:'Webhooks ו-API', desc:'חיבור ישיר בקוד'},
+  {key:'agent-sdk-automation', emoji:'🤖', title:'Agent SDK', desc:'הסוכן עצמו כמנוע'},
+  {key:'claude-code-workflows', emoji:'🎯', title:'ניצול מקסימלי', desc:'איך עובדים נכון עם קלוד קוד'},
+  {key:'automation-capstone', emoji:'🏗️', title:'פרויקט מסכם', desc:'תכננו אוטומציה מקצה לקצה', isCapstone:true}
+];
+let currentPage = 'home';
+
+const quizData = {
+  'automation-landscape': [
+    {q:'מה ההבדל המרכזי בין פלטפורמת No-Code לקוד מותאם אישית?', opts:['אין הבדל בפועל','טרייד-אוף בין מהירות בנייה לשליטה מלאה','No-Code תמיד יקר יותר','קוד מותאם תמיד מהיר יותר לבנות'], correct:1},
+    {q:'איזו גישה נותנת הכי הרבה שליטה אך הכי איטית לבנייה?', opts:['Zapier','Make.com','Claude Agent SDK','n8n'], correct:2},
+    {q:'למה ההיוריסטיקה כאן דומה לשיעור Frameworks (מודול 3)?', opts:['אין קשר בכלל','זו אותה שאלה - פרוטוטייפ מהיר מול שליטה מלאה, ברמת האפליקציה כולה','frameworks תמיד יותר טובים מפלטפורמות','זה בדיוק אותו כלי'], correct:1}
+  ],
+  make: [
+    {q:'מה זה Scenario ב-Make.com?', opts:['שם של מודל AI','תרשים ויזואלי של מודולים מחוברים שמייצג זרימת מידע','מסד נתונים','שפת תכנות'], correct:1},
+    {q:'איך מעבירים נתונים בין מודולים ב-Make?', opts:['אי אפשר להעביר נתונים','Data Mapping - תחביר כמו {{1.name}} שמפנה לפלט מודול קודם','רק דרך קבצי CSV','רק באמצעות webhook נפרד'], correct:1},
+    {q:'איך Make מתמחר?', opts:['חינם לגמרי תמיד','לפי operations - כל הפעלת מודול נספרת','לפי מספר המשתמשים בלבד','לפי כמות הקוד שנכתב'], correct:1}
+  ],
+  'zapier-n8n': [
+    {q:'מה ההבדל המרכזי בין Zapier ל-n8n?', opts:['אין הבדל','n8n קוד פתוח וניתן ל-self-host עם קוד מותאם בכל node; Zapier הוא SaaS סגור יותר','Zapier יקר יותר תמיד','n8n לא תומך ב-webhooks'], correct:1},
+    {q:'מתי n8n עדיף על Zapier?', opts:['תמיד עדיף','כשצריך לוגיקה מורכבת, קוד מותאם, או שליטה על סודות/עלות בקנה מידה','אף פעם לא עדיף','רק לפרויקטים קטנים'], correct:1},
+    {q:'מה יתרון self-hosting ב-n8n?', opts:['אין יתרון','שליטה מלאה על סודות (API keys) וזמינות, בלי תלות בספק חיצוני','זה תמיד יותר זול','זה חובה על פי חוק'], correct:1}
+  ],
+  'webhooks-api': [
+    {q:'מה זה Webhook טכנית?', opts:['בקשת GET רגילה','בקשת HTTP POST שנשלחת אוטומטית כשמשהו קורה, במקום polling','קובץ קונפיגורציה','פרוטוקול הצפנה'], correct:1},
+    {q:'למה Webhook עדיף על polling?', opts:['אין הבדל בפועל','השרת לא צריך לשאול שוב ושוב "יש חדש?" - השירות מודיע ביוזמתו','polling תמיד מהיר יותר','webhook לא עובד עם JSON'], correct:1},
+    {q:'מה חשוב להוסיף ל-webhook receiver בפרודקשן?', opts:['שום דבר נוסף','אימות (חתימת HMAC), טיפול בשגיאות, ותור עבודה','רק תמיכה ב-XML','חובה מסד נתונים בזיכרון בלבד'], correct:1}
+  ],
+  'agent-sdk-automation': [
+    {q:'מה ההבדל בין Claude כ"תחנה" בתרשים לבין Agent SDK כמנוע?', opts:['אין הבדל','בתרשים אתם מגדירים מראש את כל הצעדים; ב-Agent SDK קלוד מחליט בעצמו בזמן ריצה','Agent SDK תמיד איטי יותר','תרשים תמיד יותר גמיש'], correct:1},
+    {q:'מתי Agent SDK הוא הבחירה הנכונה?', opts:['תמיד, בכל מקרה','כשהמשימה דורשת שיקול דעת אמיתי, לא רק כלל "אם X אז Y"','רק למשימות פשוטות מאוד','אף פעם לא מומלץ'], correct:1},
+    {q:'מה קורה כששילוב Agent SDK עם תזמון (מודול 2)?', opts:['שום דבר מיוחד','הופך את זה לסוכן שרץ ברקע לגמרי לבד, בלי הודעת משתמש כטריגר','זה אסור טכנית','זה מבטל את הלולאה האג\'נטית'], correct:1}
+  ],
+  'claude-code-workflows': [
+    {q:'מה תפקיד CLAUDE.md?', opts:['קובץ לוג בלבד','זיכרון פרויקט קבוע שקלוד קורא בתחילת שיחה - מבנה, מוסכמות, פקודות','קובץ שרק Claude Code יכול לקרוא בענן','תחליף לגיט'], correct:1},
+    {q:'למה כדאי לבקש Plan Mode לפני שינויים גדולים?', opts:['זה תמיד מיותר','מפחית טעויות יקרות ונותן הזדמנות לתקן כיוון לפני השקעת עבודה','זה מאט את קלוד באופן קבוע','זה חובה טכנית בכל בקשה'], correct:1},
+    {q:'למה שימוש headless/CI בקלוד קוד שימושי?', opts:['הוא לא ניתן לשימוש כך בכלל','מאפשר להריץ אותו בתוך pipeline אוטומטי - למשל לבדוק PR ולהוסיף review בלי ממשק אינטראקטיבי','הוא רק לצורך debugging','זה זהה לחלוטין לשימוש רגיל'], correct:1}
+  ]
+};
+
+function renderQuiz(key){
+  const container = document.getElementById('quiz-'+key);
+  if(!container || container.dataset.built) return;
+  container.dataset.built = '1';
+  const questions = quizData[key];
+  if(!questions) return;
+  let html = '<div class="section-title"><span class="num">📝</span> מבחנון קצר (ענו נכון על הכל כדי לסמן שיעור זה כהושלם)</div>';
+  questions.forEach((item,qi)=>{
+    html += '<div class="quiz-q">'+(qi+1)+'. '+item.q+'</div><div class="quiz-opts" id="qopts-'+key+'-'+qi+'">';
+    item.opts.forEach((opt,oi)=>{
+      html += '<div class="quiz-opt" onclick="answerQuiz(\''+key+'\','+qi+','+oi+')" id="qopt-'+key+'-'+qi+'-'+oi+'">'+opt+'</div>';
+    });
+    html += '</div>';
+  });
+  html += '<div class="quiz-summary" id="qsummary-'+key+'" style="display:none;"></div>';
+  container.innerHTML = html;
+  container._answers = new Array(questions.length).fill(null);
+  if(isUnitDone(key)){
+    questions.forEach((item,qi)=>{
+      document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+      const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+      for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+    });
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display='block'; summary.className='quiz-summary pass';
+    summary.textContent = '🎉 כבר השלמתם שיעור זה בעבר!';
+  }
+}
+function answerQuiz(key, qi, oi){
+  const questions = quizData[key];
+  const item = questions[qi];
+  const container = document.getElementById('quiz-'+key);
+  const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+  for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+  if(oi===item.correct){ document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('correct'); }
+  else {
+    document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('wrong');
+    document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+  }
+  container._answers[qi] = (oi===item.correct);
+  checkQuizComplete(key);
+}
+function checkQuizComplete(key){
+  const container = document.getElementById('quiz-'+key);
+  const answers = container._answers;
+  if(answers.every(a=>a!==null)){
+    const allCorrect = answers.every(a=>a===true);
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display = 'block';
+    const scoreCount = answers.filter(a=>a).length;
+    if(allCorrect){
+      summary.className = 'quiz-summary pass';
+      summary.textContent = '🎉 מעולה! '+scoreCount+'/'+answers.length+' נכון - השיעור סומן כהושלם.';
+      markDone(key);
+    } else {
+      summary.className = 'quiz-summary fail';
+      summary.textContent = '📚 '+scoreCount+'/'+answers.length+' נכון. רעננו את הדף כדי לנסות שוב.';
+    }
+    updateProgress();
+    buildHome();
+  }
+}
+function buildNav(){
+  const nav = document.getElementById('navScroll');
+  nav.innerHTML = '';
+  topics.forEach(t=>{
+    const b = document.createElement('button');
+    b.className='navbtn'; b.id='nav-'+t.key; b.innerHTML=t.emoji+' '+t.title;
+    b.onclick = ()=>showPage(t.key);
+    nav.appendChild(b);
+  });
+}
+function buildHome(){
+  const grid = document.getElementById('lessonGrid');
+  grid.innerHTML = '';
+  topics.forEach(t=>{
+    const done = t.isCapstone ? isUnitDone('automation-capstone') : isUnitDone(t.key);
+    const c = document.createElement('div');
+    c.className = 'lesson-card' + (done ? ' done' : '');
+    c.innerHTML = '<span class="em">'+t.emoji+'</span><div class="tt">'+t.title+'</div><div class="dd">'+t.desc+'</div>'+(done?'<div style="margin-top:6px;">✅</div>':'');
+    c.onclick = ()=>showPage(t.key);
+    grid.appendChild(c);
+  });
+  document.querySelectorAll('.navbtn').forEach(b=>{
+    const key = b.id.replace('nav-','');
+    b.classList.toggle('passed', isUnitDone(key));
+  });
+}
+function showPage(key){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+key).classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+  const nb = document.getElementById('nav-'+key);
+  if(nb) nb.classList.add('active');
+  currentPage = key;
+  if(quizData[key]){ renderQuiz(key); }
+  buildHome();
+  updateProgress();
+  if(typeof window.scrollTo === 'function'){
+    try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+  }
+}
+function goHome(){ showPage('home'); }
+function goRelative(dir){
+  const idx = topics.findIndex(t=>t.key===currentPage);
+  if(idx===-1) return;
+  const newIdx = idx+dir;
+  if(newIdx<0){ goHome(); return; }
+  if(newIdx>=topics.length){ showPage('finish'); return; }
+  showPage(topics[newIdx].key);
+}
+function updateProgress(){
+  const done = topics.filter(t=>t.isCapstone?isUnitDone('automation-capstone'):isUnitDone(t.key)).length;
+  const pct = Math.round((done/topics.length)*100);
+  document.getElementById('progressBar').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = done+' / '+topics.length+' הושלמו';
+}
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+  safeSetTheme(isDark?'dark':'light');
+}
+
+/* ---------- CLAUDE CODE WORKFLOWS DEMO ---------- */
+const workflowScenarios = [
+  {label:'פרויקט חדש גדול', text:'✅ התחילו עם CLAUDE.md מפורט (מבנה, מוסכמות, פקודות) + בקשו מקלוד Plan Mode לפני שהוא נוגע בקוד. זה חוסך סבבי תיקון יקרים.'},
+  {label:'באג דחוף', text:'✅ תנו הקשר מדויק ומיידי: stack trace מלא, שם הקובץ, מה ציפיתם שיקרה. ככל שההקשר עשיר יותר, פחות "ניחושים" מיותרים.'},
+  {label:'עבודה חוזרת (בדיקות)', text:'✅ בנו slash command מותאם אישית כמו /run-tests-and-fix - הופך תהליך חוזר לקיצור דרך של מילה אחת (מודול 2).'},
+  {label:'משימת מחקר', text:'✅ האצילו ל-subagent ייעודי (מודול 2) כדי שכל החיפושים יישארו בהקשר מבודד ולא יציפו את השיחה הראשית.'}
+];
+function buildWorkflowPicker(){
+  const wrap = document.getElementById('workflowPicker');
+  wrap.innerHTML='';
+  workflowScenarios.forEach((s,i)=>{
+    const b = document.createElement('button');
+    b.className='platform-btn'; b.textContent = s.label;
+    b.onclick = ()=>{
+      document.querySelectorAll('#workflowPicker .platform-btn').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
+      document.getElementById('workflowResult').textContent = s.text;
+    };
+    wrap.appendChild(b);
+  });
+}
+
+/* ---------- CAPSTONE ---------- */
+const capRoleOptions = ['ניתוח כוונת הליד','כתיבת מייל תגובה','סיווג דחיפות','החלטה על פעולה הבאה'];
+function buildCapRolePicker(){
+  const wrap = document.getElementById('cap-role-picker');
+  if(!wrap) return;
+  wrap.innerHTML='';
+  capRoleOptions.forEach(opt=>{
+    const b = document.createElement('button');
+    b.type='button'; b.className='btn secondary small'; b.textContent = opt;
+    b.dataset.selected='0';
+    b.onclick = ()=>{
+      const sel = b.dataset.selected==='1';
+      b.dataset.selected = sel?'0':'1';
+      b.style.outline = sel?'none':'3px solid var(--green)';
+    };
+    wrap.appendChild(b);
+  });
+}
+function generateAutomationCapstone(){
+  const trigger = document.getElementById('cap-trigger-select').value;
+  const approach = document.getElementById('cap-approach-select').value;
+  const roleBtns = document.querySelectorAll('#cap-role-picker button');
+  const roles = Array.from(roleBtns).filter(b=>b.dataset.selected==='1').map(b=>b.textContent);
+  const errorHandling = document.getElementById('cap-error-select').value;
+  const logging = document.getElementById('cap-logging-select').value;
+
+  const triggerLabel = {webhook:'Webhook ישיר מטופס האתר', 'form-platform':'אינטגרציית טופס דרך Zapier/Make', polling:'בדיקה מתוזמנת (polling)'}[trigger];
+  const approachLabel = {make:'Make.com scenario + HTTP module', n8n:'n8n self-hosted', custom:'Webhook + קוד מותאם אישית', 'agent-sdk':'Claude Agent SDK כסוכן עצמאי'}[approach];
+  const errorLabel = {retry:'Retry עם exponential backoff', fallback:'נפילה לתבנית קבועה', alert:'התראה לצוות + עצירה'}[errorHandling];
+  const logLabel = {sheet:'Google Sheets / CRM', db:'מסד נתונים ייעודי', none:'ללא תיעוד'}[logging];
+
+  let preview = '# Automation Design Doc\n\n';
+  preview += 'Trigger: '+triggerLabel+'\n';
+  preview += 'Implementation: '+approachLabel+'\n\n';
+  preview += 'Claude role(s):\n';
+  (roles.length?roles:['ניתוח כוונת הליד']).forEach(r=>{ preview += '  - '+r+'\n'; });
+  preview += '\nError handling: '+errorLabel+'\n';
+  preview += 'Logging: '+logLabel+'\n';
+
+  const el = document.getElementById('automationPreview');
+  el.style.display='block'; el.textContent = preview;
+  markDone('automation-capstone');
+  updateProgress();
+  buildHome();
+}
+
+/* ---------- INIT ---------- */
+buildNav();
+buildHome();
+buildWorkflowPicker();
+buildCapRolePicker();
+if(safeGetTheme()==='dark'){
+  document.body.classList.add('dark');
+  document.getElementById('themeToggle').textContent='☀️';
+}
+updateProgress();
+</script>
+
+</body>
+</html>
