@@ -771,11 +771,19 @@ function goRelative(dir){
   if(newIdx>=topics.length){ showPage('finish'); return; }
   showPage(topics[newIdx].key);
 }
+function motivationalMsg(pct){
+  if(pct>=100) return ' 🎉 כל הכבוד, סיימתם את המודול - אלופים אמיתיים! 👑';
+  if(pct>=75) return ' 🔥 כמעט סיימתם - עוד קצת ואתם אלופים!';
+  if(pct>=50) return ' ⭐ באמצע הדרך - אתם תותחים!';
+  if(pct>=25) return ' 💪 התחלה מצוינת, המשיכו ככה!';
+  if(pct>0) return ' 🚀 יצאתם לדרך!';
+  return '';
+}
 function updateProgress(){
   const done = topics.filter(t=>isUnitDone(t.key)).length;
   const pct = Math.round((done/topics.length)*100);
   document.getElementById('progressBar').style.width = pct+'%';
-  document.getElementById('progressLabel').textContent = done+' / '+topics.length+' הושלמו';
+  document.getElementById('progressLabel').textContent = done+' / '+topics.length+' הושלמו'+motivationalMsg(pct);
 }
 function toggleTheme(){
   document.body.classList.toggle('dark');

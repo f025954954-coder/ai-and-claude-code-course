@@ -456,12 +456,20 @@ function goRelative(dir){
   if(next >= lessons.length){ showPage('home'); return; }
   showPage(lessons[next].key);
 }
+function motivationalMsg(pct){
+  if(pct>=100) return ' 🎉 כל הכבוד, סיימתם את המודול - אלופים אמיתיים! 👑';
+  if(pct>=75) return ' 🔥 כמעט סיימתם - עוד קצת ואתם אלופים!';
+  if(pct>=50) return ' ⭐ באמצע הדרך - אתם תותחים!';
+  if(pct>=25) return ' 💪 התחלה מצוינת, המשיכו ככה!';
+  if(pct>0) return ' 🚀 יצאתם לדרך!';
+  return '';
+}
 function updateProgress(){
   const total = lessons.length;
   const done = lessons.filter(l=>isUnitDone(l.key)).length;
   const pct = total ? Math.round((done/total)*100) : 0;
   document.getElementById('progressBar').style.width = pct + '%';
-  document.getElementById('progressLabel').textContent = done + ' / ' + total + ' הושלמו';
+  document.getElementById('progressLabel').textContent = done + ' / ' + total + ' הושלמו'+motivationalMsg(pct);
 }
 
 const SLIDE_TOTAL = 9;

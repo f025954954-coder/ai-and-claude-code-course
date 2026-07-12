@@ -61,8 +61,19 @@ button,a.btn{font-family:'Heebo',sans-serif;cursor:pointer;}
 
 .footer-note{text-align:center;color:var(--text-soft);font-size:.85rem;margin-top:40px;line-height:1.8;}
 
+.auth-area{display:flex;align-items:center;gap:10px;}
+.login-btn{display:flex;align-items:center;gap:8px;background:var(--bg2);color:var(--text);font-weight:700;font-size:.85rem;padding:8px 16px;border-radius:999px;border:none;cursor:pointer;transition:all .2s ease;}
+.login-btn:hover{background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;}
+.user-chip{display:none;align-items:center;gap:8px;background:var(--bg2);padding:6px 14px 6px 6px;border-radius:999px;font-size:.85rem;font-weight:700;}
+.user-chip img{width:30px;height:30px;border-radius:50%;}
+.user-chip .logout-x{background:none;border:none;cursor:pointer;color:var(--text-soft);font-size:.9rem;padding:2px;}
+.welcome-banner{display:none;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;border-radius:var(--radius-sm);padding:14px 20px;margin-bottom:20px;font-weight:700;text-align:center;font-size:1rem;}
+.motiv-msg{margin-top:8px;font-weight:700;font-size:.95rem;text-align:center;color:var(--purple);}
+body.dark .motiv-msg{color:#c9c2ff;}
+
 @media (max-width:600px){
   .wrap{padding:20px 14px 50px 14px;}
+  .user-chip span.uname{display:none;}
 }
 </style>
 </head>
@@ -70,10 +81,20 @@ button,a.btn{font-family:'Heebo',sans-serif;cursor:pointer;}
 
 <div class="topbar">
   <div class="logo">🤖 האקדמיה</div>
-  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  <div class="auth-area">
+    <div id="googleSignInBtn"></div>
+    <button class="login-btn" id="manualLoginBtn" onclick="promptGoogleSignIn()" style="display:none;">🔐 התחברות עם Google</button>
+    <div class="user-chip" id="userChip">
+      <img id="userChipImg" src="" alt="">
+      <span class="uname" id="userChipName"></span>
+      <button class="logout-x" onclick="signOutUser()" title="התנתקות">✕</button>
+    </div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
 </div>
 
 <div class="wrap">
+  <div class="welcome-banner" id="welcomeBanner"></div>
   <div class="hero">
     <div class="hero-title">✨ AI + פיתוח Fullstack מקצועי ✨</div>
     <div class="hero-sub">9 מודולים, 65 שיעורים ופרויקטים מסכמים - מהבנת מודלי שפה מהיסוד, דרך בניית סוכנים עם קלוד קוד, תכנות Python/Django/Frontend/Docker אמיתי, אוטומציות ואבטחתן, בניית עסק אוטומציות AI, הנדסת Prompt מתקדמת, APIs/Function Calling/RAG, וסוכני AI/MCP ברמה מקצועית. כולל מצגות PPTX מוטמעות באתר וצילומי מסך אמיתיים מקוד שרץ בפועל. (מודולים נוספים בבנייה - עדכון בהמשך.)</div>
@@ -82,6 +103,7 @@ button,a.btn{font-family:'Heebo',sans-serif;cursor:pointer;}
   <div class="overall-progress">
     <div class="label"><span>התקדמות כוללת</span><span id="overallCount">0 / 65</span></div>
     <div class="overall-bar-wrap"><div class="overall-bar" id="overallBar"></div></div>
+    <div class="motiv-msg" id="motivMsg"></div>
   </div>
 
   <div class="modules" id="modulesGrid"></div>
@@ -186,10 +208,93 @@ function render(){
     grid.appendChild(card);
   });
   document.getElementById('overallCount').textContent = totalDone+' / '+totalUnits;
-  document.getElementById('overallBar').style.width = Math.round((totalDone/totalUnits)*100)+'%';
+  const overallPct = Math.round((totalDone/totalUnits)*100);
+  document.getElementById('overallBar').style.width = overallPct+'%';
+  document.getElementById('motivMsg').textContent = motivationalMsg(overallPct, totalDone);
+}
+function motivationalMsg(pct, doneCount){
+  if(pct>=100) return '🎉👑 וואו, סיימתם את כל האקדמיה - אתם ממש אלופים! מומחי AI אמיתיים!';
+  if(pct>=75) return '🔥 כמעט גומרים את הכל - עוד קצת ואתם אלופים על!';
+  if(pct>=50) return '⭐ באמצע הדרך - אתם תותחים, תמשיכו ככה!';
+  if(pct>=25) return '💪 התחלה מצוינת - ממש רואים את ההתקדמות!';
+  if(doneCount>0) return '🚀 יצאתם לדרך - כל שיעור מקרב אתכם למומחיות!';
+  return '👋 מוכנים להתחיל? בחרו מודול ובואו נצא לדרך!';
 }
 render();
 window.addEventListener('focus', render);
+
+/* ---------- GOOGLE SIGN-IN ----------
+   כדי להפעיל התחברות אמיתית עם Google, צריך Client ID חינמי (2 דקות הקמה):
+   1. https://console.cloud.google.com/apis/credentials -> Create Credentials -> OAuth Client ID -> Web application
+   2. הוסיפו כ-Authorized JavaScript origin את הכתובת: https://f025954954-coder.github.io
+   3. הדביקו את ה-Client ID שתקבלו במקום הטקסט למטה (GOOGLE_CLIENT_ID_HERE)
+   ללא Client ID אמיתי הכפתור לא יפעל - זה לא באג, פשוט חסר הגדרה חד-פעמית.
+   שימו לב: ההתחברות היא לצורך תצוגה אישית (שם+תמונה) בלבד - ההתקדמות
+   עדיין נשמרת בדפדפן המקומי (localStorage), לא במסד נתונים משותף.
+------------------------------------------ */
+const GOOGLE_CLIENT_ID = 'GOOGLE_CLIENT_ID_HERE';
+const USER_KEY = 'academy_user_v1';
+
+function decodeJwt(token){
+  try{
+    const base64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    return JSON.parse(decodeURIComponent(atob(base64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+  }catch(e){ return null; }
+}
+function handleGoogleCredential(response){
+  const payload = decodeJwt(response.credential);
+  if(!payload) return;
+  const user = { name: payload.name, picture: payload.picture, email: payload.email };
+  try{ localStorage.setItem(USER_KEY, JSON.stringify(user)); }catch(e){}
+  showLoggedInUser(user);
+}
+function showLoggedInUser(user){
+  document.getElementById('googleSignInBtn').style.display = 'none';
+  document.getElementById('manualLoginBtn').style.display = 'none';
+  const chip = document.getElementById('userChip');
+  chip.style.display = 'flex';
+  document.getElementById('userChipImg').src = user.picture || '';
+  document.getElementById('userChipName').textContent = user.name || user.email || '';
+  const banner = document.getElementById('welcomeBanner');
+  const firstName = (user.name || '').split(' ')[0] || '';
+  banner.style.display = 'block';
+  banner.textContent = '👋 שלום ' + firstName + '! מוכנים להמשיך ולכבוש עוד שיעור היום?';
+}
+function signOutUser(){
+  try{ localStorage.removeItem(USER_KEY); }catch(e){}
+  document.getElementById('userChip').style.display = 'none';
+  document.getElementById('welcomeBanner').style.display = 'none';
+  if(GOOGLE_CLIENT_ID !== 'GOOGLE_CLIENT_ID_HERE'){
+    document.getElementById('googleSignInBtn').style.display = 'block';
+  } else {
+    document.getElementById('manualLoginBtn').style.display = 'flex';
+  }
+}
+function promptGoogleSignIn(){
+  if(GOOGLE_CLIENT_ID === 'GOOGLE_CLIENT_ID_HERE'){
+    alert('התחברות עם Google דורשת הגדרת Client ID חד-פעמית (חינמי, כ-2 דקות). ראו הוראות בתוך קוד המקור של index.html.');
+    return;
+  }
+  if(window.google && google.accounts && google.accounts.id){ google.accounts.id.prompt(); }
+}
+(function initAuth(){
+  try{
+    const saved = localStorage.getItem(USER_KEY);
+    if(saved){ showLoggedInUser(JSON.parse(saved)); return; }
+  }catch(e){}
+  if(GOOGLE_CLIENT_ID === 'GOOGLE_CLIENT_ID_HERE'){
+    document.getElementById('manualLoginBtn').style.display = 'flex';
+    return;
+  }
+  const script = document.createElement('script');
+  script.src = 'https://accounts.google.com/gsi/client';
+  script.async = true;
+  script.onload = function(){
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
+    google.accounts.id.renderButton(document.getElementById('googleSignInBtn'), { theme: 'outline', size: 'medium', shape: 'pill', text: 'signin_with' });
+  };
+  document.head.appendChild(script);
+})();
 </script>
 </body>
 </html>
