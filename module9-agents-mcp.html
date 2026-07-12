@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤖 מודול 9: סוכני AI ו-MCP מתקדם</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#4A90E2; --purple:#7B68EE; --green:#2ECC71;
+  --bg:#eef2fb; --bg2:#e4ecfb; --card:#ffffff; --text:#2d3142; --text-soft:#5a5f7a;
+  --radius:26px; --radius-sm:16px;
+  --shadow:0 12px 30px rgba(74,144,226,0.18);
+  --shadow-soft:0 6px 16px rgba(74,144,226,0.12);
+  --code-bg:#1e2233; --code-text:#d7dcff;
+}
+body.dark{
+  --bg:#141827; --bg2:#1b2032; --card:#222842; --text:#f2f3fb; --text-soft:#b7bcda;
+  --shadow:0 12px 30px rgba(0,0,0,0.45); --shadow-soft:0 6px 16px rgba(0,0,0,0.35);
+  --code-bg:#0d0f1a; --code-text:#c7d0ff;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:'Heebo',sans-serif; background:linear-gradient(160deg,var(--bg),var(--bg2)); color:var(--text); min-height:100vh; transition:background .4s ease,color .4s ease; padding-top:126px;}
+h1,h2,h3{margin:0 0 8px 0;}
+button{font-family:'Heebo',sans-serif;cursor:pointer;border:none;outline:none;}
+code, pre, .mono{font-family:'JetBrains Mono',monospace;}
+
+.topnav{position:fixed;top:0;right:0;left:0;z-index:100;background:var(--card);box-shadow:var(--shadow-soft);padding:10px 16px 0 16px;transition:background .4s ease;}
+.topnav-row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1200px;margin:0 auto;}
+.logo{font-weight:900;font-size:1.15rem;white-space:nowrap;background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;flex-shrink:0;}
+.hub-link{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 14px;font-size:.8rem;font-weight:700;text-decoration:none;white-space:nowrap;}
+.nav-scroll{display:flex;gap:8px;overflow-x:auto;flex:1;padding:4px 2px;scrollbar-width:thin;align-items:center;}
+.nav-scroll::-webkit-scrollbar{height:6px;}
+.nav-scroll::-webkit-scrollbar-thumb{background:var(--purple);border-radius:10px;}
+.navbtn{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 13px;font-size:0.8rem;font-weight:500;white-space:nowrap;transition:all .25s ease;border:2px solid transparent;position:relative;}
+.navbtn:hover{transform:translateY(-2px) scale(1.04);}
+.navbtn.active{background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;box-shadow:var(--shadow-soft);}
+.navbtn.passed::after{content:'✓';position:absolute;top:-4px;left:-4px;background:var(--green);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
+.theme-toggle{flex-shrink:0;background:var(--bg2);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;transition:transform .3s ease;}
+.theme-toggle:hover{transform:rotate(20deg) scale(1.1);}
+.progress-wrap{max-width:1200px;margin:8px auto 0 auto;height:10px;background:var(--bg2);border-radius:999px;overflow:hidden;}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));border-radius:999px;transition:width .5s ease;}
+.progress-label{max-width:1200px;margin:4px auto 0 auto;font-size:.72rem;color:var(--text-soft);text-align:left;padding:0 4px;}
+
+.page{display:none;animation:fadeIn .5s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.page-inner{max-width:860px;margin:0 auto;padding:18px 16px 60px 16px;}
+.hero-title{font-size:clamp(1.5rem,4vw,2.3rem);font-weight:900;text-align:center;margin-bottom:6px;}
+.hero-sub{text-align:center;color:var(--text-soft);font-size:1.02rem;margin-bottom:22px;}
+.world-tag{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 12px;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--green));color:#fff;margin-bottom:10px;}
+.level-tag{display:inline-block;font-size:.7rem;font-weight:800;padding:3px 12px;border-radius:999px;background:var(--bg2);color:var(--text-soft);margin-bottom:10px;margin-right:6px;}
+
+.card{background:var(--card);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);margin-bottom:20px;}
+.explain{font-size:1.05rem;line-height:1.95;color:var(--text);}
+.explain p{margin:0 0 14px 0;}
+.explain p:last-child{margin-bottom:0;}
+.explain b, .highlight{background:linear-gradient(90deg,rgba(123,104,238,.18),rgba(46,204,113,.18));padding:2px 8px;border-radius:8px;font-weight:700;color:var(--purple);}
+body.dark .explain b, body.dark .highlight{color:#c9c2ff;}
+.callout{background:rgba(241,196,15,.12);border-right:4px solid #f1c40f;padding:12px 16px;border-radius:10px;margin-top:14px;font-size:.95rem;}
+.callout.info{background:rgba(74,144,226,.1);border-color:var(--blue);}
+
+.section-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.05rem;margin:0 0 14px 0;}
+.section-title .num{background:var(--purple);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;}
+
+.lab-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.code-block{position:relative;background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px 18px;overflow-x:auto;font-size:.82rem;line-height:1.7;direction:ltr;text-align:left;margin-top:10px;}
+.code-block pre{margin:0;white-space:pre;}
+.code-label{position:absolute;top:8px;left:14px;font-size:.65rem;color:#8891b8;letter-spacing:.05em;text-transform:uppercase;}
+.lab-note{font-size:.92rem;color:var(--text-soft);margin-top:10px;line-height:1.7;}
+
+textarea, input[type=text], select{width:100%;font-family:'Heebo',sans-serif;font-size:1rem;padding:14px 16px;border-radius:var(--radius-sm);border:2px solid var(--bg2);background:var(--bg);color:var(--text);resize:none;transition:border .2s ease;}
+textarea:focus, input[type=text]:focus, select:focus{border-color:var(--purple);}
+
+.btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;font-weight:700;font-size:0.92rem;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-soft);transition:transform .2s ease, box-shadow .2s ease;}
+.btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 26px rgba(74,144,226,.3);}
+.btn:active{transform:translateY(0) scale(.98);}
+.btn.secondary{background:var(--bg2);color:var(--text);}
+.btn.green{background:linear-gradient(90deg,var(--green),#27ae60);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn.small{padding:8px 14px;font-size:.8rem;}
+.row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:10px;}
+
+.quiz-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.quiz-q{font-weight:700;margin:18px 0 10px 0;}
+.quiz-q:first-of-type{margin-top:6px;}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{background:var(--bg);border-radius:12px;padding:11px 16px;text-align:right;font-size:.95rem;border:2px solid transparent;transition:all .2s ease;}
+.quiz-opt:hover{border-color:var(--purple);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(46,204,113,.15);font-weight:700;}
+.quiz-opt.wrong{border-color:#e74c3c;background:rgba(231,76,60,.12);}
+.quiz-opt.disabled{pointer-events:none;}
+.quiz-summary{margin-top:18px;padding:14px 18px;border-radius:14px;background:var(--bg);font-weight:700;text-align:center;}
+.quiz-summary.pass{background:rgba(46,204,113,.15);color:var(--green);}
+.quiz-summary.fail{background:rgba(231,76,60,.12);color:#e74c3c;}
+
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:10px;}
+.lesson-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:transform .25s ease, box-shadow .25s ease;text-align:center;border:3px solid transparent;position:relative;}
+.lesson-card:hover{transform:translateY(-6px) rotate(-1deg);box-shadow:0 16px 32px rgba(74,144,226,.25);}
+.lesson-card .em{font-size:2.2rem;display:block;margin-bottom:8px;}
+.lesson-card .tt{font-weight:800;font-size:1rem;margin-bottom:4px;}
+.lesson-card .dd{font-size:.85rem;color:var(--text-soft);}
+.lesson-card.done{border-color:var(--green);}
+
+.compare-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.85rem;}
+.compare-table th, .compare-table td{border:1px solid var(--bg2);padding:10px 12px;text-align:right;}
+.compare-table th{background:var(--bg);font-weight:800;}
+
+.screenshot-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:20px;}
+.screenshot-badge{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;font-weight:800;padding:4px 12px;border-radius:999px;background:linear-gradient(90deg,#f39c12,#e67e22);color:#fff;margin-bottom:12px;}
+.real-screenshot{width:100%;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.25);display:block;}
+.screenshot-caption{font-size:.85rem;color:var(--text-soft);margin-top:10px;line-height:1.6;}
+
+.capstone-preview{background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px;font-size:.8rem;white-space:pre-wrap;direction:ltr;text-align:left;margin-top:14px;display:none;}
+
+@media (max-width:600px){
+  body{padding-top:112px;}
+  .logo{font-size:.92rem;}
+  .navbtn{font-size:.72rem;padding:6px 9px;}
+  .card,.lab-card,.quiz-card{padding:18px;}
+}
+
+.slide-viewer-overlay{display:none;position:fixed;inset:0;background:rgba(10,12,20,.9);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.slide-viewer-overlay.active{display:flex;}
+.slide-viewer-box{max-width:920px;width:100%;background:var(--card);border-radius:20px;padding:18px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.slide-viewer-close{position:absolute;top:-14px;left:-14px;background:var(--card);border-radius:50%;width:38px;height:38px;font-size:1.1rem;box-shadow:var(--shadow);}
+.slide-viewer-imgwrap{background:#0d0f1a;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:200px;}
+#slideViewerImg{width:100%;display:block;}
+.slide-viewer-controls{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px;}
+.slide-viewer-controls span{font-weight:700;color:var(--text-soft);font-size:.9rem;}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="topnav-row">
+    <a class="hub-link" href="index.html">🏠 האקדמיה</a>
+    <div class="logo">🤖 מודול 9: סוכני AI ו-MCP מתקדם</div>
+    <div class="nav-scroll" id="navScroll"></div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 7 הושלמו</div>
+</div>
+
+<section class="page active" id="page-home">
+  <div class="page-inner">
+    <div class="hero-title">🤖 מודול 9: סוכני AI ו-MCP מתקדם</div>
+    <div class="hero-sub">לולאת סוכן (Plan/Act/Observe), Reflection ו-Self-Correction, Multi-Agent Systems, ופרוטוקול MCP לעומק - כולל בניית שרת MCP אמיתי שרץ כתת-תהליך.</div>
+    <div style="text-align:center;margin-bottom:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn" onclick="openSlideViewer()">🎞️ צפו במצגת המודול</button>
+      <a href="slides/module9-agents-mcp.pptx" download class="btn secondary" style="text-decoration:none;">📥 הורידו PPTX</a>
+    </div>
+    <div class="lesson-grid" id="lessonGrid"></div>
+  </div>
+</section>
+
+<div class="slide-viewer-overlay" id="slideViewerOverlay" onclick="if(event.target===this) closeSlideViewer()">
+  <div class="slide-viewer-box">
+    <button class="slide-viewer-close" onclick="closeSlideViewer()">✕</button>
+    <div class="slide-viewer-imgwrap"><img id="slideViewerImg" src="" alt="slide"></div>
+    <div class="slide-viewer-controls">
+      <button class="btn secondary small" onclick="slideViewerNav(-1)">➡ הקודם</button>
+      <span id="slideViewerCounter">1 / 8</span>
+      <button class="btn small" onclick="slideViewerNav(1)">הבא ⬅</button>
+    </div>
+  </div>
+</div>
+
+<!-- AGENT LOOP -->
+<section class="page" id="page-agentloop">
+  <div class="page-inner">
+    <div class="world-tag">🤖 מודול 9</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🔄 לולאת הסוכן - Plan / Act / Observe</div>
+    <div class="card">
+      <div class="explain">
+        <p>סוכן AI (Agent) שונה מקריאת LLM בודדת בכך שהוא פועל ב<b class="highlight">לולאה</b>: בכל סיבוב הוא מתכנן את הצעד הבא (Plan), מבצע אותו בפועל דרך כלי (Act), וקולט את התוצאה (Observe) - וחוזר חלילה עד שהמשימה הושלמה. זו בדיוק הארכיטקטורה שראינו במודול 1 ("הלולאה האג'נטית") ובקלוד קוד עצמו (מודול 2).</p>
+        <p><b class="highlight">Planning</b> הוא השלב שבו הסוכן מחליט מה לעשות הבא - לא בהכרח תוכנית קבועה מראש, אלא החלטה דינמית שמתחשבת בכל מה שקרה עד כה. <b class="highlight">Memory</b> - זיכרון הצעדים הקודמים (state) - קריטי כדי שהסוכן "ידע" איפה הוא נמצא בתהליך ולא יתחיל מחדש בכל סיבוב.</p>
+        <p>מתי לולאת סוכן מתאימה, ומתי לא: משימות עם מספר שלבים לא-ידוע מראש (המסלול תלוי בתוצאות ביניים) מתאימות מצוין ללולאת סוכן. משימות עם רצף פעולות קבוע וידוע - עדיף Prompt Chaining (מודול 7), שהוא פשוט וצפוי יותר, בלי "הימור" על החלטות המודל בכל צעד.</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי - קוד שרץ בפועל</div>
+      <img class="real-screenshot" src="screenshots/agent-loop.png" alt="agent plan act observe loop">
+      <div class="screenshot-caption">לולאת סוכן אמיתית שמתכננת, מבצעת, וצופה בתוצאה בכל סיבוב - עד שהיא מחליטה בעצמה שהמשימה הושלמה (action="finish").</div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goHome()">🏠 חזרה למפת המודול</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- REFLECTION -->
+<section class="page" id="page-reflection">
+  <div class="page-inner">
+    <div class="world-tag">🤖 מודול 9</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🪞 Reflection ו-Self-Correction</div>
+    <div class="card">
+      <div class="explain">
+        <p><b class="highlight">Reflection</b> היא היכולת של סוכן "לבקר" את הפלט שלו לפני שהוא מציג אותו כתשובה סופית - בדומה לאיך שבן אדם קורא טיוטה שכתב ומתקן אותה. בפועל זו קריאת LLM נוספת (או פונקציית בדיקה דטרמיניסטית) שבודקת את הפלט מול קריטריונים (טון, דיוק עובדתי, שלמות) ומחזירה משוב.</p>
+        <p><b class="highlight">Self-Correction</b> היא הלולאה השלמה: ייצור → ביקורת → אם נכשל, תיקון לפי המשוב → ביקורת מחדש - עד שהפלט עומד בסטנדרט, או עד שמגיעים למספר ניסיונות מקסימלי (חשוב להגביל! אחרת הסוכן עלול "להסתובב במעגל" ללא סוף).</p>
+        <p>שימוש נכון: לא כל משימה צריכה reflection - זה מוסיף עלות (עוד קריאות LLM) וזמן. שימושי במיוחד למשימות עם קריטריוני איכות ברורים לבדיקה (עמידה בפורמט, טון מקצועי, דיוק נתונים) ופחות למשימות פשוטות שסיכוי הטעות בהן נמוך מלכתחילה.</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי - קוד שרץ בפועל</div>
+      <img class="real-screenshot" src="screenshots/agent-reflection.png" alt="reflection self correction loop">
+      <div class="screenshot-caption">לולאת ביקורת עצמית אמיתית: כל ניסיון מזוהה ומתוקן לפי בעיה קונקרטית (טון לא מקצועי, נתון בלי מקור) עד שעובר ביקורת.</div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- MULTI AGENT -->
+<section class="page" id="page-multiagent">
+  <div class="page-inner">
+    <div class="world-tag">🤖 מודול 9</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">👥 Multi-Agent Systems</div>
+    <div class="card">
+      <div class="explain">
+        <p>במקום סוכן אחד "יודע-כל" שמנסה לעשות הכל, ארכיטקטורת <b class="highlight">Multi-Agent</b> מפצלת את העבודה בין כמה סוכנים ייעודיים, כל אחד מתמחה במשימה צרה - בדיוק כמו subagents בקלוד קוד (מודול 2). דפוס נפוץ: <b>Supervisor</b> (סוכן-על) שמקבל את המשימה הכללית ומאציל לסוכנים מתמחים (research/writing/review), ואז מרכיב את התוצאות הסופיות.</p>
+        <p>היתרון המרכזי: כל סוכן-משנה מקבל context ממוקד ותפקיד ברור, מה שמפחית "בלבול" ומשפר איכות - בדיוק כמו שצוות עם תפקידים ברורים עובד טוב יותר מקבוצת אנשים ללא חלוקת אחריות. יתרון נוסף: אפשר להריץ סוכני-משנה שלא תלויים זה בזה במקביל, מה שמקצר זמן כולל.</p>
+        <p>מחיר: מורכבות ניהול גבוהה יותר (תזמון, טיפול בכשלים של סוכן-משנה בודד, עלות מצטברת של כמה קריאות LLM). כלל אצבע: התחילו עם סוכן יחיד; עברו ל-multi-agent רק כשמזהים בבירור שתפקיד אחד "עמוס מדי" או שקיימות משימות עצמאיות שיכולות לרוץ במקביל.</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי - קוד שרץ בפועל</div>
+      <img class="real-screenshot" src="screenshots/agent-multiagent.png" alt="supervisor multi agent system">
+      <div class="screenshot-caption">Supervisor אמיתי שמאציל בזה אחר זה לשלושה סוכני-משנה (research/writing/review) ומרכיב את התהליך המלא.</div>
+    </div>
+    <div class="quiz-card" id="quiz-multiagent"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- MCP PROTOCOL -->
+<section class="page" id="page-mcpprotocol">
+  <div class="page-inner">
+    <div class="world-tag">🤖 מודול 9</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🔌 פרוטוקול MCP לעומק</div>
+    <div class="card">
+      <div class="explain">
+        <p>ראינו ב-MCP במודול 2 ברמת המשתמש - עכשיו נכנסים ברמת הפרוטוקול. MCP (Model Context Protocol) בנוי מעל <b class="highlight">JSON-RPC 2.0</b> - פורמט הודעות סטנדרטי לקריאות "בקשה-תשובה" בין תהליכים. כל הודעה כוללת jsonrpc, id (לשיוך תשובה לבקשה), method (הפעולה המבוקשת), ו-params/result/error.</p>
+        <p>שלוש הפעולות המרכזיות שכל MCP client/server "מדברים" בהן: <b>initialize</b> (handshake ראשוני - הכרות בין הצדדים), <b>tools/list</b> (ה-client שואל אילו כלים השרת חושף), ו-<b>tools/call</b> (קריאה בפועל לכלי ספציפי עם פרמטרים). זה בדיוק ה"חוזה" שמאפשר לכל שרת MCP (Filesystem/Database/Git/Browser) להיות מתחלף ועקבי - קלוד קוד לא צריך לדעת שום דבר על המימוש הפנימי של השרת, רק לדבר בפרוטוקול המוסכם.</p>
+        <p>נקודה חשובה: client ו-server ב-MCP הם בד"כ שני <b>תהליכים נפרדים</b> (processes) שמתקשרים over stdio (קלט/פלט סטנדרטי) - לא ספריית קוד רגילה שקוראים לה ישירות. זו בדיוק הסיבה שאפשר לכתוב שרת MCP בכל שפת תכנות, כל עוד הוא "מדבר" את הפרוטוקול הנכון.</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי - קוד שרץ בפועל</div>
+      <img class="real-screenshot" src="screenshots/mcp-protocol.png" alt="MCP JSON-RPC protocol messages">
+      <div class="screenshot-caption">מבנה ההודעות האמיתי של initialize, tools/list ו-tools/call - בדיוק כפי שהן נראות בתקשורת אמיתית בין Claude Code לשרת MCP.</div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- BUILDING MCP SERVER -->
+<section class="page" id="page-mcpserver">
+  <div class="page-inner">
+    <div class="world-tag">🤖 מודול 9</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🛠️ בניית שרת MCP אמיתי</div>
+    <div class="card">
+      <div class="explain">
+        <p>עכשיו נבנה שרת MCP מינימלי מאפס, בלי שום ספרייה חיצונית - רק כדי להבין בדיוק מה קורה "מתחת למכסה". השרת קורא שורות JSON מ-stdin (כל שורה = בקשה אחת), מפרש את ה-method, מבצע את הפעולה, וכותב תשובת JSON חזרה ל-stdout. זה כל מה שצריך כדי להיות "שרת MCP חוקי".</p>
+        <p>ה-client (שיכול להיות Claude Code בעצמו, או קוד שלכם) מפעיל את השרת <b class="highlight">כתת-תהליך</b> (subprocess) ומתקשר איתו דרך הצינורות (pipes) של stdin/stdout - בדיוק כמו שמוגדר בקובץ קונפיגורציית ה-MCP servers של קלוד קוד.</p>
+        <p>שימו לב לפרט האבטחה בקוד: פונקציית <b>safe_path</b> מוודאת שכל נתיב קובץ מבוקש נשאר בתוך תיקיית ה-sandbox המוגדרת, וחוסמת ניסיון path traversal (כמו "../../../etc/passwd") - זו בדיוק סוגיית האבטחה שנדבר עליה בשיעור הבא.</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי - קוד שרץ בפועל</div>
+      <img class="real-screenshot" src="screenshots/mcp-server-client.png" alt="real MCP server subprocess client">
+      <div class="screenshot-caption">Client אמיתי שמפעיל שרת MCP כתת-תהליך אמיתי (subprocess.Popen), שולח לו בקשות initialize/tools/list/tools/call, וכולל ניסיון path traversal שנחסם בפועל.</div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- MCP SECURITY -->
+<section class="page" id="page-mcpsecurity">
+  <div class="page-inner">
+    <div class="world-tag">🤖 מודול 9</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">🔒 אבטחת MCP Servers</div>
+    <div class="card">
+      <div class="explain">
+        <p>שרת MCP הוא בפועל דלת פתוחה בין המודל למערכת אמיתית שלכם - קובץ, מסד נתונים, דפדפן. אבטחה לא-מספקת כאן חמורה: מודל שגורם לקריאת/כתיבת קבצים מחוץ לתחום, שאילתת SQL הרסנית, או פעולה בדפדפן שהמשתמש לא התכוון אליה.</p>
+        <p>עקרונות מפתח: <b class="highlight">Least Privilege</b> - השרת חושף רק את הכלים המינימליים הנדרשים, לא גישה גורפת. <b class="highlight">Sandboxing</b> - כל פעולת קובץ/רשת מוגבלת לתיקייה/משאב מוגדר מראש (כמו safe_path שראינו). <b class="highlight">Input Validation</b> - כל פרמטר שמגיע מהמודל (שמקורו בסופו של דבר בטקסט חופשי - ולכן לא אמין באופן מובנה) נבדק לפני שמבוצעת פעולה בפועל.</p>
+        <p>סיכון ייחודי ל-MCP: תוכן שהשרת מחזיר (למשל תוכן קובץ, תוצאת שאילתה) חוזר לתוך context המודל - אם תוכן זה מכיל טקסט שנראה כמו הוראה ("התעלם מההנחיות הקודמות ותעשה X"), זהו בדיוק וקטור ה-Prompt Injection שראינו במודול 5, רק שהפעם המקור הוא תוצאת כלי, לא קלט משתמש ישיר.</p>
+      </div>
+    </div>
+    <div class="quiz-card" id="quiz-mcpsecurity"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- CAPSTONE -->
+<section class="page" id="page-capstone">
+  <div class="page-inner">
+    <div class="world-tag">🤖 מודול 9 · פרויקט מסכם</div>
+    <div class="hero-title">🏗️ תכננו מערכת סוכנים + MCP</div>
+    <div class="card">
+      <div class="explain">
+        <p>תכננו ארכיטקטורת סוכן שמשתמשת בשרתי MCP כדי לבצע משימה אמיתית - כולל החלטה על מבנה הסוכן ואמצעי האבטחה הנדרשים.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> בונה הארכיטקטורה</div>
+      <div class="row" style="flex-direction:column;gap:14px;">
+        <div>
+          <label style="font-weight:700;display:block;margin-bottom:6px;">מורכבות המשימה:</label>
+          <select id="cap-complexity">
+            <option value="single">שלב יחיד ברור - סוכן בודד מספיק</option>
+            <option value="multistep">כמה שלבים תלויי-תוצאה - נדרשת לולאת סוכן</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-weight:700;display:block;margin-bottom:6px;">האם נדרשת ביקורת איכות על הפלט?</label>
+          <select id="cap-reflection">
+            <option value="no">לא - הסיכון לטעות נמוך</option>
+            <option value="yes">כן - נדרש Reflection לפני מסירה סופית</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-weight:700;display:block;margin-bottom:6px;">מספר תחומי אחריות נפרדים במשימה:</label>
+          <select id="cap-agents">
+            <option value="one">תחום אחד - סוכן יחיד</option>
+            <option value="multi">כמה תחומים נפרדים - Multi-Agent עם Supervisor</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-weight:700;display:block;margin-bottom:6px;">גישה נדרשת למערכות חיצוניות:</label>
+          <select id="cap-mcp">
+            <option value="none">אין - רק שיחה טקסטואלית</option>
+            <option value="files">קבצים/מסד נתונים - נדרש שרת MCP ייעודי עם sandbox</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" style="margin-top:16px;" onclick="generateAgentCapstone()">🏗️ בנו את תוכנית הארכיטקטורה</button>
+      <div class="capstone-preview" id="agentCapstonePreview"></div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <a class="btn" href="index.html" style="text-decoration:none;">🏠 חזרה לאקדמיה</a>
+    </div>
+  </div>
+</section>
+
+<script>
+const THIS_FILE = 'module9-agents-mcp.html';
+const PROGRESS_KEY = 'academy_progress_v1';
+function loadProgressSet(){
+  try{ return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]')); }
+  catch(e){ return new Set(); }
+}
+function markDone(unitKey){
+  const s = loadProgressSet();
+  s.add(THIS_FILE+'::'+unitKey);
+  try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(Array.from(s))); }catch(e){}
+}
+function isUnitDone(unitKey){ return loadProgressSet().has(THIS_FILE+'::'+unitKey); }
+function safeGetTheme(){ try{ return localStorage.getItem('ai-theme'); }catch(e){ return null; } }
+function safeSetTheme(v){ try{ localStorage.setItem('ai-theme', v); }catch(e){} }
+
+const topics = [
+  {key:'agentloop', emoji:'🔄', title:'לולאת הסוכן', desc:'Plan / Act / Observe'},
+  {key:'reflection', emoji:'🪞', title:'Reflection', desc:'ביקורת עצמית ותיקון'},
+  {key:'multiagent', emoji:'👥', title:'Multi-Agent', desc:'Supervisor וסוכני-משנה'},
+  {key:'mcpprotocol', emoji:'🔌', title:'פרוטוקול MCP', desc:'JSON-RPC לעומק'},
+  {key:'mcpserver', emoji:'🛠️', title:'בניית שרת MCP', desc:'קוד אמיתי מאפס'},
+  {key:'mcpsecurity', emoji:'🔒', title:'אבטחת MCP', desc:'Sandboxing ו-Least Privilege'},
+  {key:'capstone', emoji:'🏗️', title:'פרויקט מסכם', desc:'סוכנים + MCP מלא', isCapstone:true}
+];
+let currentPage = 'home';
+
+const quizData = {
+  'multiagent': [
+    {q:'מה תפקיד ה-Supervisor בארכיטקטורת Multi-Agent?', opts:['לבצע את כל העבודה בעצמו', 'לקבל את המשימה הכללית, להאציל לסוכני-משנה מתמחים, ולהרכיב את התוצאות', 'להחליף לגמרי את הסוכנים האחרים', 'לשמש רק כלוג'], correct:1},
+    {q:'מה היתרון המרכזי בפיצול לסוכני-משנה ייעודיים?', opts:['זה תמיד זול יותר', 'כל סוכן מקבל context ממוקד ותפקיד ברור, מה שמפחית בלבול', 'זה מבטל את הצורך ב-API', 'זה מהיר יותר תמיד בלי יוצא מן הכלל'], correct:1},
+    {q:'מתי כדאי לעבור מסוכן יחיד ל-multi-agent?', opts:['תמיד מההתחלה', 'רק כשמזהים תפקיד עמוס מדי או משימות עצמאיות שיכולות לרוץ במקביל', 'אף פעם לא כדאי', 'רק במשימות טריוויאליות'], correct:1}
+  ],
+  'mcpsecurity': [
+    {q:'מה המשמעות של Least Privilege בהקשר שרת MCP?', opts:['לתת לשרת גישה מלאה לכל המערכת', 'לחשוף רק את הכלים המינימליים הנדרשים, לא גישה גורפת', 'להריץ את השרת ללא הרשאות בכלל', 'לבטל את כל האבטחה'], correct:1},
+    {q:'למה תוכן שמוחזר משרת MCP (כמו תוכן קובץ) מהווה סיכון אבטחה ייחודי?', opts:['הוא לעולם לא מהווה סיכון', 'הוא חוזר לתוך context המודל ועלול להכיל הוראות מוסוות - וקטור Prompt Injection', 'הוא תמיד מוצפן', 'MCP חוסם את זה אוטומטית'], correct:1},
+    {q:'מה תפקיד sandboxing בשרת MCP לקבצים?', opts:['להאיץ את קריאת הקבצים', 'להגביל כל פעולת קובץ לתיקייה מוגדרת מראש, ולמנוע path traversal', 'להצפין את שם הקובץ', 'זה לא נדרש אם השרת כתוב היטב'], correct:1}
+  ]
+};
+
+function renderQuiz(key){
+  const container = document.getElementById('quiz-'+key);
+  if(!container || container.dataset.built) return;
+  container.dataset.built = '1';
+  const questions = quizData[key];
+  if(!questions) return;
+  let html = '<div class="section-title"><span class="num">📝</span> מבחנון קצר (ענו נכון על הכל כדי לסמן שיעור זה כהושלם)</div>';
+  questions.forEach((item,qi)=>{
+    html += '<div class="quiz-q">'+(qi+1)+'. '+item.q+'</div><div class="quiz-opts" id="qopts-'+key+'-'+qi+'">';
+    item.opts.forEach((opt,oi)=>{
+      html += '<div class="quiz-opt" onclick="answerQuiz(\''+key+'\','+qi+','+oi+')" id="qopt-'+key+'-'+qi+'-'+oi+'">'+opt+'</div>';
+    });
+    html += '</div>';
+  });
+  html += '<div class="quiz-summary" id="qsummary-'+key+'" style="display:none;"></div>';
+  container.innerHTML = html;
+  container._answers = new Array(questions.length).fill(null);
+  if(isUnitDone(key)){
+    questions.forEach((item,qi)=>{
+      document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+      const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+      for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+    });
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display='block'; summary.className='quiz-summary pass';
+    summary.textContent = '🎉 כבר השלמתם שיעור זה בעבר!';
+  }
+}
+function answerQuiz(key, qi, oi){
+  const questions = quizData[key];
+  const item = questions[qi];
+  const container = document.getElementById('quiz-'+key);
+  const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+  for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+  if(oi===item.correct){ document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('correct'); }
+  else {
+    document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('wrong');
+    document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+  }
+  container._answers[qi] = (oi===item.correct);
+  checkQuizComplete(key);
+}
+function checkQuizComplete(key){
+  const container = document.getElementById('quiz-'+key);
+  const answers = container._answers;
+  if(answers.every(a=>a!==null)){
+    const allCorrect = answers.every(a=>a===true);
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display = 'block';
+    const scoreCount = answers.filter(a=>a).length;
+    if(allCorrect){
+      summary.className = 'quiz-summary pass';
+      summary.textContent = '🎉 מעולה! '+scoreCount+'/'+answers.length+' נכון - השיעור סומן כהושלם.';
+      markDone(key);
+    } else {
+      summary.className = 'quiz-summary fail';
+      summary.textContent = '📚 '+scoreCount+'/'+answers.length+' נכון. רעננו את הדף כדי לנסות שוב.';
+    }
+    updateProgress();
+    buildHome();
+  }
+}
+function buildNav(){
+  const nav = document.getElementById('navScroll');
+  nav.innerHTML = '';
+  topics.forEach(t=>{
+    const b = document.createElement('button');
+    b.className='navbtn'; b.id='nav-'+t.key; b.innerHTML=t.emoji+' '+t.title;
+    b.onclick = ()=>showPage(t.key);
+    nav.appendChild(b);
+  });
+}
+function buildHome(){
+  const grid = document.getElementById('lessonGrid');
+  grid.innerHTML = '';
+  topics.forEach(t=>{
+    const done = isUnitDone(t.key);
+    const c = document.createElement('div');
+    c.className = 'lesson-card' + (done ? ' done' : '');
+    c.innerHTML = '<span class="em">'+t.emoji+'</span><div class="tt">'+t.title+'</div><div class="dd">'+t.desc+'</div>'+(done?'<div style="margin-top:6px;">✅</div>':'');
+    c.onclick = ()=>showPage(t.key);
+    grid.appendChild(c);
+  });
+  document.querySelectorAll('.navbtn').forEach(b=>{
+    const key = b.id.replace('nav-','');
+    b.classList.toggle('passed', isUnitDone(key));
+  });
+}
+function showPage(key){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+key).classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+  const nb = document.getElementById('nav-'+key);
+  if(nb) nb.classList.add('active');
+  currentPage = key;
+  if(quizData[key]){ renderQuiz(key); }
+  if(key !== 'home' && !quizData[key] && key !== 'capstone'){ markDone(key); }
+  buildHome();
+  updateProgress();
+  if(typeof window.scrollTo === 'function'){
+    try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+  }
+}
+function goHome(){ showPage('home'); }
+function goRelative(dir){
+  const idx = topics.findIndex(t=>t.key===currentPage);
+  if(idx===-1) return;
+  const newIdx = idx+dir;
+  if(newIdx<0){ goHome(); return; }
+  if(newIdx>=topics.length){ goHome(); return; }
+  showPage(topics[newIdx].key);
+}
+function updateProgress(){
+  const done = topics.filter(t=>isUnitDone(t.key)).length;
+  const pct = Math.round((done/topics.length)*100);
+  document.getElementById('progressBar').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = done+' / '+topics.length+' הושלמו';
+}
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+  safeSetTheme(isDark?'dark':'light');
+}
+
+/* ---------- CAPSTONE ---------- */
+function generateAgentCapstone(){
+  const complexity = document.getElementById('cap-complexity').value;
+  const reflection = document.getElementById('cap-reflection').value;
+  const agents = document.getElementById('cap-agents').value;
+  const mcp = document.getElementById('cap-mcp').value;
+
+  let plan = '# Agent + MCP Architecture Design\n\n';
+  plan += 'שכבה 1 - מבנה ההרצה:\n';
+  plan += '  - ' + (complexity==='multistep' ? 'לולאת סוכן מלאה (Plan/Act/Observe) - המסלול תלוי בתוצאות ביניים' : 'קריאה בודדת - אין צורך בלולאה') + '\n\n';
+  plan += 'שכבה 2 - בקרת איכות:\n';
+  plan += '  - ' + (reflection==='yes' ? 'שלב Reflection לפני מסירה סופית + הגבלת מספר ניסיונות מקסימלי' : 'ללא reflection - סיכון טעות נמוך מספיק') + '\n\n';
+  plan += 'שכבה 3 - חלוקת אחריות:\n';
+  plan += '  - ' + (agents==='multi' ? 'Multi-Agent: Supervisor שמאציל לסוכני-משנה מתמחים' : 'סוכן יחיד - תחום אחריות אחד') + '\n\n';
+  plan += 'שכבה 4 - גישה למערכות חיצוניות:\n';
+  if(mcp==='files'){
+    plan += '  - שרת MCP ייעודי עם sandbox מוגדר (safe_path)\n';
+    plan += '  - Least Privilege: רק הכלים המינימליים הנדרשים חשופים\n';
+    plan += '  - ולידציה על כל תוכן שחוזר מהשרת (סיכון prompt injection)';
+  } else {
+    plan += '  - אין גישה למערכות חיצוניות - שיחה טקסטואלית בלבד';
+  }
+
+  const el = document.getElementById('agentCapstonePreview');
+  el.style.display='block'; el.textContent = plan;
+  markDone('capstone');
+  updateProgress();
+  buildHome();
+}
+
+/* ---------- SLIDE VIEWER ---------- */
+const SLIDE_TOTAL = 8;
+const SLIDE_FOLDER = 'slide-images/module9-agents-mcp';
+let slideIdx = 1;
+function openSlideViewer(){
+  slideIdx = 1;
+  document.getElementById('slideViewerOverlay').classList.add('active');
+  updateSlideViewer();
+}
+function closeSlideViewer(){ document.getElementById('slideViewerOverlay').classList.remove('active'); }
+function slideViewerNav(dir){
+  slideIdx += dir;
+  if(slideIdx<1) slideIdx=SLIDE_TOTAL;
+  if(slideIdx>SLIDE_TOTAL) slideIdx=1;
+  updateSlideViewer();
+}
+function updateSlideViewer(){
+  const n = String(slideIdx).padStart(2,'0');
+  document.getElementById('slideViewerImg').src = SLIDE_FOLDER+'/s-'+n+'.jpg';
+  document.getElementById('slideViewerCounter').textContent = slideIdx+' / '+SLIDE_TOTAL;
+}
+document.addEventListener('keydown', function(e){
+  if(!document.getElementById('slideViewerOverlay').classList.contains('active')) return;
+  if(e.key==='Escape') closeSlideViewer();
+  if(e.key==='ArrowLeft') slideViewerNav(1);
+  if(e.key==='ArrowRight') slideViewerNav(-1);
+});
+
+/* ---------- INIT ---------- */
+buildNav();
+buildHome();
+if(safeGetTheme()==='dark'){
+  document.body.classList.add('dark');
+  document.getElementById('themeToggle').textContent='☀️';
+}
+updateProgress();
+</script>
+</body>
+</html>

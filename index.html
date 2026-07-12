@@ -76,11 +76,11 @@ button,a.btn{font-family:'Heebo',sans-serif;cursor:pointer;}
 <div class="wrap">
   <div class="hero">
     <div class="hero-title">✨ AI + פיתוח Fullstack מקצועי ✨</div>
-    <div class="hero-sub">8 מודולים, 58 שיעורים ופרויקטים מסכמים - מהבנת מודלי שפה מהיסוד, דרך בניית סוכנים עם קלוד קוד, תכנות Python/Django/Frontend/Docker אמיתי, אוטומציות ואבטחתן, בניית עסק אוטומציות AI, הנדסת Prompt מתקדמת, ו-APIs/Function Calling/RAG ברמה מקצועית. כולל מצגות PPTX מוטמעות באתר וצילומי מסך אמיתיים מקוד שרץ בפועל. (מודולים נוספים בבנייה - עדכון בהמשך.)</div>
+    <div class="hero-sub">9 מודולים, 65 שיעורים ופרויקטים מסכמים - מהבנת מודלי שפה מהיסוד, דרך בניית סוכנים עם קלוד קוד, תכנות Python/Django/Frontend/Docker אמיתי, אוטומציות ואבטחתן, בניית עסק אוטומציות AI, הנדסת Prompt מתקדמת, APIs/Function Calling/RAG, וסוכני AI/MCP ברמה מקצועית. כולל מצגות PPTX מוטמעות באתר וצילומי מסך אמיתיים מקוד שרץ בפועל. (מודולים נוספים בבנייה - עדכון בהמשך.)</div>
   </div>
 
   <div class="overall-progress">
-    <div class="label"><span>התקדמות כוללת</span><span id="overallCount">0 / 58</span></div>
+    <div class="label"><span>התקדמות כוללת</span><span id="overallCount">0 / 65</span></div>
     <div class="overall-bar-wrap"><div class="overall-bar" id="overallBar"></div></div>
   </div>
 
@@ -140,14 +140,19 @@ const modules = [
     time:'~2 שעות', units:['niche','pricing','clients','sales','delivery','scaling','action-plan']
   },
   {
-    num: 7, emoji:'🎯', title:'הנדסת Prompt מתקדמת', file:'module7-prompt-engineering.html', isNew:true, slides:'slides/module7-prompt-engineering.pptx',
+    num: 7, emoji:'🎯', title:'הנדסת Prompt מתקדמת', file:'module7-prompt-engineering.html', slides:'slides/module7-prompt-engineering.pptx',
     desc:'System/User/Assistant, Zero-shot מול Few-shot, Chain of Thought, Prompt Chaining, Structured Outputs (JSON) ו-Prompt Debugging - עם קוד אמיתי שרץ ומדגים כל טכניקה.',
     time:'~2.5 שעות', units:['roles','fewshot','cot','chaining','structured','debugging','capstone']
   },
   {
-    num: 8, emoji:'🔌', title:'APIs, Function Calling ו-RAG מתקדם', file:'module8-apis-rag.html', isNew:true, slides:'slides/module8-apis-rag.pptx',
+    num: 8, emoji:'🔌', title:'APIs, Function Calling ו-RAG מתקדם', file:'module8-apis-rag.html', slides:'slides/module8-apis-rag.pptx',
     desc:'Tool Use/Function Calling, Streaming ו-Fallbacks, ריבוי ספקי מודלים (Anthropic/OpenAI/Gemini), Chunking, Vector Search, Hybrid Search ו-Reranking.',
     time:'~2.5 שעות', units:['toolcall','streaming','provider','chunking','vectorsearch','ragpipeline','capstone']
+  },
+  {
+    num: 9, emoji:'🤖', title:'סוכני AI ו-MCP מתקדם', file:'module9-agents-mcp.html', isNew:true, slides:'slides/module9-agents-mcp.pptx',
+    desc:'לולאת סוכן (Plan/Act/Observe), Reflection ו-Self-Correction, Multi-Agent Systems, ופרוטוקול MCP לעומק - כולל בניית שרת MCP אמיתי שרץ כתת-תהליך.',
+    time:'~2.5 שעות', units:['agentloop','reflection','multiagent','mcpprotocol','mcpserver','mcpsecurity','capstone']
   }
 ];
 
