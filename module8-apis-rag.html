@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔌 מודול 8: APIs, Function Calling ו-RAG מתקדם</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#4A90E2; --purple:#7B68EE; --green:#2ECC71;
+  --bg:#eef2fb; --bg2:#e4ecfb; --card:#ffffff; --text:#2d3142; --text-soft:#5a5f7a;
+  --radius:26px; --radius-sm:16px;
+  --shadow:0 12px 30px rgba(74,144,226,0.18);
+  --shadow-soft:0 6px 16px rgba(74,144,226,0.12);
+  --code-bg:#1e2233; --code-text:#d7dcff;
+}
+body.dark{
+  --bg:#141827; --bg2:#1b2032; --card:#222842; --text:#f2f3fb; --text-soft:#b7bcda;
+  --shadow:0 12px 30px rgba(0,0,0,0.45); --shadow-soft:0 6px 16px rgba(0,0,0,0.35);
+  --code-bg:#0d0f1a; --code-text:#c7d0ff;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:'Heebo',sans-serif; background:linear-gradient(160deg,var(--bg),var(--bg2)); color:var(--text); min-height:100vh; transition:background .4s ease,color .4s ease; padding-top:126px;}
+h1,h2,h3{margin:0 0 8px 0;}
+button{font-family:'Heebo',sans-serif;cursor:pointer;border:none;outline:none;}
+code, pre, .mono{font-family:'JetBrains Mono',monospace;}
+
+.topnav{position:fixed;top:0;right:0;left:0;z-index:100;background:var(--card);box-shadow:var(--shadow-soft);padding:10px 16px 0 16px;transition:background .4s ease;}
+.topnav-row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1200px;margin:0 auto;}
+.logo{font-weight:900;font-size:1.15rem;white-space:nowrap;background:linear-gradient(90deg,var(--blue),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;flex-shrink:0;}
+.hub-link{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 14px;font-size:.8rem;font-weight:700;text-decoration:none;white-space:nowrap;}
+.nav-scroll{display:flex;gap:8px;overflow-x:auto;flex:1;padding:4px 2px;scrollbar-width:thin;align-items:center;}
+.nav-scroll::-webkit-scrollbar{height:6px;}
+.nav-scroll::-webkit-scrollbar-thumb{background:var(--purple);border-radius:10px;}
+.navbtn{flex-shrink:0;background:var(--bg2);color:var(--text-soft);border-radius:999px;padding:7px 13px;font-size:0.8rem;font-weight:500;white-space:nowrap;transition:all .25s ease;border:2px solid transparent;position:relative;}
+.navbtn:hover{transform:translateY(-2px) scale(1.04);}
+.navbtn.active{background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;box-shadow:var(--shadow-soft);}
+.navbtn.passed::after{content:'✓';position:absolute;top:-4px;left:-4px;background:var(--green);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
+.theme-toggle{flex-shrink:0;background:var(--bg2);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;transition:transform .3s ease;}
+.theme-toggle:hover{transform:rotate(20deg) scale(1.1);}
+.progress-wrap{max-width:1200px;margin:8px auto 0 auto;height:10px;background:var(--bg2);border-radius:999px;overflow:hidden;}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));border-radius:999px;transition:width .5s ease;}
+.progress-label{max-width:1200px;margin:4px auto 0 auto;font-size:.72rem;color:var(--text-soft);text-align:left;padding:0 4px;}
+
+.page{display:none;animation:fadeIn .5s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.page-inner{max-width:860px;margin:0 auto;padding:18px 16px 60px 16px;}
+.hero-title{font-size:clamp(1.5rem,4vw,2.3rem);font-weight:900;text-align:center;margin-bottom:6px;}
+.hero-sub{text-align:center;color:var(--text-soft);font-size:1.02rem;margin-bottom:22px;}
+.world-tag{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 12px;border-radius:999px;background:linear-gradient(90deg,var(--purple),var(--green));color:#fff;margin-bottom:10px;}
+.level-tag{display:inline-block;font-size:.7rem;font-weight:800;padding:3px 12px;border-radius:999px;background:var(--bg2);color:var(--text-soft);margin-bottom:10px;margin-right:6px;}
+
+.card{background:var(--card);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);margin-bottom:20px;}
+.explain{font-size:1.05rem;line-height:1.95;color:var(--text);}
+.explain p{margin:0 0 14px 0;}
+.explain p:last-child{margin-bottom:0;}
+.explain b, .highlight{background:linear-gradient(90deg,rgba(123,104,238,.18),rgba(46,204,113,.18));padding:2px 8px;border-radius:8px;font-weight:700;color:var(--purple);}
+body.dark .explain b, body.dark .highlight{color:#c9c2ff;}
+.callout{background:rgba(241,196,15,.12);border-right:4px solid #f1c40f;padding:12px 16px;border-radius:10px;margin-top:14px;font-size:.95rem;}
+.callout.info{background:rgba(74,144,226,.1);border-color:var(--blue);}
+
+.section-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.05rem;margin:0 0 14px 0;}
+.section-title .num{background:var(--purple);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;}
+
+.lab-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.code-block{position:relative;background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px 18px;overflow-x:auto;font-size:.82rem;line-height:1.7;direction:ltr;text-align:left;margin-top:10px;}
+.code-block pre{margin:0;white-space:pre;}
+.code-label{position:absolute;top:8px;left:14px;font-size:.65rem;color:#8891b8;letter-spacing:.05em;text-transform:uppercase;}
+.lab-note{font-size:.92rem;color:var(--text-soft);margin-top:10px;line-height:1.7;}
+
+textarea, input[type=text], select{width:100%;font-family:'Heebo',sans-serif;font-size:1rem;padding:14px 16px;border-radius:var(--radius-sm);border:2px solid var(--bg2);background:var(--bg);color:var(--text);resize:none;transition:border .2s ease;}
+textarea:focus, input[type=text]:focus, select:focus{border-color:var(--purple);}
+
+.btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;font-weight:700;font-size:0.92rem;padding:11px 20px;border-radius:999px;box-shadow:var(--shadow-soft);transition:transform .2s ease, box-shadow .2s ease;}
+.btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 14px 26px rgba(74,144,226,.3);}
+.btn:active{transform:translateY(0) scale(.98);}
+.btn.secondary{background:var(--bg2);color:var(--text);}
+.btn.green{background:linear-gradient(90deg,var(--green),#27ae60);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn.small{padding:8px 14px;font-size:.8rem;}
+.row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.nav-buttons{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:10px;}
+
+.quiz-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px;}
+.quiz-q{font-weight:700;margin:18px 0 10px 0;}
+.quiz-q:first-of-type{margin-top:6px;}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{background:var(--bg);border-radius:12px;padding:11px 16px;text-align:right;font-size:.95rem;border:2px solid transparent;transition:all .2s ease;}
+.quiz-opt:hover{border-color:var(--purple);}
+.quiz-opt.correct{border-color:var(--green);background:rgba(46,204,113,.15);font-weight:700;}
+.quiz-opt.wrong{border-color:#e74c3c;background:rgba(231,76,60,.12);}
+.quiz-opt.disabled{pointer-events:none;}
+.quiz-summary{margin-top:18px;padding:14px 18px;border-radius:14px;background:var(--bg);font-weight:700;text-align:center;}
+.quiz-summary.pass{background:rgba(46,204,113,.15);color:var(--green);}
+.quiz-summary.fail{background:rgba(231,76,60,.12);color:#e74c3c;}
+
+.lesson-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:10px;}
+.lesson-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:transform .25s ease, box-shadow .25s ease;text-align:center;border:3px solid transparent;position:relative;}
+.lesson-card:hover{transform:translateY(-6px) rotate(-1deg);box-shadow:0 16px 32px rgba(74,144,226,.25);}
+.lesson-card .em{font-size:2.2rem;display:block;margin-bottom:8px;}
+.lesson-card .tt{font-weight:800;font-size:1rem;margin-bottom:4px;}
+.lesson-card .dd{font-size:.85rem;color:var(--text-soft);}
+.lesson-card.done{border-color:var(--green);}
+
+.compare-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.85rem;}
+.compare-table th, .compare-table td{border:1px solid var(--bg2);padding:10px 12px;text-align:right;}
+.compare-table th{background:var(--bg);font-weight:800;}
+
+.screenshot-card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:20px;}
+.screenshot-badge{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;font-weight:800;padding:4px 12px;border-radius:999px;background:linear-gradient(90deg,#f39c12,#e67e22);color:#fff;margin-bottom:12px;}
+.real-screenshot{width:100%;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.25);display:block;}
+.screenshot-caption{font-size:.85rem;color:var(--text-soft);margin-top:10px;line-height:1.6;}
+
+.capstone-preview{background:var(--code-bg);color:var(--code-text);border-radius:14px;padding:16px;font-size:.8rem;white-space:pre-wrap;direction:ltr;text-align:left;margin-top:14px;display:none;}
+
+@media (max-width:600px){
+  body{padding-top:112px;}
+  .logo{font-size:.92rem;}
+  .navbtn{font-size:.72rem;padding:6px 9px;}
+  .card,.lab-card,.quiz-card{padding:18px;}
+}
+
+.slide-viewer-overlay{display:none;position:fixed;inset:0;background:rgba(10,12,20,.9);z-index:1000;align-items:center;justify-content:center;padding:20px;}
+.slide-viewer-overlay.active{display:flex;}
+.slide-viewer-box{max-width:920px;width:100%;background:var(--card);border-radius:20px;padding:18px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.slide-viewer-close{position:absolute;top:-14px;left:-14px;background:var(--card);border-radius:50%;width:38px;height:38px;font-size:1.1rem;box-shadow:var(--shadow);}
+.slide-viewer-imgwrap{background:#0d0f1a;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:200px;}
+#slideViewerImg{width:100%;display:block;}
+.slide-viewer-controls{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:10px;}
+.slide-viewer-controls span{font-weight:700;color:var(--text-soft);font-size:.9rem;}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="topnav-row">
+    <a class="hub-link" href="index.html">🏠 האקדמיה</a>
+    <div class="logo">🔌 מודול 8: APIs, Function Calling ו-RAG</div>
+    <div class="nav-scroll" id="navScroll"></div>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 7 הושלמו</div>
+</div>
+
+<section class="page active" id="page-home">
+  <div class="page-inner">
+    <div class="hero-title">🔌 מודול 8: APIs, Function Calling ו-RAG מתקדם</div>
+    <div class="hero-sub">Tool Use, Streaming, ריבוי ספקי מודלים (Anthropic/OpenAI/Gemini), Chunking, Vector Search ו-Reranking - עם קוד אמיתי שרץ ומדגים כל טכניקה.</div>
+    <div style="text-align:center;margin-bottom:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn" onclick="openSlideViewer()">🎞️ צפו במצגת המודול</button>
+      <a href="slides/module8-apis-rag.pptx" download class="btn secondary" style="text-decoration:none;">📥 הורידו PPTX</a>
+    </div>
+    <div class="lesson-grid" id="lessonGrid"></div>
+  </div>
+</section>
+
+<div class="slide-viewer-overlay" id="slideViewerOverlay" onclick="if(event.target===this) closeSlideViewer()">
+  <div class="slide-viewer-box">
+    <button class="slide-viewer-close" onclick="closeSlideViewer()">✕</button>
+    <div class="slide-viewer-imgwrap"><img id="slideViewerImg" src="" alt="slide"></div>
+    <div class="slide-viewer-controls">
+      <button class="btn secondary small" onclick="slideViewerNav(-1)">➡ הקודם</button>
+      <span id="slideViewerCounter">1 / 8</span>
+      <button class="btn small" onclick="slideViewerNav(1)">הבא ⬅</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOOL USE -->
+<section class="page" id="page-toolcall">
+  <div class="page-inner">
+    <div class="world-tag">🔌 מודול 8</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🛠️ Tool Use / Function Calling</div>
+    <div class="card">
+      <div class="explain">
+        <p>Function Calling הופך את המודל ממחולל טקסט בלבד למערכת שיכולה <b class="highlight">לפעול בעולם האמיתי</b>. מגדירים למודל רשימת "כלים" זמינים (שם, תיאור, סכימת קלט), והמודל מחליט בעצמו מתי ואיזה כלי לקרוא כדי לענות על הבקשה - במקום שאתם תכתבו את כל הלוגיקה מראש.</p>
+        <p>הזרימה בפועל: (1) שולחים בקשה + הגדרת tools[], (2) המודל מחזיר לא טקסט אלא בלוק tool_use עם שם הכלי והפרמטרים, (3) הקוד שלכם מריץ את הפונקציה המתאימה בפועל (דיספצ'ר), (4) שולחים את תוצאת הביצוע (tool_result) בחזרה למודל כדי שהוא ינסח תשובה סופית למשתמש.</p>
+        <p>נקודה קריטית: המודל <b>לא מבצע</b> את הפעולה בעצמו - הוא רק "מבקש" לבצע אותה. הקוד שלכם הוא זה שבפועל קורא למסד הנתונים, שולח מייל, או מבטל הזמנה. זה גם נקודת האבטחה הקריטית - תמיד לוודא הרשאות לפני ביצוע פעולה שהמודל ביקש.</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי - קוד שרץ בפועל</div>
+      <img class="real-screenshot" src="screenshots/api-toolcall.png" alt="tool use function calling">
+      <div class="screenshot-caption">דיספצ'ר אמיתי שמקבל tool_use block מדומה ומריץ בפועל את הפונקציה המתאימה (cancel_order) מול "מסד נתונים" בזיכרון.</div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goHome()">🏠 חזרה למפת המודול</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- STREAMING -->
+<section class="page" id="page-streaming">
+  <div class="page-inner">
+    <div class="world-tag">🔌 מודול 8</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🌊 Streaming, Latency ו-Fallbacks</div>
+    <div class="card">
+      <div class="explain">
+        <p>ב<b class="highlight">streaming</b>, במקום לחכות לתשובה מלאה לפני שמציגים כלום, המודל שולח את התשובה chunk-אחר-chunk (בדיוק כמו שנראה בצ'אט של Claude עצמו) - וה-UI מציג אותם מיד עם הגעתם. זה לא משנה את התוכן הסופי, אבל משפר דרמטית את חוויית המשתמש הנתפסת, במיוחד בתשובות ארוכות.</p>
+        <p><b>Latency</b> - זמן התגובה - משתנה בין קריאות, ולעיתים שרתי המודל עמוסים או נופלים זמנית. תכנון UX טוב כולל: אינדיקציית טעינה ברורה, timeout סביר עם retry אוטומטי (עם exponential backoff - המתנה גדלה בין ניסיונות), ו<b>fallback</b> - תגובת ברירת מחדל הגיונית אם כל הניסיונות נכשלו, במקום מסך שגיאה גולמי.</p>
+        <p>בפרודקשן אמיתי: תמיד עוטפים קריאות API ב-try/except עם retry logic, מגדירים timeout מפורש (לא סומכים על ברירת המחדל), ומתעדים (logging) כשלים כדי לזהות דפוסי בעיה - בדיוק כמו כל קריאת רשת חיצונית אחרת במערכת פרודקשן.</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי - קוד שרץ בפועל</div>
+      <img class="real-screenshot" src="screenshots/api-streaming.png" alt="streaming responses">
+      <div class="screenshot-caption">קוד שצורך אירועי stream בזמן-אמת ומרכיב את הטקסט הסופי chunk-אחר-chunk, בדיוק כפי שקורה בפועל ב-server-sent events.</div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- MULTI PROVIDER -->
+<section class="page" id="page-provider">
+  <div class="page-inner">
+    <div class="world-tag">🔌 מודול 8</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">🌐 ריבוי ספקי מודלים</div>
+    <div class="card">
+      <div class="explain">
+        <p>לכל ספק API (Anthropic, OpenAI, Google Gemini, OpenRouter, Together AI) יש פורמט payload קצת שונה - איך system prompt מוגדר, איך מבנה ה-content נראה, איך קוראים לפרמטרים. OpenRouter שווה הכרות מיוחדת: הוא נותן גישה למגוון עצום של מודלים (כולל מודלים פתוחים) דרך API אחיד יחיד - שימושי לפרוטוטייפינג מהיר בלי לנהל כמה מפתחות API.</p>
+        <p>כשבונים מוצר אמיתי, כדאי לבנות <b class="highlight">שכבת הפשטה (abstraction layer)</b> - קוד שממיר בקשה "אחידה" משלכם לפורמט הספציפי של כל ספק. זה מאפשר להחליף ספק (או לבדוק כמה ספקים במקביל) בלי לשכתב את כל הלוגיקה העסקית שסביב הקריאה.</p>
+        <p>למה בכלל להחליף ספק: עלות (מחירים שונים למודל דומה), ביצועים (latency שונה), יכולות ייחודיות (context window ארוך יותר, תמיכה במולטימודל), או פשוט זמינות (redundancy - אם ספק אחד נופל, לעבור לאחר אוטומטית).</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי - קוד שרץ בפועל</div>
+      <img class="real-screenshot" src="screenshots/api-provider.png" alt="multi provider abstraction">
+      <div class="screenshot-caption">שכבת הפשטה אמיתית שממירה בקשה אחידה (UnifiedRequest) לפורמט payload ספציפי של Anthropic, OpenAI, ו-Gemini - שלושה מבנים שונים לגמרי.</div>
+    </div>
+    <div class="quiz-card" id="quiz-provider"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- CHUNKING -->
+<section class="page" id="page-chunking">
+  <div class="page-inner">
+    <div class="world-tag">🔌 מודול 8</div><span class="level-tag">⏱️ כ-20 דק'</span>
+    <div class="hero-title">✂️ Chunking - חיתוך מסמכים ל-RAG</div>
+    <div class="card">
+      <div class="explain">
+        <p>לפני שאפשר לחפש במסמכים ארוכים (RAG - מודול 1), צריך לחתוך אותם ל<b class="highlight">chunks</b> - קטעים קטנים שכל אחד הופך לוקטור embedding נפרד. הגודל האידיאלי הוא טרייד-אוף: chunks קטנים מדי מאבדים הקשר, chunks גדולים מדי "מדללים" את האיתות הסמנטי ומקשים על התאמה מדויקת לשאילתה.</p>
+        <p>אסטרטגיות נפוצות: חיתוך לפי מספר תווים/טוקנים קבוע, חיתוך לפי גבולות משפט/פסקה (שומר על שלמות רעיונית), וחיתוך לפי מבנה המסמך (כותרות, סעיפים - שימושי למסמכים משפטיים/טכניים מובנים).</p>
+        <p><b>Overlap</b> - חפיפה בין chunks סמוכים (למשל המשפט האחרון של chunk אחד חוזר בתחילת הבא) - מונעת מצב שבו מידע קריטי "נקטע" בדיוק בגבול בין שני chunks ואף אחד מהם לבדו לא נותן הקשר מלא.</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי - קוד שרץ בפועל</div>
+      <img class="real-screenshot" src="screenshots/api-chunking.png" alt="RAG document chunking">
+      <div class="screenshot-caption">אלגוריתם chunking אמיתי לפי משפטים עם overlap, שפועל על מסמך מדיניות אמיתי ומפיק chunks עם חפיפה ביניהם.</div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- VECTOR SEARCH -->
+<section class="page" id="page-vectorsearch">
+  <div class="page-inner">
+    <div class="world-tag">🔌 מודול 8</div><span class="level-tag">⏱️ כ-25 דק'</span>
+    <div class="hero-title">🔍 Vector Search, Hybrid Search ו-Reranking</div>
+    <div class="card">
+      <div class="explain">
+        <p>מסדי נתונים וקטוריים (Pinecone, Weaviate, Chroma, Qdrant) מאחסנים embeddings ומאפשרים חיפוש מהיר של "השכנים הקרובים ביותר" (Nearest Neighbor) לפי מדד דמיון כמו <b class="highlight">Cosine Similarity</b>. חיפוש וקטורי לבדו תופס דמיון סמנטי (משמעות), אבל לפעמים "מפספס" התאמות מילוליות מדויקות.</p>
+        <p><b>Hybrid Search</b> משלב חיפוש וקטורי (סמנטי) עם חיפוש מילות-מפתח קלאסי (BM25/keyword) - נותן ציון משוקלל שמשלב את שני העולמות, ולעיתים תופס תוצאות שכל שיטה לבד הייתה מפספסת.</p>
+        <p><b>Reranking</b> - שלב נוסף אחרי השליפה הראשונית: מודל ייעודי (או היוריסטיקה) מדרג מחדש את התוצאות המובילות לפי רלוונטיות עדינה יותר, לפני שמזינים אותן בפועל למודל השפה. זה משפר משמעותית את איכות ה-context שמוזן ל-RAG, במיוחד כשהשליפה הראשונית מחזירה הרבה מועמדים "כמעט נכונים".</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <div class="screenshot-badge">📸 צילום מסך אמיתי - קוד שרץ בפועל</div>
+      <img class="real-screenshot" src="screenshots/api-vectorsearch.png" alt="vector search hybrid reranking">
+      <div class="screenshot-caption">חיפוש וקטורי אמיתי עם numpy (cosine similarity), ולאחריו שלב reranking שמשלב חפיפת מילות מפתח - שים לב איך סדר התוצאות משתנה בפועל.</div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- RAG PIPELINE -->
+<section class="page" id="page-ragpipeline">
+  <div class="page-inner">
+    <div class="world-tag">🔌 מודול 8</div><span class="level-tag">⏱️ כ-15 דק'</span>
+    <div class="hero-title">🏛️ ארכיטקטורת RAG מקצה לקצה</div>
+    <div class="card">
+      <div class="explain">
+        <p>עכשיו נחבר את כל השלבים (מודול 1 + השיעורים הקודמים כאן) לפייפליין RAG שלם. <b>שלב הכנה (offline)</b>: מסמכים → chunking → embedding לכל chunk → אחסון במסד נתונים וקטורי. זה קורה פעם אחת (או מתעדכן תקופתית) לפני שמשתמש אמיתי שואל שאלה.</p>
+        <p><b>שלב שאילתה (online, בזמן-אמת)</b>: שאלת המשתמש → embedding לשאלה → vector search (+hybrid אם רלוונטי) → reranking → הרכבת prompt שמזריק את ה-chunks הרלוונטיים כהקשר → קריאת LLM עם ה-context המועשר → תשובה סופית למשתמש.</p>
+        <div class="callout info">💡 טעות נפוצה: להזריק יותר מדי chunks "ליתר ביטחון". יותר context לא תמיד טוב יותר - chunks לא רלוונטיים "מדללים" את תשומת הלב של המודל ועלולים להוריד דיוק. עדיף 3-5 chunks באמת רלוונטיים (אחרי reranking) מאשר 20 chunks גולמיים.</div>
+      </div>
+    </div>
+    <div class="quiz-card" id="quiz-ragpipeline"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <button class="btn" onclick="goRelative(1)">הבא ⬅</button>
+    </div>
+  </div>
+</section>
+
+<!-- CAPSTONE -->
+<section class="page" id="page-capstone">
+  <div class="page-inner">
+    <div class="world-tag">🔌 מודול 8 · פרויקט מסכם</div>
+    <div class="hero-title">🏗️ תכננו מערכת RAG + Tool Use מלאה</div>
+    <div class="card">
+      <div class="explain">
+        <p>תכננו מערכת שמשלבת RAG (חיפוש במאגר ידע) עם Function Calling (ביצוע פעולות) - למשל בוט תמיכה שגם עונה משאלות ידע וגם מבצע פעולות אמיתיות.</p>
+      </div>
+    </div>
+    <div class="lab-card">
+      <div class="section-title"><span class="num">🔬</span> בונה המערכת</div>
+      <div class="row" style="flex-direction:column;gap:14px;">
+        <div>
+          <label style="font-weight:700;display:block;margin-bottom:6px;">גודל מאגר הידע:</label>
+          <select id="cap-corpus">
+            <option value="small">קטן (עשרות מסמכים) - חיפוש וקטורי בזיכרון מספיק</option>
+            <option value="large">גדול (אלפי מסמכים) - נדרש מסד נתונים וקטורי ייעודי</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-weight:700;display:block;margin-bottom:6px;">דיוק שליפה נדרש:</label>
+          <select id="cap-precision">
+            <option value="basic">בסיסי - חיפוש וקטורי בלבד</option>
+            <option value="high">גבוה - Hybrid Search + Reranking</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-weight:700;display:block;margin-bottom:6px;">האם המערכת צריכה לבצע פעולות (לא רק לענות)?</label>
+          <select id="cap-actions">
+            <option value="no">לא - שאלות-תשובות בלבד</option>
+            <option value="yes">כן - נדרש Function Calling</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-weight:700;display:block;margin-bottom:6px;">חשיפת המערכת:</label>
+          <select id="cap-exposure">
+            <option value="internal">פנימית לצוות</option>
+            <option value="external">ללקוחות חיצוניים</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" style="margin-top:16px;" onclick="generateRagCapstone()">🏗️ בנו את תוכנית הארכיטקטורה</button>
+      <div class="capstone-preview" id="ragCapstonePreview"></div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="goRelative(-1)">➡ הקודם</button>
+      <a class="btn" href="index.html" style="text-decoration:none;">🏠 חזרה לאקדמיה</a>
+    </div>
+  </div>
+</section>
+
+<script>
+const THIS_FILE = 'module8-apis-rag.html';
+const PROGRESS_KEY = 'academy_progress_v1';
+function loadProgressSet(){
+  try{ return new Set(JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]')); }
+  catch(e){ return new Set(); }
+}
+function markDone(unitKey){
+  const s = loadProgressSet();
+  s.add(THIS_FILE+'::'+unitKey);
+  try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(Array.from(s))); }catch(e){}
+}
+function isUnitDone(unitKey){ return loadProgressSet().has(THIS_FILE+'::'+unitKey); }
+function safeGetTheme(){ try{ return localStorage.getItem('ai-theme'); }catch(e){ return null; } }
+function safeSetTheme(v){ try{ localStorage.setItem('ai-theme', v); }catch(e){} }
+
+const topics = [
+  {key:'toolcall', emoji:'🛠️', title:'Tool Use', desc:'הפיכת המודל למבצע פעולות'},
+  {key:'streaming', emoji:'🌊', title:'Streaming', desc:'Latency ו-Fallbacks'},
+  {key:'provider', emoji:'🌐', title:'ריבוי ספקים', desc:'Anthropic/OpenAI/Gemini'},
+  {key:'chunking', emoji:'✂️', title:'Chunking', desc:'חיתוך מסמכים ל-RAG'},
+  {key:'vectorsearch', emoji:'🔍', title:'Vector Search', desc:'Hybrid Search ו-Reranking'},
+  {key:'ragpipeline', emoji:'🏛️', title:'ארכיטקטורת RAG', desc:'מקצה לקצה'},
+  {key:'capstone', emoji:'🏗️', title:'פרויקט מסכם', desc:'RAG + Tool Use מלא', isCapstone:true}
+];
+let currentPage = 'home';
+
+const quizData = {
+  'provider': [
+    {q:'למה כדאי לבנות שכבת הפשטה (abstraction layer) מעל ספקי מודלים שונים?', opts:['זה חובה טכנית', 'כי לכל ספק פורמט payload שונה - אבסטרקציה מאפשרת להחליף ספק בלי לשכתב לוגיקה', 'זה מוזיל תמיד את העלות', 'זה נדרש רק לפיתוח, לא לפרודקשן'], correct:1},
+    {q:'מה מיוחד ב-OpenRouter?', opts:['הוא ספק מודל יחיד', 'נותן גישה למגוון עצום של מודלים דרך API אחיד יחיד', 'הוא רק לשימוש חינמי', 'הוא תחליף ל-embeddings בלבד'], correct:1},
+    {q:'מה חשוב לעשות כשקריאת API נכשלת בגלל latency?', opts:['לוותר מיד ולהחזיר שגיאה למשתמש', 'retry עם exponential backoff ו-fallback הגיוני אם הכל נכשל', 'לנסות שוב מיידית ללא הפסקה עד אינסוף', 'להתעלם מהשגיאה'], correct:1}
+  ],
+  'ragpipeline': [
+    {q:'מה קורה בשלב ה"הכנה" (offline) של פייפליין RAG?', opts:['עונים בזמן אמת למשתמש', 'מסמכים -> chunking -> embedding -> אחסון במסד וקטורי, פעם אחת מראש', 'מריצים תמיד vector search', 'מבטלים הזמנות'], correct:1},
+    {q:'למה הזרקת יותר מדי chunks לא תמיד משפרת תוצאה?', opts:['זה תמיד משפר', 'chunks לא רלוונטיים מדללים את תשומת הלב של המודל ועלולים להוריד דיוק', 'זה אסור טכנית', 'זה מגדיל את מספר הספקים'], correct:1},
+    {q:'מה סדר הפעולות הנכון בשלב השאילתה (online)?', opts:['embedding לשאלה -> vector search -> reranking -> קריאת LLM עם context', 'קריאת LLM ואז חיפוש', 'reranking לפני vector search', 'אין סדר משנה'], correct:0}
+  ]
+};
+
+function renderQuiz(key){
+  const container = document.getElementById('quiz-'+key);
+  if(!container || container.dataset.built) return;
+  container.dataset.built = '1';
+  const questions = quizData[key];
+  if(!questions) return;
+  let html = '<div class="section-title"><span class="num">📝</span> מבחנון קצר (ענו נכון על הכל כדי לסמן שיעור זה כהושלם)</div>';
+  questions.forEach((item,qi)=>{
+    html += '<div class="quiz-q">'+(qi+1)+'. '+item.q+'</div><div class="quiz-opts" id="qopts-'+key+'-'+qi+'">';
+    item.opts.forEach((opt,oi)=>{
+      html += '<div class="quiz-opt" onclick="answerQuiz(\''+key+'\','+qi+','+oi+')" id="qopt-'+key+'-'+qi+'-'+oi+'">'+opt+'</div>';
+    });
+    html += '</div>';
+  });
+  html += '<div class="quiz-summary" id="qsummary-'+key+'" style="display:none;"></div>';
+  container.innerHTML = html;
+  container._answers = new Array(questions.length).fill(null);
+  if(isUnitDone(key)){
+    questions.forEach((item,qi)=>{
+      document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+      const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+      for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+    });
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display='block'; summary.className='quiz-summary pass';
+    summary.textContent = '🎉 כבר השלמתם שיעור זה בעבר!';
+  }
+}
+function answerQuiz(key, qi, oi){
+  const questions = quizData[key];
+  const item = questions[qi];
+  const container = document.getElementById('quiz-'+key);
+  const opts = document.getElementById('qopts-'+key+'-'+qi).children;
+  for(let i=0;i<opts.length;i++){ opts[i].classList.add('disabled'); }
+  if(oi===item.correct){ document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('correct'); }
+  else {
+    document.getElementById('qopt-'+key+'-'+qi+'-'+oi).classList.add('wrong');
+    document.getElementById('qopt-'+key+'-'+qi+'-'+item.correct).classList.add('correct');
+  }
+  container._answers[qi] = (oi===item.correct);
+  checkQuizComplete(key);
+}
+function checkQuizComplete(key){
+  const container = document.getElementById('quiz-'+key);
+  const answers = container._answers;
+  if(answers.every(a=>a!==null)){
+    const allCorrect = answers.every(a=>a===true);
+    const summary = document.getElementById('qsummary-'+key);
+    summary.style.display = 'block';
+    const scoreCount = answers.filter(a=>a).length;
+    if(allCorrect){
+      summary.className = 'quiz-summary pass';
+      summary.textContent = '🎉 מעולה! '+scoreCount+'/'+answers.length+' נכון - השיעור סומן כהושלם.';
+      markDone(key);
+    } else {
+      summary.className = 'quiz-summary fail';
+      summary.textContent = '📚 '+scoreCount+'/'+answers.length+' נכון. רעננו את הדף כדי לנסות שוב.';
+    }
+    updateProgress();
+    buildHome();
+  }
+}
+function buildNav(){
+  const nav = document.getElementById('navScroll');
+  nav.innerHTML = '';
+  topics.forEach(t=>{
+    const b = document.createElement('button');
+    b.className='navbtn'; b.id='nav-'+t.key; b.innerHTML=t.emoji+' '+t.title;
+    b.onclick = ()=>showPage(t.key);
+    nav.appendChild(b);
+  });
+}
+function buildHome(){
+  const grid = document.getElementById('lessonGrid');
+  grid.innerHTML = '';
+  topics.forEach(t=>{
+    const done = isUnitDone(t.key);
+    const c = document.createElement('div');
+    c.className = 'lesson-card' + (done ? ' done' : '');
+    c.innerHTML = '<span class="em">'+t.emoji+'</span><div class="tt">'+t.title+'</div><div class="dd">'+t.desc+'</div>'+(done?'<div style="margin-top:6px;">✅</div>':'');
+    c.onclick = ()=>showPage(t.key);
+    grid.appendChild(c);
+  });
+  document.querySelectorAll('.navbtn').forEach(b=>{
+    const key = b.id.replace('nav-','');
+    b.classList.toggle('passed', isUnitDone(key));
+  });
+}
+function showPage(key){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+key).classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+  const nb = document.getElementById('nav-'+key);
+  if(nb) nb.classList.add('active');
+  currentPage = key;
+  if(quizData[key]){ renderQuiz(key); }
+  if(key !== 'home' && !quizData[key] && key !== 'capstone'){ markDone(key); }
+  buildHome();
+  updateProgress();
+  if(typeof window.scrollTo === 'function'){
+    try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); }
+  }
+}
+function goHome(){ showPage('home'); }
+function goRelative(dir){
+  const idx = topics.findIndex(t=>t.key===currentPage);
+  if(idx===-1) return;
+  const newIdx = idx+dir;
+  if(newIdx<0){ goHome(); return; }
+  if(newIdx>=topics.length){ goHome(); return; }
+  showPage(topics[newIdx].key);
+}
+function updateProgress(){
+  const done = topics.filter(t=>isUnitDone(t.key)).length;
+  const pct = Math.round((done/topics.length)*100);
+  document.getElementById('progressBar').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = done+' / '+topics.length+' הושלמו';
+}
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+  safeSetTheme(isDark?'dark':'light');
+}
+
+/* ---------- CAPSTONE ---------- */
+function generateRagCapstone(){
+  const corpus = document.getElementById('cap-corpus').value;
+  const precision = document.getElementById('cap-precision').value;
+  const actions = document.getElementById('cap-actions').value;
+  const exposure = document.getElementById('cap-exposure').value;
+
+  let plan = '# RAG + Tool Use Architecture\n\n';
+  plan += 'שכבה 1 - אחסון ושליפה:\n';
+  plan += '  - ' + (corpus==='large' ? 'מסד נתונים וקטורי ייעודי (Pinecone/Weaviate/Qdrant)' : 'חיפוש וקטורי בזיכרון (Chroma מקומי מספיק)') + '\n';
+  plan += '  - ' + (precision==='high' ? 'Hybrid Search (vector + keyword) + שלב Reranking' : 'Vector Search בסיסי (cosine similarity)') + '\n\n';
+  plan += 'שכבה 2 - יכולות פעולה:\n';
+  if(actions==='yes'){
+    plan += '  - Function Calling מוגדר עם דיספצ\'ר מאובטח\n';
+    plan += '  - בדיקת הרשאות לפני כל ביצוע פעולה בפועל\n';
+  } else {
+    plan += '  - שאלות-תשובות בלבד, ללא ביצוע פעולות (אין tools)\n';
+  }
+  plan += '\nשכבה 3 - חשיפה ואבטחה:\n';
+  if(exposure==='external'){
+    plan += '  - הגנת Prompt Injection על תוכן משתמש חיצוני (מודול 5)\n';
+    plan += '  - Rate limiting ומעקב עלויות טוקנים לכל לקוח\n';
+  } else {
+    plan += '  - חשיפה פנימית בלבד - סיכון נמוך יותר, עדיין מומלץ logging';
+  }
+
+  const el = document.getElementById('ragCapstonePreview');
+  el.style.display='block'; el.textContent = plan;
+  markDone('capstone');
+  updateProgress();
+  buildHome();
+}
+
+/* ---------- SLIDE VIEWER ---------- */
+const SLIDE_TOTAL = 8;
+const SLIDE_FOLDER = 'slide-images/module8-apis-rag';
+let slideIdx = 1;
+function openSlideViewer(){
+  slideIdx = 1;
+  document.getElementById('slideViewerOverlay').classList.add('active');
+  updateSlideViewer();
+}
+function closeSlideViewer(){ document.getElementById('slideViewerOverlay').classList.remove('active'); }
+function slideViewerNav(dir){
+  slideIdx += dir;
+  if(slideIdx<1) slideIdx=SLIDE_TOTAL;
+  if(slideIdx>SLIDE_TOTAL) slideIdx=1;
+  updateSlideViewer();
+}
+function updateSlideViewer(){
+  const n = String(slideIdx).padStart(2,'0');
+  document.getElementById('slideViewerImg').src = SLIDE_FOLDER+'/s-'+n+'.jpg';
+  document.getElementById('slideViewerCounter').textContent = slideIdx+' / '+SLIDE_TOTAL;
+}
+document.addEventListener('keydown', function(e){
+  if(!document.getElementById('slideViewerOverlay').classList.contains('active')) return;
+  if(e.key==='Escape') closeSlideViewer();
+  if(e.key==='ArrowLeft') slideViewerNav(1);
+  if(e.key==='ArrowRight') slideViewerNav(-1);
+});
+
+/* ---------- INIT ---------- */
+buildNav();
+buildHome();
+if(safeGetTheme()==='dark'){
+  document.body.classList.add('dark');
+  document.getElementById('themeToggle').textContent='☀️';
+}
+updateProgress();
+</script>
+</body>
+</html>
